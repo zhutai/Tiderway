@@ -1,0 +1,51 @@
+.content {
+	display: flex;
+	flex-direction: column;
+	justify-content:center;
+	/* margin-top: 128rpx; */
+}
+
+/* 头部 logo */
+.header {
+	width:161rpx;
+	height:161rpx;
+	box-shadow:0rpx 0rpx 60rpx 0rpx rgba(0,0,0,0.1);
+	border-radius:50%;
+	background-color: #000; 
+	margin-top: 128rpx;
+	margin-bottom: 72rpx;
+	margin-left: auto;
+	margin-right: auto;
+}
+.header image{
+	width:161rpx;
+	height:161rpx;
+	border-radius:50%;
+}
+
+/* 主体 */
+.main {
+	display: flex;
+	flex-direction: column;
+	padding-left: 70rpx;
+	padding-right: 70rpx;
+}
+
+/* 底部 */
+.footer{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	font-size: 28rpx;
+	margin-top: 64rpx;
+	color: rgba(0,0,0,0.7);
+	text-align: center;
+	height: 40rpx;
+	line-height: 40rpx;
+}
+.footer text{
+	font-size: 24rpx;
+	margin-left: 15rpx;
+	margin-right: 15rpx;
+}
