@@ -175,9 +175,16 @@ export default {
 			canvasObj['canvasLineA'].scrollStart(e);
 		},
 		moveLineA(e) {
+			// console.log(e)
 			canvasObj['canvasLineA'].scroll(e);
+			canvasObj['canvasLineA'].showToolTip(e, {
+				format: function(item, category) {
+					return category + ' ' + item.name + ':' + item.data
+				}
+			});
 		},
 		touchEndLineA(e) {
+			console.log(e)
 			canvasObj['canvasLineA'].scrollEnd(e);
 			//下面是toolTip事件，如果滚动后不需要显示，可不填写
 			canvasObj['canvasLineA'].showToolTip(e, {
@@ -207,7 +214,7 @@ export default {
 				categories: chartData.categories,
 				series: chartData.series,
 				animation: false,
-				enableScroll: true, //开启图表拖拽功能
+				enableScroll: false, //开启图表拖拽功能
 				xAxis: {
 					disableGrid: true,
 					type: 'grid',
