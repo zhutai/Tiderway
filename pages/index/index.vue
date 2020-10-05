@@ -2,7 +2,7 @@
 	<view class="container">
 		
 		<!--  自定义顶部栏 -->
-		<uni-nav-bar fixed :border="false">
+		<uni-nav-bar fixed :border="false" :statusBar="true">
 			<view class="user-center">
 				<image class="user-avatar" src="../../static/missing-face.png"></image>
 			</view>
@@ -16,7 +16,7 @@
 				<uni-icons type="info" color="#8f8f94" size="48" />
 			</view>
 			<view class="device-text">
-				<text>很遗憾您的设备不在线~~</text>
+				<text>很遗憾您的设备不在线~	~</text>
 			</view>
 			<view class="device-btn">
 				<button class="mini-btn" type="default" :plain="true" size="mini">查看原因</button>
@@ -80,8 +80,8 @@
 			</view>
 		</view>
 		
-		<view class="ad-1">
-			<image src="/static/temp/ad1.jpg" mode="scaleToFill"></image>
+		<view style="height: 900px;">
+			
 		</view>
 
 	</view>
@@ -193,6 +193,9 @@ export default {
 			let goodsList = await this.$api.json('goodsList');
 			this.goodsList = goodsList || [];
 		},
+		change() {
+			console.log(197)
+		}
 	},
 	// #ifndef MP
 	// 标题栏input搜索框点击
@@ -268,16 +271,15 @@ export default {
 		}
 	}
 	
-	/deep/ .uni-navbar__header-container {
-		flex: none;
-		margin: 0 auto;
-		.user-center {
-			display: inline-flex;
-			image {
-				width: 42px;
-				height: 42px;
-				border-radius: 50%;
-			}
+	.user-center {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		image {
+			width: 42px;
+			height: 42px;
+			border-radius: 50%;
 		}
 	}
 	

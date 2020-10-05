@@ -20,6 +20,7 @@
 	.uni-status-bar {
 		width: 750rpx;
 		height: 20px;
+		// background-color: #fff;
 		// height: var(--status-bar-height);
 	}
 </style>

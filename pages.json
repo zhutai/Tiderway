@@ -129,6 +129,16 @@
 				}
 			}
 		}, {
+			"path": "pages/health/health",
+			"style": {
+				// #ifdef MP
+				"navigationStyle": "custom",
+				// #endif 
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		}, {
 			"path": "pages/product/list",
 			"style": {
 				"enablePullDownRefresh": true,
@@ -154,7 +164,7 @@
 				"text": "首页"
 			},
 			{
-				"pagePath": "pages/category/category",
+				"pagePath": "pages/health/health",
 				"iconPath": "static/image/tabbar/tab-healthy.png",
 				"selectedIconPath": "static/image/tabbar/tab-select-healthy.png",
 				"text": "健康"
