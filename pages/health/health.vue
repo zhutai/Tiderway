@@ -8,14 +8,14 @@
 			</view>
 		</uni-nav-bar>
 		
-		<view class="tabbars">
-			<view class="tabbar" v-for="item in tabbars" 
-			@click="handleClick(item)" :class="{ active: item.active }"
+		<view class="tabs">
+			<view class="tabbar" v-for="(item, index) in tabs" 
+			@click="handleClick(item, index)" :class="{ active: item.active }"
 			:key="item.value">{{ item.label }}</view>
 		</view>
 		
 		<view class="date-time">
-			<text>{{ tabbars[current].createTime + ' 至 ' +  tabbars[current].endTime }}</text>
+			<text>{{ tabs[dateTimeIndex].createTime + ' 至 ' +  tabs[dateTimeIndex].endTime }}</text>
 		</view>
 		
 		<view class="heart-rate">
@@ -32,14 +32,31 @@
 				</view>
 			</scroll-view>
 			
-			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
-				<view class="qiun-title-dot-light">折线图一（可横向拖拽带滚动条）</view>
-				<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
+			<view class="content">
+				<view class="title-style" >
+					<view class="title-dot-light">折线图一</view>
+				</view>
+				<view class="chart">
+					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
+					<canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas>
+				</view>
 			</view>
-			<view class="qiun-charts">
-				<canvas canvas-id="canvasLineA" id="canvasLineA" class="charts" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas>
-				<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
+			
+			<view class="content">
+				<view class="title-style" >
+					<view class="title-dot-light">
+						<text>标准范围说明</text>
+					</view>
+				</view>
+				<view class="describe">
+					<text>心率的正常范围在90--120之间</text>
+				</view>
 			</view>
+			
+			<view class="bar-fixed">
+				<text>远程测量</text>
+			</view>
+			
 		</view>
 		
 		<view class="motion">
@@ -49,7 +66,8 @@
 		<view class="blood-pressure">
 			
 		</view>
-	
+		
+		<uni-calendar ref="calendar" class="uni-calendar--hook" :clear-date="true" :date="info.date" :insert="info.insert" :lunar="info.lunar" :startDate="info.startDate" :endDate="info.endDate" :range="info.range" @confirm="confirm" @close="close" />
 		
 	</view>
 </template>
@@ -57,34 +75,54 @@
 <script>
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 import uCharts from '@/components/u-charts/u-charts.js'
+import { dateRangeUtils } from '@/common/util.js'
 var canvasObj = {};
 var _self;
+
 const tabbars = [
 	{
+		name: '心率',
+		dateTimeIndex: 0,
+	},{
+		name: '运动',
+		dateTimeIndex: 0,
+	},{
+		name: '血压',
+		dateTimeIndex: 0,
+	},
+]
+
+const tabs = [
+	{
+		days: 0,
 		label: '今天',
 		value: 'today',
-		createTime: '2020-09-04',
-		endTime: '2020-10-04',
-		active: true
+		createTime: '',
+		endTime: '',
+		active: false
 	},{
+		days: 7,
 		label: '近7天',
 		value: 'week',
 		createTime: '',
 		endTime: '',
 		active: false
 	},{
+		days: 30,
 		label: '近30天',
 		value: 'month',
 		createTime: '',
 		endTime: '',
 		active: false
 	},{
+		days: 365,
 		label: '近一年',
 		value: 'year',
 		createTime: '',
 		endTime: '',
 		active: false
 	},{
+		days: null,
 		label: '自定义',
 		value: 'costom',
 		createTime: '',
@@ -115,20 +153,36 @@ const heartInfo = [
 	}
 ]
 
+
 export default {
 
 	data() {
+		var titleNames = tabbars.map(item => item.name)
+		var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 		return {
-			tabbars,
+			tabs,
 			current: 0,
 			heartInfo,
-			titleNames: ['心率', '运动', '血压']
+			titleNames,
+			dateTimeIndex: 0,
+			info: {
+				lunar: true,
+				range: true,
+				insert: false,
+				selected: [],
+				date: today.createTime,
+				startDate: '2018-01-01',
+				endDate: today.endTime
+			}
 		};
 	},
 	components: {
 		uniNavBar
 	},
 	onLoad() {
+		console.log()
+		this.toggleTabs(this.current)
+		
 		_self = this;
 		this.cWidth = uni.upx2px(750);
 		this.cHeight = uni.upx2px(500);
@@ -158,18 +212,67 @@ export default {
 		this.showLineA("canvasLineA", LineA);
 	},
 	methods: {
+		toggleTabs(current, dataTime) {
+			// 获取存储的当前模块下的时间选项
+			let dateTimeIndex = tabbars[current].dateTimeIndex
+			this.dateTimeIndex = dateTimeIndex
+			this.tabs.forEach((item, index) => {
+				if (index === dateTimeIndex) {
+					let obj = null
+					
+					if (item.days !== null) {
+						obj = dateRangeUtils.getDateRange(new Date(), item.days, true)
+					} else if(dataTime){
+						obj = dataTime
+					}
+					
+					if (obj) {
+						item.createTime = obj.createTime
+						item.endTime = obj.endTime
+					}
+					item.active = true
+				} else {
+					item.active = false
+				}
+			})
+		},
 		onClickItem(e) {
 			if (this.current !== e.currentIndex) {
 				this.current = e.currentIndex
+				this.toggleTabs(this.current)
 			}
 		},
-		handleClick(current) {
-			if (current.active) return;
-			console.log(current)
-			this.tabbars.forEach(item => {
-				item.active = false
-			})
-			current.active = true
+		handleClick(item, index) {
+			
+			// 自定义时间选项单独处理
+			if (item.days !== null) {
+				if (item.active) return;
+				// 存储当前模块下选中的时间选项
+				tabbars[this.current].dateTimeIndex = index
+				
+				this.toggleTabs(this.current)	
+			} else {
+				this.$refs.calendar.open()
+			}
+		},
+		close() {
+			console.log('弹窗关闭');
+		},
+		confirm(e) {
+			tabbars[this.current].dateTimeIndex = this.tabs.length - 1
+			
+			var dataTime = {
+				createTime: e.range.before,
+				endTime: e.range.after
+			}
+			this.toggleTabs(this.current, dataTime)
+			// this.tabs.forEach(item => {
+			// 	if (item.days === null) {
+			// 		item.createTime = e.range.before
+			// 		item.endTime = e.range.after
+			// 	}
+			// })
+			// console.log('confirm 返回:', e)
 		},
 		touchLineA(e) {
 			canvasObj['canvasLineA'].scrollStart(e);
@@ -177,11 +280,11 @@ export default {
 		moveLineA(e) {
 			// console.log(e)
 			canvasObj['canvasLineA'].scroll(e);
-			canvasObj['canvasLineA'].showToolTip(e, {
-				format: function(item, category) {
-					return category + ' ' + item.name + ':' + item.data
-				}
-			});
+			// canvasObj['canvasLineA'].showToolTip(e, {
+			// 	format: function(item, category) {
+			// 		return category + ' ' + item.name + ':' + item.data
+			// 	}
+			// });
 		},
 		touchEndLineA(e) {
 			console.log(e)
@@ -214,12 +317,12 @@ export default {
 				categories: chartData.categories,
 				series: chartData.series,
 				animation: false,
-				enableScroll: false, //开启图表拖拽功能
+				enableScroll: true, //开启图表拖拽功能
 				xAxis: {
 					disableGrid: true,
 					type: 'grid',
 					// gridType: 'dash',
-					itemCount: 10,
+					itemCount: 5,
 					scrollShow: true, 
 					scrollAlign: 'left',
 					//scrollBackgroundColor:'#F7F7FF',//可不填写，配合enableScroll图表拖拽功能使用，X轴滚动条背景颜色,默认为 #EFEBEF
@@ -293,7 +396,7 @@ export default {
 		}
 	}
 	
-	.tabbars {
+	.tabs {
 		/* #ifndef APP-NVUE */
 		box-sizing: border-box;
 		display: flex;
@@ -376,36 +479,53 @@ export default {
 				}
 				.label {
 					font-size: 14px;
-					color: $font-color-base;;
+					color: $font-color-base;
 				}
 			}
 		}
 	}
 	
-	.qiun-bg-white {
-		background: $color-white;
+	.content {
+		margin-bottom: 24rpx;
+		.describe {
+			padding: 0 32rpx 32rpx;
+			font-size: 14px;
+			color: $font-color-base;
+			background-color: $color-white;
+		}
 	}
-	.qiun-title-bar {
+	
+	.title-style {
 		width: 100%;
-		padding: 12rpx 24rpx;
-		padding-top: 24rpx;
+		padding: 24rpx;
 		flex-wrap: nowrap;
+		background: $color-white;
+		.title-dot-light {
+			height: 18px;
+			font-size: 14px;
+			padding-left: 6px;
+			color: $font-color-dark;
+			border-left: 8rpx solid $font-color-spec;
+		}
 	}
-	.qiun-title-dot-light {
-		height: 18px;
+	
+	.bar-fixed {
+		position: fixed;
+		right: 40rpx;
+		background: $font-color-spec;
+		bottom: 200rpx;
+		width: 92rpx;
+		height: 92rpx;
+		border-radius: 50%;
 		font-size: 14px;
-		padding-left: 6px;
-		color: $font-color-dark;
-		border-left: 8rpx solid $font-color-spec;
+		padding: 8rpx;
+		text-align: center;
+		color: #fff;
 	}
-	.qiun-charts {
+	
+	#canvasLineA {
 		width: 375px;
 		height: 250px;
 		background-color: $color-white;
-		#canvasLineA {
-			width: 375px;
-			height: 250px;
-			background-color: $color-white;
-		}
 	}
 </style>
