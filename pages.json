@@ -72,6 +72,12 @@
 			}
 		},
 		{
+			"path": "pages/notice/notice",
+			"style": {
+				"navigationBarTitleText": "通知"
+			}
+		},
+		{
 			"path": "pages/set/set",
 			"style": {
 				"navigationBarTitleText": "设置"
@@ -86,21 +92,6 @@
 			"path": "pages/product/product",
 			"style": {
 				"navigationBarTitleText": "详情展示",
-				"app-plus": {
-					"titleNView": {
-						"type": "transparent"
-					}
-				}
-			}
-		}, {
-			"path": "pages/cart/cart",
-			"style": {
-				"navigationBarTitleText": "购物车"
-			}
-		}, {
-			"path": "pages/detail/detail",
-			"style": {
-				"navigationBarTitleText": "",
 				"app-plus": {
 					"titleNView": {
 						"type": "transparent"
@@ -124,16 +115,6 @@
 				"navigationBarTitleText": "创建订单"
 			}
 		}, {
-			"path": "pages/address/address",
-			"style": {
-				"navigationBarTitleText": "收货地址"
-			}
-		}, {
-			"path": "pages/address/addressManage",
-			"style": {
-				"navigationBarTitleText": ""
-			}
-		}, {
 			"path": "pages/money/pay",
 			"style": {
 				"navigationBarTitleText": "支付"
@@ -143,19 +124,6 @@
 			"path": "pages/money/paySuccess",
 			"style": {
 				"navigationBarTitleText": "支付成功"
-			}
-		}, {
-			"path": "pages/notice/notice",
-			"style": {
-				"navigationBarTitleText": "通知"
-			}
-		}, {
-			"path": "pages/category/category",
-			"style": {
-				"navigationBarTitleText": "分类",
-				"app-plus": {
-					"bounce": "none"
-				}
 			}
 		}, {
 			"path": "pages/product/list",
