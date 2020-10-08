@@ -119,6 +119,7 @@
 	import Echarts from '@/components/echarts/echarts.vue'
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
 	import { dateRangeUtils } from '@/common/util.js'
+	import { getGoodsList, getGoodsInfo } from '@/api/goods.js';
 	var canvasObj = {};
 	var _self;
 
@@ -227,6 +228,11 @@
 			this.chartHeight = uni.upx2px(500)
 		},
 		onReady() {
+			getGoodsList().then(res => {
+				console.log(res)
+			}, err => {
+				console.log(err)
+			})
 		},
 		methods: {
 				
