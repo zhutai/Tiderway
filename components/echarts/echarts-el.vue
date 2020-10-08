@@ -134,7 +134,6 @@
 					unit = unit ? unit : ''
 					for (let i in params) {
 						if (i == 0) {
-							console.log(params[i])
 							result += params[i].axisValueLabel
 						}
 						let value = '--'
@@ -149,7 +148,6 @@
 								value = this.formatThousands(value)
 							}
 						}
-						console.log(result)
 						// #ifdef H5
 						result += '\n' + params[i].seriesName + '：' + value + ' ' + unit
 						// #endif

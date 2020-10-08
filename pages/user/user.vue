@@ -3,25 +3,74 @@
 		
 		<view class="cover-container">
 			<uni-list>
-				<uni-list-item title="畅想童年" note="60300074" showArrow thumb="../../static/missing-face.png" thumb-size="lg" />
+				<uni-list-item title="畅想童年" note="60300074" showArrow thumb="../../static/missing-face.png" to="../userinfo/userinfo" thumb-size="lg" />
 			</uni-list>
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
-				<list-cell icon="iconfont iconxiaoxi" iconColor="#e07472" title="我的消息" tips=""></list-cell>
-				<list-cell icon="iconfont icontubiaozhizuomoban-1-05" iconColor="#5fcda2" title="我的设备" @eventClick="navTo('/pages/address/address')"></list-cell>
-				<list-cell icon="iconfont iconGroup" iconColor="#9789f7" title="我的数据" tips=""></list-cell>
+				<list-cell v-for="item in cellList.slice(0, 3)"
+				:icon="`iconfont ${item.icon}`" 
+				:iconColor="item.iconColor"
+				:title="item.title" 
+				:tips="item.tips"
+				@eventClick="navTo(item.url)">
+				</list-cell>
 			</view>
 			<view class="history-section icon">
-				<list-cell icon="iconfont iconyijian" iconColor="#ee883b" title="意见反馈" tips=""></list-cell>
-				<list-cell icon="iconfont iconshebeishezhi" iconColor="#54b4ef" title="设置"></list-cell>
-				<list-cell icon="iconfont iconguanyu" iconColor="#e07472" title="关于" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
+				<list-cell v-for="item in cellList.slice(3, 6)"
+				:icon="`iconfont ${item.icon}`" 
+				:iconColor="item.iconColor"
+				:title="item.title" 
+				:tips="item.tips"
+				@eventClick="navTo(item.url)">
+				</list-cell>
 			</view>
 		</view>
     </view>
 </template>  
 <script>  
 	import listCell from '@/components/mix-list-cell';
-  import { mapState } from 'vuex';  
+  import { mapState } from 'vuex';
+	
+	const cellList = [
+		{
+			icon: 'iconxiaoxi',
+			iconColor: '#e07472',
+			title: '我的消息',
+			tips: '',
+			url: '/pages/notice/notice'
+		},{
+			icon: 'icontubiaozhizuomoban-1-05',
+			iconColor: '#5fcda2',
+			title: '我的设备',
+			tips: '',
+			url: '/pages/set/set'
+		},{
+			icon: 'iconGroup',
+			iconColor: '#9789f7',
+			title: '我的数据',
+			tips: '',
+			url: '/pages/set/set'
+		},{
+			icon: 'iconyijian',
+			iconColor: '#ee883b',
+			title: '意见反馈',
+			tips: '',
+			url: '/pages/set/set'
+		},{
+			icon: 'iconshebeishezhi',
+			iconColor: '#54b4ef',
+			title: '设置',
+			tips: '',
+			url: '/pages/set/set'
+		},{
+			icon: 'iconguanyu',
+			iconColor: '#795548',
+			title: '关于',
+			tips: '',
+			url: '/pages/set/set'
+		},
+	]
+	
 	let startY = 0, moveY = 0, pageAtTop = true;
     export default {
 		components: {
@@ -29,6 +78,7 @@
 		},
 		data(){
 			return {
+				cellList,
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
 				moving: false,
@@ -56,63 +106,21 @@
 			}
 		},
 		// #endif
-        computed: {
+    computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
-        methods: {
-
+    methods: {
 			/**
 			 * 统一跳转接口,拦截未登录路由
 			 * navigator标签现在默认没有转场动画，所以用view
 			 */
 			navTo(url){
-				if(!this.hasLogin){
-					url = '/pages/public/login';
-				}
-				uni.navigateTo({  
-					url
-				})  
-			}, 
-	
-			/**
-			 *  会员卡下拉和回弹
-			 *  1.关闭bounce避免ios端下拉冲突
-			 *  2.由于touchmove事件的缺陷（以前做小程序就遇到，比如20跳到40，h5反而好很多），下拉的时候会有掉帧的感觉
-			 *    transition设置0.1秒延迟，让css来过渡这段空窗期
-			 *  3.回弹效果可修改曲线值来调整效果，推荐一个好用的bezier生成工具 http://cubic-bezier.com/
-			 */
-			coverTouchstart(e){
-				if(pageAtTop === false){
-					return;
-				}
-				this.coverTransition = 'transform .1s linear';
-				startY = e.touches[0].clientY;
-			},
-			coverTouchmove(e){
-				moveY = e.touches[0].clientY;
-				let moveDistance = moveY - startY;
-				if(moveDistance < 0){
-					this.moving = false;
-					return;
-				}
-				this.moving = true;
-				if(moveDistance >= 80 && moveDistance < 100){
-					moveDistance = 80;
-				}
-		
-				if(moveDistance > 0 && moveDistance <= 80){
-					this.coverTransform = `translateY(${moveDistance}px)`;
-				}
-			},
-			coverTouchend(){
-				if(this.moving === false){
-					return;
-				}
-				this.moving = false;
-				this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
-				this.coverTransform = 'translateY(0px)';
+				// if(!this.hasLogin){
+				// 	url = '/pages/public/login';
+				// }
+				uni.navigateTo({ url })  
 			}
-        }  
+    }  
     }  
 </script>  
 <style lang='scss'>
