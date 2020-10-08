@@ -60,6 +60,7 @@
 			 */
 			init() {
 				// 根据id初始化图表
+				console.log(echarts)
 				this.chart = echarts.init(document.getElementById(this.option.id))
 				this.update(this.option)
 				// echarts的点击事件

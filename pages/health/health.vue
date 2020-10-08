@@ -18,7 +18,7 @@
 			<text>{{ tabs[dateTimeIndex].createTime + ' 至 ' +  tabs[dateTimeIndex].endTime }}</text>
 		</view>
 
-		<view class="heart-rate">
+		<view class="heart-rate" v-if="current === 0">
 			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
 				<view class="info-item" v-for="item in heartInfo">
 					<view class="info-num">
@@ -34,12 +34,12 @@
 
 			<view class="content">
 				<view class="title-style">
-					<view class="title-dot-light">折线图一</view>
+					<view class="title-dot-light">心率曲线(mmg)</view>
 				</view>
 				
 				<view class="chart">
-					<echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts>
-					<!-- <echarts-el class="echarts" :option="option" style="height: 300px;"></echarts-el> -->
+					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
+					<echarts-el :key="1" class="echarts" :option="heartRateOption" :style="{height: `${chartHeight}px`}"></echarts-el>
 					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
 					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
 				</view>
@@ -62,12 +62,92 @@
 
 		</view>
 
-		<view class="motion">
-
+		<view class="motion" v-if="current === 1">
+			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
+				<view class="info-item" v-for="item in heartInfo">
+					<view class="info-num">
+						<text class="num">{{ item.num }}</text>
+						<text class="unit">{{ item.unit }}</text>
+					</view>
+					<view class="info-label">
+						<text class="round" :class="item.className"></text>
+						<text class="label">{{ item.name }}</text>
+					</view>
+				</view>
+			</scroll-view>
+			
+			<view class="content">
+				<view class="title-style">
+					<view class="title-dot-light">运动步数</view>
+				</view>
+				
+				<view class="chart">
+					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
+					<echarts-el :key="2"  class="echarts" :option="motionOption" :style="{height: `${chartHeight}px`}"></echarts-el>
+					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
+					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
+				</view>
+			</view>
+			
+			<view class="content">
+				<view class="title-style">
+					<view class="title-dot-light">
+						<text>标准范围说明</text>
+					</view>
+				</view>
+				<view class="describe">
+					<text>心率的正常范围在90--120之间</text>
+				</view>
+			</view>
+			
+			<view class="bar-fixed">
+				<text>远程测量</text>
+			</view>
+			
 		</view>
 
-		<view class="blood-pressure">
-
+		<view class="blood-pressure" v-if="current === 2">
+			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
+				<view class="info-item" v-for="item in heartInfo">
+					<view class="info-num">
+						<text class="num">{{ item.num }}</text>
+						<text class="unit">{{ item.unit }}</text>
+					</view>
+					<view class="info-label">
+						<text class="round" :class="item.className"></text>
+						<text class="label">{{ item.name }}</text>
+					</view>
+				</view>
+			</scroll-view>
+			
+			<view class="content">
+				<view class="title-style">
+					<view class="title-dot-light">心率曲线(mmg)</view>
+				</view>
+				
+				<view class="chart">
+					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
+					<echarts-el :key="3"  class="echarts" :option="bloodOption" :style="{height: `${chartHeight}px`}"></echarts-el>
+					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
+					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
+				</view>
+			</view>
+			
+			<view class="content">
+				<view class="title-style">
+					<view class="title-dot-light">
+						<text>标准范围说明</text>
+					</view>
+				</view>
+				<view class="describe">
+					<text>心率的正常范围在90--120之间</text>
+				</view>
+			</view>
+			
+			<view class="bar-fixed">
+				<text>远程测量</text>
+			</view>
+			
 		</view>
 
 		<uni-calendar ref="calendar" class="uni-calendar--hook" :clear-date="true" :date="info.date" :insert="info.insert"
@@ -162,11 +242,14 @@
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
 				tabs,
-				option: null,
+				bloodOption: null,
+				motionOption: null,
+				heartRateOption: null,
 				current: 0,
 				heartInfo,
 				titleNames,
 				dateTimeIndex: 0,
+				chartHeight: 0,
 				info: {
 					lunar: true,
 					range: true,
@@ -184,25 +267,168 @@
 			EchartsEl
 		},
 		onLoad() {
-			console.log(187)
-			// setTimeout(() => {
-				this.option = this.getOptions(0)
-			// }, 1000)
+			this.heartRateOption = this.getOption1()
+			this.motionOption = this.getOption2()
+			this.bloodOption = this.getOptions(0)
 			this.toggleTabs(this.current)
-			_self = this;
-			this.cWidth = uni.upx2px(750);
-			this.cHeight = uni.upx2px(500);
-			this.cWidth2 = uni.upx2px(700);
-			this.cHeight2 = uni.upx2px(1100);
-			this.cWidth3 = uni.upx2px(250);
-			this.cHeight3 = uni.upx2px(250);
-			this.arcbarWidth = uni.upx2px(24);
-			this.gaugeWidth = uni.upx2px(30);
+			this.chartHeight = uni.upx2px(500)
 		},
 		onReady() {
-			console.log(202)
 		},
 		methods: {
+				
+			getOption1() {
+				var base = +new Date(2019, 9, 3);
+				var oneDay = 24 * 3600 * 1000;
+				var date = [];
+				
+				var data = [Math.random() * 300];
+				
+				for (var i = 1; i < 200; i++) {
+					var now = new Date(base += oneDay);
+					date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+					data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
+				}
+
+				return {
+					id: 'echartA',
+					tooltip: {
+						trigger: 'axis',
+						positionStatus: true,
+						formatterStatus: true,
+						// formatterUnit: '元', // 自定义变量：数值后面的单位
+						// formatFloat2: false, // 自定义变量：是否格式化为两位小数
+						position: function (pt) {
+							return [pt[0], '10%'];
+						}
+					},
+					grid: {
+						left: 20,
+						top: 10,
+						bottom: 20,
+						right: 20,
+						containLabel: true
+					},
+					title: {
+						left: 'center',
+						show: false,
+						text: '',
+					},
+					xAxis: {
+						type: 'category',
+						boundaryGap: false,
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
+						data: date
+					},
+					yAxis: {
+						type: 'value',
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
+						boundaryGap: [0, '100%']
+					},
+					series: [
+						{
+							name: '模拟数据',
+							type: 'line',
+							smooth: true,
+							symbol: 'none',
+							sampling: 'average',
+							itemStyle: {
+							color: 'rgb(255, 70, 131)'
+							},
+							// 自定义变量，以数组形式传递渐变参数
+							areaGradient: [0, 0, 0, 1,[{
+								offset: 0,
+								color: 'rgb(255, 158, 68)'
+							}, {
+								offset: 1,
+								color: 'rgb(255, 70, 131)'
+							}]],
+							// areaStyle: {
+							// },
+							data: data
+						}
+					],
+				}
+			},
+				
+			getOption2() {
+				let getTime = new Date().getTime()
+				let array = []
+				for(var i = 1; i <= 12; i++) {
+					let c = i * (2 * 60 * 60 * 1000)
+					array.push([getTime - c, i ])
+				}
+				return {
+					notMerge: true, // 自定义变量：true代表不合并数据，比如从折线图变为柱形图则需设置为true；false或不写代表合并
+					tooltip: {
+						trigger: 'axis',
+						positionStatus: true,
+						formatterStatus: true, // 自定义变量：是否格式化tooltip，设置为false时下面三项均不起作用
+						// formatterUnit: '元', // 自定义变量：数值后面的单位
+						// formatFloat2: true, // 自定义变量：是否格式化为两位小数
+						// formatThousands: true // 自定义变量：是否添加千分位
+					},
+					legend: {
+						show: false
+					},
+					grid: {
+						left: '5%',
+						right: '6%',
+						bottom: '5%',
+						top: 10,
+						containLabel: true
+					},
+					xAxis: [{
+						type: 'time',
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
+						data: array.map(function(item) {
+							return item[0]
+						})
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						}
+					}],
+					series: [{
+							name: '邮件',
+							type: 'bar',
+							data: array,
+							// 自定义变量，以数组形式传递渐变参数
+							linearGradient: [0, 0, 0, 1,
+								[{
+										offset: 0,
+										color: '#2378f7'
+									},
+									{
+										offset: 0.7,
+										color: '#2378f7'
+									},
+									{
+										offset: 1,
+										color: '#83bff6'
+									}
+								]
+							]
+						}
+					]
+				}
+			},
 			toggleTabs(current, dataTime) {
 				// 获取存储的当前模块下的时间选项
 				let dateTimeIndex = tabbars[current].dateTimeIndex
@@ -227,155 +453,6 @@
 					}
 				})
 			},
-			onClickItem(e) {
-				if (this.current !== e.currentIndex) {
-					this.current = e.currentIndex
-					this.toggleTabs(this.current)
-				}
-			},
-			handleClick(item, index) {
-
-				// 自定义时间选项单独处理
-				if (item.days !== null) {
-					if (item.active) return;
-					// 存储当前模块下选中的时间选项
-					tabbars[this.current].dateTimeIndex = index
-
-					this.toggleTabs(this.current)
-				} else {
-					this.$refs.calendar.open()
-				}
-			},
-			close() {
-				console.log('弹窗关闭');
-			},
-			confirm(e) {
-				tabbars[this.current].dateTimeIndex = this.tabs.length - 1
-
-				var dataTime = {
-					createTime: e.range.before,
-					endTime: e.range.after
-				}
-				this.toggleTabs(this.current, dataTime)
-			},
-			touchLineA(e) {
-				canvasObj['canvasLineA'].scrollStart(e);
-			},
-			moveLineA(e) {
-				// console.log(e)
-				canvasObj['canvasLineA'].scroll(e);
-				// canvasObj['canvasLineA'].showToolTip(e, {
-				// 	format: function(item, category) {
-				// 		return category + ' ' + item.name + ':' + item.data
-				// 	}
-				// });
-			},
-			touchEndLineA(e) {
-				console.log(e)
-				canvasObj['canvasLineA'].scrollEnd(e);
-				//下面是toolTip事件，如果滚动后不需要显示，可不填写
-				canvasObj['canvasLineA'].showToolTip(e, {
-					format: function(item, category) {
-						return category + ' ' + item.name + ':' + item.data
-					}
-				});
-			},
-			showLineA(canvasId, chartData) {
-				if (!_self.pixelRatio) _self.pixelRatio = 1
-				canvasObj[canvasId] = new uCharts({
-					$this: _self,
-					canvasId: canvasId,
-					type: 'line',
-					fontSize: 12,
-					padding: [16, 16, 0, 16],
-					legend: {
-						show: true,
-						padding: 6,
-						lineHeight: 12,
-						margin: 6,
-					},
-					dataLabel: false,
-					dataPointShape: false,
-					background: '#fff',
-					pixelRatio: _self.pixelRatio,
-					categories: chartData.categories,
-					series: chartData.series,
-					animation: false,
-					enableScroll: true, //开启图表拖拽功能
-					xAxis: {
-						disableGrid: true,
-						type: 'grid',
-						// gridType: 'dash',
-						itemCount: 5,
-						scrollShow: true,
-						scrollAlign: 'left',
-						//scrollBackgroundColor:'#F7F7FF',//可不填写，配合enableScroll图表拖拽功能使用，X轴滚动条背景颜色,默认为 #EFEBEF
-						//scrollColor:'#DEE7F7',//可不填写，配合enableScroll图表拖拽功能使用，X轴滚动条颜色,默认为 #A6A6A6
-					},
-					yAxis: {
-						// disabled: false,
-						gridType: 'dash',
-						splitNumber: 4,
-						gridColor: '#eee',
-						// min: 10,
-						// max: 180,
-						// axisLineColor: '#ddd',
-						format: (val) => {
-							return val.toFixed(0) + '元'
-						} //如不写此方法，Y轴刻度默认保留两位小数
-					},
-					width: _self.cWidth * _self.pixelRatio,
-					height: _self.cHeight * _self.pixelRatio,
-					extra: {
-						lineStyle: 'straight',
-					},
-				});
-			}
-		},
-		// #ifndef MP
-		// 标题栏input搜索框点击
-		onNavigationBarSearchInputClicked: async function(e) {
-			this.$api.msg('点击了搜索框');
-		},
-		//点击导航栏 buttons 时触发
-		onNavigationBarButtonTap(e) {
-			const index = e.index;
-			if (index === 0) {
-				this.$api.msg('点击了扫描');
-			} else if (index === 1) {
-				// #ifdef APP-PLUS
-				const pages = getCurrentPages();
-				const page = pages[pages.length - 1];
-				const currentWebview = page.$getAppWebview();
-				currentWebview.hideTitleNViewButtonRedDot({
-					index
-				});
-				// #endif
-				uni.navigateTo({
-					url: '/pages/notice/notice'
-				})
-			}
-		}
-		// #endif
-	}
-</script>
-
-<script module="echarts" lang="renderjs">
-	let myChart
-	export default {
-		mounted() {
-			if (typeof window.echarts === 'function') {
-				this.initEcharts()
-			} else {
-				// 动态引入较大类库避免影响页面展示
-				const script = document.createElement('script')
-				// view 层的页面运行在 www 根目录，其相对路径相对于 www 计算
-				script.src = 'static/echarts.js'
-				script.onload = this.initEcharts.bind(this)
-				document.head.appendChild(script)
-			}
-		},
-		methods: {
 			getCharts() {
 				var chartData = [
 					["2014-09-26", 170],
@@ -514,39 +591,49 @@
 				return {
 					id: 'echartB',
 					title: {
-						text: 'Beijing AQI'
+						show: false
+						// text: 'Beijing AQI'
 					},
 					tooltip: {
-						trigger: 'axis'
+						trigger: 'axis',
+						positionStatus: true,
+						formatterStatus: true, // 自定义变量：是否格式化tooltip，设置为false时下面三项均不起作用
+						// formatterUnit: '元', // 自定义变量：数值后面的单位
+						// formatFloat2: true, // 自定义变量：是否格式化为两位小数
+					},
+					grid: {
+						top: 10,
+						left: 20,
+						right: 30,
+						bottom: 40,
+						containLabel: true
 					},
 					xAxis: {
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
+						nameTextStyle: {
+							color: '#ccc',
+						},
 						data: data.map(function(item) {
 							return item[0];
 						})
 					},
 					yAxis: {
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
 						splitLine: {
-							show: false
+							show: true
 						}
 					},
-					toolbox: {
-						left: 'center',
-						feature: {
-							dataZoom: {
-								yAxisIndex: 'none'
-							},
-							restore: {},
-							saveAsImage: {}
-						}
-					},
-					// dataZoom: [{
-					// 	startValue: '2014-06-01'
-					// }, {
-					// 	type: 'inside'
-					// }],
 					visualMap: {
-						top: 10,
-						right: 10,
+						orient: 'horizontal',
+						bottom: 10,
 						pieces: [{
 							gt: 0,
 							lte: 50,
@@ -573,7 +660,10 @@
 						}],
 						outOfRange: {
 							color: '#999'
-						}
+						},
+						// formatter: function (value, value2) {
+						// 	return value + 'ml' + '--' + value2 + 'ml'; // 范围标签显示内容。
+						// }
 					},
 					series: {
 						name: 'Beijing AQI',
@@ -583,35 +673,100 @@
 						}),
 						markLine: {
 							silent: true,
-							data: [{
-								yAxis: 50
-							}, {
-								yAxis: 100
-							}, {
-								yAxis: 150
-							}, {
-								yAxis: 200
-							}, {
-								yAxis: 300
-							}]
+							// data: [{
+							// 	yAxis: 50
+							// }, {
+							// 	yAxis: 100
+							// }, {
+							// 	yAxis: 150
+							// }, {
+							// 	yAxis: 200
+							// }, {
+							// 	yAxis: 300
+							// }]
 						}
 					}
 				}
 			},
-			initEcharts() {
-				myChart = echarts.init(document.getElementById('echarts'))
-				this.option = this.getOptions()
-				// 观测更新的数据在 view 层可以直接访问到
-				myChart.setOption(this.option)
+			onClickItem(e) {
+				if (this.current !== e.currentIndex) {
+					this.current = e.currentIndex
+					this.toggleTabs(this.current)
+				}
 			},
-			/**
-			 * 点击事件
-			 * @param {Object} params
-			 */
-			echartsClick(params) {
-				console.log('点击数据', params)
+			handleClick(item, index) {
+
+				// 自定义时间选项单独处理
+				if (item.days !== null) {
+					if (item.active) return;
+					// 存储当前模块下选中的时间选项
+					tabbars[this.current].dateTimeIndex = index
+
+					this.toggleTabs(this.current)
+				} else {
+					this.$refs.calendar.open()
+				}
 			},
+			close() {
+				console.log('弹窗关闭');
+			},
+			confirm(e) {
+				tabbars[this.current].dateTimeIndex = this.tabs.length - 1
+
+				var dataTime = {
+					createTime: e.range.before,
+					endTime: e.range.after
+				}
+				this.toggleTabs(this.current, dataTime)
+			},
+			touchLineA(e) {
+				canvasObj['canvasLineA'].scrollStart(e);
+			},
+			moveLineA(e) {
+				// console.log(e)
+				canvasObj['canvasLineA'].scroll(e);
+				// canvasObj['canvasLineA'].showToolTip(e, {
+				// 	format: function(item, category) {
+				// 		return category + ' ' + item.name + ':' + item.data
+				// 	}
+				// });
+			},
+			touchEndLineA(e) {
+				console.log(e)
+				canvasObj['canvasLineA'].scrollEnd(e);
+				//下面是toolTip事件，如果滚动后不需要显示，可不填写
+				canvasObj['canvasLineA'].showToolTip(e, {
+					format: function(item, category) {
+						return category + ' ' + item.name + ':' + item.data
+					}
+				});
+			}
+		},
+		// #ifndef MP
+		// 标题栏input搜索框点击
+		onNavigationBarSearchInputClicked: async function(e) {
+			this.$api.msg('点击了搜索框');
+		},
+		//点击导航栏 buttons 时触发
+		onNavigationBarButtonTap(e) {
+			const index = e.index;
+			if (index === 0) {
+				this.$api.msg('点击了扫描');
+			} else if (index === 1) {
+				// #ifdef APP-PLUS
+				const pages = getCurrentPages();
+				const page = pages[pages.length - 1];
+				const currentWebview = page.$getAppWebview();
+				currentWebview.hideTitleNViewButtonRedDot({
+					index
+				});
+				// #endif
+				uni.navigateTo({
+					url: '/pages/notice/notice'
+				})
+			}
 		}
+		// #endif
 	}
 </script>
 
@@ -737,7 +892,9 @@
 
 	.content {
 		margin-bottom: 24rpx;
-
+		.chart {
+			background-color: #fff;
+		}
 		.describe {
 			padding: 0 32rpx 32rpx;
 			font-size: 14px;
@@ -769,10 +926,15 @@
 		width: 92rpx;
 		height: 92rpx;
 		border-radius: 50%;
-		font-size: 14px;
-		padding: 8rpx;
+		font-size: 12px;
+		padding: 12rpx 20rpx;
+		line-height: 16px;
 		text-align: center;
 		color: #fff;
+	}
+	
+	.echarts {
+		height: 500rpx;
 	}
 
 	#canvasLineA,

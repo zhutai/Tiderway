@@ -41,6 +41,7 @@
 			 */
 			init() {
 				// 根据id初始化图表
+				console.log(echarts)
 				this.chart = echarts.init(this.$el)
 				console.log(this.$el)
 				console.log(this.chart)
@@ -82,8 +83,14 @@
 						if (option.series) {
 							for (let i in option.series) {
 								let linearGradient = option.series[i].linearGradient
+								let areaGradient = option.series[i].areaGradient
+								
 								if (linearGradient) {
 									option.series[i].color = new echarts.graphic.LinearGradient(linearGradient[0],linearGradient[1],linearGradient[2],linearGradient[3],linearGradient[4])
+								}
+								if (areaGradient) {
+									if (!option.series[i].areaStyle) option.series[i].areaStyle = {}
+									option.series[i].areaStyle.color = new echarts.graphic.LinearGradient(areaGradient[0],areaGradient[1],areaGradient[2],areaGradient[3],areaGradient[4])
 								}
 							}
 						}
@@ -127,6 +134,7 @@
 					unit = unit ? unit : ''
 					for (let i in params) {
 						if (i == 0) {
+							console.log(params[i])
 							result += params[i].axisValueLabel
 						}
 						let value = '--'
@@ -141,6 +149,7 @@
 								value = this.formatThousands(value)
 							}
 						}
+						console.log(result)
 						// #ifdef H5
 						result += '\n' + params[i].seriesName + '：' + value + ' ' + unit
 						// #endif
