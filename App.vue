@@ -11,16 +11,12 @@
 		},
 		onLaunch: function() {
 			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(userInfo.id){
+			if(userInfo){
 				//更新登陆状态
-				uni.getStorage({
-					key: 'userInfo',
-					success: (res) => {
-						this.login(res.data);
-					}
-				});
+				this.login(userInfo)
+			} else {
+				uni.navigateTo({ url: '/pages/public/login' }) 
 			}
-			
 		},
 		onShow: function() {
 			console.log('App Show')

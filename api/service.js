@@ -20,11 +20,10 @@ const getTokenStorage = () => {
 
 const http = new Request()
 http.setConfig((config) => { /* 设置全局配置 */
-  config.baseURL = 'https://www.fastmock.site/mock/26243bdf9062eeae2848fc67603bda2d/luchrequest' /* 根域名不同 */
+  config.baseURL = 'http://appapi.tiderway.com/' /* 根域名不同 */
   config.header = {
     ...config.header,
-    a: 1, // 演示
-    b: 2 // 演示
+		'Content-Type': 'application/x-www-form-urlencoded'
   }
   return config
 })
@@ -32,7 +31,7 @@ http.setConfig((config) => { /* 设置全局配置 */
 http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使用async await 做异步操作 */
   config.header = {
     ...config.header,
-    token: getTokenStorage() || '4399'
+    token: getTokenStorage()
   }
   /*
  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求

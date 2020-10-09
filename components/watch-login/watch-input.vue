@@ -7,7 +7,7 @@
 			:type="_type" 
 			:maxlength="maxlength" 
 			:placeholder="placeholder" 
-			:password="type ===' password' && !showPassword" 
+			:password="type === 'password' && !showPassword" 
 			
 			@input="$emit('input', $event.target.value)"
 			@blur="$emit('blur', $event)"
