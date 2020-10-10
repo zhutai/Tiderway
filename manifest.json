@@ -52,6 +52,11 @@
             },
             "splashscreen" : {
                 "androidStyle" : "common"
+            },
+            "icons" : {
+                "android" : {
+                    "xhdpi" : "static/image/logo.png"
+                }
             }
         }
     },
@@ -64,6 +69,11 @@
         "appid" : "",
         "setting" : {
             "urlCheck" : true
+        }
+    },
+    "h5" : {
+        "devServer" : {
+            "port" : 8181
         }
     }
 }
