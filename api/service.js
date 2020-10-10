@@ -7,8 +7,9 @@
  * DCloud: http://ext.dcloud.net.cn/plugin?id=392
  * HBuilderX: beat-2.7.14 alpha-2.8.0
  */
+import store from '@/store'
 import Request from '@/utils/luch-request/index.js'
-
+// console.log(store.state)
 const getTokenStorage = () => {
   let token = ''
   try {
@@ -33,6 +34,7 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
     ...config.header,
     token: getTokenStorage()
   }
+	console.log(store)
   /*
  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
    return Promise.reject(config)
@@ -44,12 +46,27 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
 })
 
 http.interceptors.response.use(async (response) => { /* 请求之后拦截器。可以使用async await 做异步操作  */
-  // if (response.data.code !== 200) { // 服务端返回的状态码不等于200，则reject()
-  //   return Promise.reject(response)
-  // }
-  return response
+	if (response.statusCode === 200) { // 接口请求成功
+		if (response.data.Code === 200) { // 接口内部状态无异常
+			return response.data
+		} else {
+			uni.showToast({
+			  icon: 'none',
+				position: 'bottom',
+			  title: response.data.Message
+			});
+			return Promise.reject(response)
+		}
+	} else { // 接口请求异常
+		uni.showToast({
+		  icon: 'none',
+			position: 'bottom',
+		  title: '接口请求失败，请刷新重试'
+		});
+	}
+	console.log(response)
 }, (response) => { // 请求错误做点什么。可以使用async await 做异步操作
-  console.log(response)
+  // console.log(response)
   return Promise.reject(response)
 })
 
