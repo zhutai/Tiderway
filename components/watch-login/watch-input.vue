@@ -154,9 +154,9 @@
 					return this.codeText;
 				}else{
 					if(this.second<10){
-						return '0'+this.second;
+						return '0'+ this.second + 'S';
 					}else{
-						return this.second;
+						return this.second + 'S';
 					}
 				}
 				
@@ -174,7 +174,7 @@
 		align-items: center;
 		/* height: 36rpx; */   /* Input 高度 */
 		color: #333333;
-		padding: 40rpx 32rpx;
+		padding: 32rpx;
 		margin:32rpx 0;
 	}
 	.img{
