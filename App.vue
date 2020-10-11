@@ -28,7 +28,8 @@
 </script>
 
 <style lang='scss'>
-	@import './common/uni.css';
+	/* @import './common/uni.css'; */
+	@import './common/common.css';
 	@import './common/icon.css';
 	/*
 		全局公共样式和字体图标

@@ -9,12 +9,18 @@
  */
 import store from '@/store'
 import Request from '@/utils/luch-request/index.js'
-// console.log(store.state)
+
 const getTokenStorage = () => {
   let token = ''
   try {
-    token = uni.getStorageSync('token')
+		if (store.state.hasLogin) {
+			token = store.state.userInfo.Token
+		} else {
+			let userInfo = uni.getStorageSync('userInfo') || {}
+			token = userInfo.Token || ''
+		}
   } catch (e) {
+		console.log(e)
   }
   return token
 }
@@ -34,12 +40,11 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
     ...config.header,
     token: getTokenStorage()
   }
-	console.log(store)
   /*
- if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
-   return Promise.reject(config)
- }
- */
+	  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
+		  return Promise.reject(config)
+	  }
+	*/
   return config
 }, (config) => {
   return Promise.reject(config)

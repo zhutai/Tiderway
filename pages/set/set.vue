@@ -60,7 +60,12 @@
 				    	if(e.confirm){
 				    		this.logout();
 				    		setTimeout(()=>{
-				    			uni.navigateBack();
+									uni.navigateTo({
+										url: '/pages/public/login',
+										fail(err) {
+											console.log(err)
+										}
+									})
 				    		}, 200)
 				    	}
 				    }

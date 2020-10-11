@@ -7,7 +7,6 @@ const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
 		userInfo: {},
-		token: ''
 	},
 	getters: {
 		hasLogin: state => {
@@ -15,21 +14,16 @@ const store = new Vuex.Store({
 		},
 		userInfo: state => {
 			return state.userInfo
-		},
-		token: state => {
-			return state.token
 		}
 	},
 	mutations: {
 		login(state, provider) {
-
 			state.hasLogin = true;
 			state.userInfo = provider;
 			uni.setStorage({ //缓存用户登陆状态
 				key: 'userInfo',  
 				data: provider  
-			}) 
-			console.log(state.userInfo);
+			})
 		},
 		logout(state) {
 			state.hasLogin = false;

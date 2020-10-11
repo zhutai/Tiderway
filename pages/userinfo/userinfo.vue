@@ -1,21 +1,44 @@
 <template>
-	<view>
-		<view class="user-section">
-			<image class="bg" src="/static/user-bg.jpg"></image>
-			<text class="bg-upload-btn yticon icon-paizhao"></text>
-			<view class="portrait-box">
-				<image class="portrait" :src="userInfo.portrait || '/static/missing-face.png'"></image>
-				<text class="pt-upload-btn yticon icon-paizhao"></text>
-			</view>
+	<view class="container">
+		
+		<view class="list-cell b-b m-t" @click="navTo('个人资料')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">个人资料</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">收货地址</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">实名认证</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		
+		<view class="list-cell m-t">
+			<text class="cell-tit">消息推送</text>
+			<switch checked color="#fa436a" @change="switchChange" />
+		</view>
+		<view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">清除缓存</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell b-b" @click="navTo('关于Dcloud')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">关于Dcloud</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell">
+			<text class="cell-tit">检查更新</text>
+			<text class="cell-tip">当前版本 1.0.3</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell log-out-btn" @click="toLogout">
+			<text class="cell-tit">退出登录</text>
 		</view>
 	</view>
 </template>
 
 <script>
-	import {  
-	    mapState,  
-	    mapMutations  
-	} from 'vuex';  
+	import { mapState, mapMutations } from 'vuex';
 	export default {
 		data() {
 			return {
@@ -24,63 +47,89 @@
 		},
 		computed:{
 			...mapState(['userInfo']),
+		},
+		methods:{
+			...mapMutations(['logout']),
+
+			navTo(url){
+				this.$api.msg(`跳转到${url}`);
+			},
+			//退出登录
+			toLogout(){
+				uni.showModal({
+				    content: '确定要退出登录么',
+				    success: (e)=>{
+				    	if(e.confirm){
+				    		this.logout();
+				    		setTimeout(()=>{
+									uni.navigateTo({
+										url: '/pages/public/login',
+										fail(err) {
+											console.log(err)
+										}
+									})
+				    		}, 200)
+				    	}
+				    }
+				});
+			},
+			//switch
+			switchChange(e){
+				let statusTip = e.detail.value ? '打开': '关闭';
+				this.$api.msg(`${statusTip}消息推送`);
+			},
+
 		}
 	}
 </script>
 
-<style lang="scss">
+<style lang='scss'>
 	page{
 		background: $page-color-base;
 	}
-	.user-section{
+	.list-cell{
 		display:flex;
-		align-items:center;
-		justify-content: center;
-		height: 460upx;
-		padding: 40upx 30upx 0;
+		align-items:baseline;
+		padding: 20upx $page-row-spacing;
+		line-height:60upx;
 		position:relative;
-		.bg{
-			position:absolute;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			filter: blur(1px);
-			opacity: .7;
+		background: #fff;
+		justify-content: center;
+		&.log-out-btn{
+			margin-top: 40upx;
+			.cell-tit{
+				color: $uni-color-primary;
+				text-align: center;
+				margin-right: 0;
+			}
 		}
-		.portrait-box{
-			width: 200upx;
-			height: 200upx;
-			border:6upx solid #fff;
-			border-radius: 50%;
-			position:relative;
-			z-index: 2;
+		&.cell-hover{
+			background:#fafafa;
 		}
-		.portrait{
-			position: relative;
-			width: 100%;
-			height: 100%;
-			border-radius: 50%;
+		&.b-b:after{
+			left: 30upx;
 		}
-		.yticon{
-			position:absolute;
-			line-height: 1;
-			z-index: 5;
-			font-size: 48upx;
-			color: #fff;
-			padding: 4upx 6upx;
-			border-radius: 6upx;
-			background: rgba(0,0,0,.4);
+		&.m-t{
+			margin-top: 16upx; 
 		}
-		.pt-upload-btn{
-			right: 0;
-			bottom: 10upx;
+		.cell-more{
+			align-self: baseline;
+			font-size:$font-lg;
+			color:$font-color-light;
+			margin-left:10upx;
 		}
-		.bg-upload-btn{
-			right: 20upx;
-			bottom: 16upx;
+		.cell-tit{
+			flex: 1;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			margin-right:10upx;
+		}
+		.cell-tip{
+			font-size: $font-base;
+			color: $font-color-light;
+		}
+		switch{
+			transform: translateX(16upx) scale(.84);
 		}
 	}
-
-
 </style>

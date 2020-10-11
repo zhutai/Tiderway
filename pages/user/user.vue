@@ -3,7 +3,8 @@
 		
 		<view class="cover-container">
 			<uni-list>
-				<uni-list-item title="畅想童年" note="60300074" showArrow thumb="../../static/missing-face.png" to="../userinfo/userinfo" thumb-size="lg" />
+				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
+				<uni-list-item :title="userInfo.LoginName" :note="userInfo.UserName" showArrow thumb="../../static/missing-face.png" to="../userinfo/userinfo" thumb-size="lg" />
 			</uni-list>
 			<!-- 浏览历史 -->
 			<view class="history-section icon">

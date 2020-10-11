@@ -158,14 +158,9 @@
 				}
 				
 				this.register()
-				
-				console.log("注册成功")
-				_this.isRotate = true
-				setTimeout(function(){
-					_this.isRotate = false
-				},3000)
 		  },
 			register() {
+				_this.isRotate = true
 				var params = {
 					PhoneNumber: this.phoneData,
 					Code: this.verCode,
@@ -173,7 +168,10 @@
 					Pwd: this.passData
 				}
 				register(params).then(res => {
-					console.log(res)
+					_this.isRotate = false
+					uni.navigateTo({
+						url: '/pages/public/login'
+					})
 				})
 			}
 		}

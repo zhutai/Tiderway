@@ -39,7 +39,8 @@
 	var _this;
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
-
+	import { login } from '@/api/user'
+	import { mapMutations } from 'vuex';
 	export default {
 		data() {
 			return {
@@ -54,26 +55,28 @@
 			wInput,
 			wButton,
 		},
+		
 		mounted() {
 			_this = this;
-			//this.isLogin();
+			this.isLogin();
 		},
 		methods: {
+			...mapMutations(['login']),
 			isLogin() {
 				//判断缓存中是否登录过，直接登录
-				// try {
-				// 	const value = uni.getStorageSync('setUserData');
-				// 	if (value) {
-				// 		//有登录信息
-				// 		console.log("已登录用户：",value);
-				// 		_this.$store.dispatch("setUserData",value); //存入状态
-				// 		uni.reLaunch({
-				// 			url: '../../../pages/index',
-				// 		});
-				// 	}
-				// } catch (e) {
-				// 	// error
-				// }
+				try {
+					const value = uni.getStorageSync('userInfo');
+					// console.log(value)
+					if (value) {
+						//有登录信息
+						console.log("已登录用户：",value);
+						uni.reLaunch({
+							url: '/pages/index/index'
+						});
+					}
+				} catch (e) {
+					// error
+				}
 			},
 			startLogin(e) {
 				console.log(e)
@@ -82,11 +85,11 @@
 					//判断是否加载中，避免重复点击请求
 					return false;
 				}
-				if (this.phoneData.length == "") {
+				if (this.phoneData.length < 5) {
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '用户名不能为空'
+						title: '用户名不能小于6位'
 					});
 					return;
 				}
@@ -102,9 +105,23 @@
 				console.log("登录成功")
 
 				_this.isRotate = true
-				setTimeout(function() {
-					_this.isRotate = false
-				}, 3000)
+				let params = {
+					LoginName: this.phoneData,
+					Pwd: this.passData,
+					LoginType: 1
+				}
+				
+				login(params).then(res => {
+					if (res && res.Data) {
+						this.login(res.Data)
+						uni.reLaunch({
+							url: '/pages/index/index'
+						})
+					}
+				})
+				// setTimeout(function() {
+				// 	_this.isRotate = false
+				// }, 3000)
 				// uni.showLoading({
 				// 	title: '登录中'
 				// });
