@@ -124,13 +124,13 @@
 				})
 				// setTimeout(function() {
 				// 	_this.isRotate = false
-				// }, 3000)
+				// }, 3000)  
 				// uni.showLoading({
 				// 	title: '登录中'
 				// });
 				// getLogin()
-				// .then(res => {
-				// 	//console.log(res)
+				// .then(res => { 
+				// 	//console.log(res)  
 				// 	//简单验证下登录（不安全）
 				// 	if(_this.phoneData==res.data.username && _this.passData==res.data.password){
 				// 		let userdata={

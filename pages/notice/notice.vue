@@ -1,74 +1,105 @@
 <template>
-	<view>
-		<view class="notice-item">
-			<text class="time">11:30</text>
-			<view class="content">
-				<text class="title">新品上市，全场满199减50</text>
-				<view class="img-wrapper">
-					<image class="pic" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556465765776&di=57bb5ff70dc4f67dcdb856e5d123c9e7&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01fd015aa4d95fa801206d96069229.jpg%401280w_1l_2o_100sh.jpg"></image>
-				</view>
-				<text class="introduce">
-					虽然做了一件好事，但很有可能因此招来他人的无端猜测，例如被质疑是否藏有其他利己动机等，乃至谴责。即便如此，还是要做好事。
-				</text>
-				<view class="bot b-t">
-					<text>查看详情</text>
-					<text class="more-icon yticon icon-you"></text>
-				</view>
+	<view class="page-notice">
+		<view class="navbar">
+			<view 
+				v-for="(item, index) in navList" :key="index" 
+				class="nav-item" 
+				:class="{current: tabCurrentIndex === index}"
+				@click="tabClick(index)"
+			>
+				{{item.text}}
 			</view>
 		</view>
-		<view class="notice-item">
-			<text class="time">昨天 12:30</text>
-			<view class="content">
-				<text class="title">新品上市，全场满199减50</text>
-				<view class="img-wrapper">
-					<image class="pic" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3761064275,227090144&fm=26&gp=0.jpg"></image>
-					<view class="cover">
-						活动结束
+		<swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
+			<swiper-item class="tab-content" v-for="(tabItem, tabIndex) in navList" :key="tabIndex">
+				<scroll-view 
+					class="list-scroll-content" 
+					scroll-y
+					@scrolltolower="loadData"
+				>
+				<view class="notice-item" v-if="!tabIndex">
+					<text class="time">昨天 12:30</text>
+					<view class="content">
+						<text class="title">新品上市，全场满199减50</text>
+						<view class="img-wrapper">
+							<image class="pic" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3761064275,227090144&fm=26&gp=0.jpg"></image>
+							<view class="cover">
+								活动结束
+							</view>
+						</view>
+						<view class="bot b-t">
+							<text>查看详情</text>
+							<text class="more-icon yticon icon-you"></text>
+						</view>
 					</view>
 				</view>
-				<view class="bot b-t">
-					<text>查看详情</text>
-					<text class="more-icon yticon icon-you"></text>
+				<view v-else>
+					<uni-list>
+						<uni-list-chat v-for="item in [1,2,3,4,5,7]" :key="item.id" :title="'名称'" :time="'17:56'" 
+						:avatar="'https://img.36krcdn.com/20200410/v2_86bbf8245f754be79f3386a82b385093_img_000'" :note="'描述内容'" badge-positon="left" :badge-text="3">
+							<!-- <view class="chat-custom-right">
+								<text class="chat-custom-text">刚刚</text>
+								<uni-icons type="star-filled" color="#999" size="18"></uni-icons>
+							</view> -->
+						</uni-list-chat>
+					</uni-list>
 				</view>
-			</view>
-		</view>
-		<view class="notice-item">
-			<text class="time">2019-07-26 12:30</text>
-			<view class="content">
-				<text class="title">新品上市，全场满199减50</text>
-				<view class="img-wrapper">
-					<image class="pic" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556465765776&di=57bb5ff70dc4f67dcdb856e5d123c9e7&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01fd015aa4d95fa801206d96069229.jpg%401280w_1l_2o_100sh.jpg"></image>
-					<view class="cover">
-						活动结束
-					</view>
-				</view>
-				<text class="introduce">新品上市全场2折起，新品上市全场2折起，新品上市全场2折起，新品上市全场2折起，新品上市全场2折起</text>
-				<view class="bot b-t">
-					<text>查看详情</text>
-					<text class="more-icon yticon icon-you"></text>
-				</view>
-			</view>
-		</view>
+				</scroll-view>
+			</swiper-item>
+			
+		</swiper>
 	</view>
 </template>
 
 <script>
+	const navList = [{
+		state: 0,
+		text: '系统消息',
+		loadingType: 'more',
+		orderList: []
+	},
+	{
+		state: 1,
+		text: '提示消息',
+		loadingType: 'more',
+		orderList: []
+	}]
 	export default {
 		data() {
 			return {
-
+				navList,
+				tabCurrentIndex: 0
 			}
 		},
 		methods: {
-
+			loadData() {
+				
+			},
+			//swiper 切换
+			changeTab(e){
+				this.tabCurrentIndex = e.target.current;
+				this.loadData('tabChange');
+			},
+			//顶部tab点击
+			tabClick(index){
+				this.tabCurrentIndex = index;
+			},
 		}
 	}
 </script>
 
 <style lang='scss'>
-	page {
-		background-color: #f7f7f7;
-		padding-bottom: 30upx;
+	
+	page, .page-notice{
+		background: $page-color-base;
+		height: 100%;
+	}
+	
+	.swiper-box{
+		height: calc(100% - 40px);
+	}
+	.list-scroll-content{
+		height: 100%;
 	}
 
 	.notice-item {
@@ -150,4 +181,38 @@
 	.more-icon {
 		font-size: 32upx;
 	}
+	
+	.navbar{
+		display: flex;
+		height: 40px;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		.nav-item{
+			flex: 1;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+			font-size: 15px;
+			color: $font-color-dark;
+			position: relative;
+			&.current{
+				color: $font-color-spec;
+				&:after{
+					content: '';
+					position: absolute;
+					left: 50%;
+					bottom: 0;
+					transform: translateX(-50%);
+					width: 44px;
+					height: 0;
+					border-bottom: 2px solid $font-color-spec;
+				}
+			}
+		}
+	}
+	
 </style>
