@@ -43,6 +43,9 @@
 
 <script>
 	var _this;
+	import { mapState, mapMutations } from 'vuex';
+	import { findPwd, sendCode } from '@/api/user'
+	import md5 from '@/utils/md5/md5.min.js'
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
 	export default {
@@ -62,6 +65,7 @@
 			_this= this;
 		},
 		methods: {
+			...mapMutations(['logout']),
 			getVerCode(){
 				//获取验证码
 				if (_this.phoneData.length != 11) {
@@ -72,22 +76,17 @@
 					});
 					return false;
 				}
-				console.log("获取验证码")
 				this.$refs.runCode.$emit('runCode'); //触发倒计时（一般用于请求成功验证码后调用）
-				uni.showToast({
-				  icon: 'none',
-					position: 'bottom',
-				  title: '模拟倒计时触发'
-				});
 				
-				// setTimeout(function(){
-				// 	_this.$refs.runCode.$emit('runCode',0); //假装模拟下需要 终止倒计时
-				// 	uni.showToast({
-				// 	  icon: 'none',
-				// 		position: 'bottom',
-				// 	  title: '模拟倒计时终止'
-				// 	});
-				// },3000)
+				let params = {
+					PhoneNumber: this.phoneData,
+					SMSType: 2 // 1 手机注册   2 找回密码
+				}
+				sendCode(params).then(res => {
+					this.$api.msg('验证码发送成功')
+				}, err => {
+					this.$api.msg('验证码发送失败，请重试')
+				})
 			},
 			startRePass() {
 				//重置密码
@@ -96,36 +95,51 @@
 					return false;
 				}
 				if (this.phoneData.length != 11) {
-				    uni.showToast({
-				        icon: 'none',
+				  uni.showToast({
+						icon: 'none',
 						position: 'bottom',
-				        title: '手机号不正确'
-				    });
-				    return false;
+						title: '手机号不正确'
+					});
+					return false;
 				}
-			    if (this.passData.length < 6) {
-			        uni.showToast({
-			            icon: 'none',
+				if (this.passData.length < 6) {
+					uni.showToast({
+						icon: 'none',
 						position: 'bottom',
-			            title: '密码不正确'
-			        });
-			        return false;
-			    }
+						title: '密码不正确'
+					});
+					return false;
+				}
 				if (this.verCode.length != 4) {
-				    uni.showToast({
-				        icon: 'none',
+					uni.showToast({
+						icon: 'none',
 						position: 'bottom',
-				        title: '验证码不正确'
-				    });
-				    return false;
+						title: '验证码不正确'
+					});
+					return false;
 				}
-				console.log("重置密码成功")
-				_this.isRotate=true
-				setTimeout(function(){
-					_this.isRotate=false
-				},3000)
 				
-				
+				this.setPassWord()
+			},
+			setPassWord() {
+				let params = {
+					Phone: this.phoneData,
+					Code: this.verCode,
+					Pwd: md5(this.passData)
+				}
+				this.isRotate = true
+				findPwd(params).then(res => {
+					this.isRotate = false
+					this.logout()
+					this.$api.mag('密码修改成功')
+					setTimeout(() => {
+						uni.reLaunch({
+							url: '/pages/public/login'
+						})
+					}, 300)
+				}, err => {
+					this.isRotate = false
+				})
 			}
 		}
 	}

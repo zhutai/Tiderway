@@ -32,7 +32,7 @@
 	}
 	.success-icon{
 		font-size: 160upx;
-		color: #fa436a;
+		color: $font-color-base;
 		margin-top: 100upx;
 	}
 	.tit{

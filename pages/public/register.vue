@@ -101,7 +101,9 @@
 					SMSType: 1 // 1 手机注册   2 找回密码
 				}
 				sendCode(params).then(res => {
-					console.log(res)
+					this.$api.msg('验证码发送成功')
+				}, err => {
+					this.$api.msg('验证码发送失败，请重试')
 				})
 				// uni.showToast({
 				//   icon: 'none',

@@ -1,34 +1,28 @@
 <template>
 	<view class="container">
-		
-		<view class="list-cell b-b m-t" @click="navTo('个人资料')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">个人资料</text>
+		<view class="list-cell b-b m-t" @click="navTo('头像')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">头像</text>
+			<image class="slot-image" src="../../static/missing-face.png" mode="widthFix"></image>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" @click="navTo('手机号')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">手机号</text>
+			<text class="cell-tip">{{ userInfo.LoginName }}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">收货地址</text>
-			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">实名认证</text>
+		<view class="list-cell" @click="navTo('用户名')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">用户名</text>
+			<text class="cell-tip">{{ userInfo.LoginName }}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 		
 		<view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
-			<switch checked color="#fa436a" @change="switchChange" />
+			<switch checked color="#4399fc" @change="switchChange" />
 		</view>
-		<view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">清除缓存</text>
-			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell b-b" @click="navTo('关于Dcloud')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">关于Dcloud</text>
-			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell">
-			<text class="cell-tit">检查更新</text>
-			<text class="cell-tip">当前版本 1.0.3</text>
+		
+		<view class="list-cell m-t" @click="navTo('/pages/public/forget')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">修改密码</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 		<view class="list-cell log-out-btn" @click="toLogout">
@@ -52,7 +46,10 @@
 			...mapMutations(['logout']),
 
 			navTo(url){
-				this.$api.msg(`跳转到${url}`);
+				uni.navigateTo({
+					url
+				})
+				// this.$api.msg(`跳转到${url}`);
 			},
 			//退出登录
 			toLogout(){
@@ -87,9 +84,19 @@
 	page{
 		background: $page-color-base;
 	}
+	
+	.slot-image {
+		/* #ifndef APP-NVUE */
+		display: block;
+		/* #endif */
+		margin-right: 10px;
+		width: 80rpx;
+		height: 80rpx;
+	}
+	
 	.list-cell{
 		display:flex;
-		align-items:baseline;
+		align-items:center;
 		padding: 20upx $page-row-spacing;
 		line-height:60upx;
 		position:relative;
@@ -98,7 +105,7 @@
 		&.log-out-btn{
 			margin-top: 40upx;
 			.cell-tit{
-				color: $uni-color-primary;
+				color: $font-color-spec;
 				text-align: center;
 				margin-right: 0;
 			}

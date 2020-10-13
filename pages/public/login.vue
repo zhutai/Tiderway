@@ -37,6 +37,7 @@
 
 <script>
 	var _this;
+	import md5 from '@/utils/md5/md5.min.js'
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
 	import { login } from '@/api/user'
@@ -102,22 +103,24 @@
 					return;
 				}
 
-				console.log("登录成功")
-
 				_this.isRotate = true
 				let params = {
 					LoginName: this.phoneData,
-					Pwd: this.passData,
+					Pwd: md5(this.passData),
 					LoginType: 1
 				}
 				
 				login(params).then(res => {
 					if (res && res.Data) {
+						_this.isRotate = false
 						this.login(res.Data)
 						uni.reLaunch({
 							url: '/pages/index/index'
 						})
 					}
+				}, err => {
+					_this.isRotate = false
+					// this.$api.msg(err.errMsg)
 				})
 				// setTimeout(function() {
 				// 	_this.isRotate = false

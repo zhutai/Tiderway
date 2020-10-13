@@ -55,6 +55,7 @@ http.interceptors.response.use(async (response) => { /* 请求之后拦截器。
 		if (response.data.Code === 200) { // 接口内部状态无异常
 			return response.data
 		} else {
+			console.log(response)
 			uni.showToast({
 			  icon: 'none',
 				position: 'bottom',
