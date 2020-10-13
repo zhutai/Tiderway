@@ -28,7 +28,7 @@
 </script>
 
 <style lang='scss'>
-	/* @import './common/uni.css'; */
+	@import './common/uni.css'; 	
 	@import './common/common.css';
 	@import './common/icon.css';
 	/*

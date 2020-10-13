@@ -87,6 +87,11 @@
 			"style": {
 				"navigationBarTitleText": "个人资料"
 			}
+		}, {
+			"path": "pages/user/feedback",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
 		},
 		{
 			"path": "pages/product/product",

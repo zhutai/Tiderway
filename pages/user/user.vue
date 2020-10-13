@@ -56,7 +56,7 @@
 			iconColor: '#ee883b',
 			title: '意见反馈',
 			tips: '',
-			url: '/pages/set/set'
+			url: '/pages/user/feedback'
 		},{
 			icon: 'iconshebeishezhi',
 			iconColor: '#54b4ef',
