@@ -177,9 +177,40 @@ export default {
 		uniNavBar
 	},
 	onLoad() {
+		this.loadExecution()
 		this.loadData();
 	},
 	methods: {
+		loadExecution: function(){
+			/**
+			 * 获取本地存储中launchFlag的值
+			 * 若存在，说明不是首次启动，直接进入首页；
+			 * 若不存在，说明是首次启动，进入引导页；
+			 */
+			try {
+				// 获取本地存储中launchFlag标识
+			    const value = uni.getStorageSync('launchFlag');
+			    if (!value) {
+					// launchFlag=true直接跳转到首页
+					uni.reLaunch({
+						url: '/pages/index/guide'
+					});
+			    } else {
+					// launchFlag!=true显示引导页
+			      this.guidePages = true
+			    }
+			} catch(e) { 
+				// error 
+				uni.setStorage({ 
+					key: 'launchFlag', 
+					data: true, 
+					success: function () {
+						console.log('error时存储launchFlag');
+					} 
+				}); 
+				this.guidePages = true
+			}
+		},
 		/**
 		 * 请求静态数据只是为了代码不那么乱
 		 * 分次请求未作整合

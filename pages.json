@@ -12,6 +12,13 @@
 					"titleNView": false
 				}
 			}
+		},{
+			"path": "pages/index/guide", // 引导页
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				}
+			}
 		},
 		{
 			"path": "pages/health/health",

@@ -181,6 +181,7 @@
 		width: 32rpx;
 		height: 32rpx;
 		font-size: 32rpx;
+		line-height: 32rpx;
 	}
 	.main-input{
 		flex: 1;
