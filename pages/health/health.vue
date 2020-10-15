@@ -163,18 +163,22 @@
 	import Echarts from '@/components/echarts/echarts.vue'
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
 	import { dateRangeUtils } from '@/common/util.js'
+	import { getHistoryData } from '@/api/history.js'
 	var canvasObj = {};
 	var _self;
 
 	const tabbars = [{
 		name: '心率',
 		dateTimeIndex: 0,
+		path: 'HeartHistory'
 	}, {
 		name: '运动',
 		dateTimeIndex: 0,
+		path: 'StepHistory'
 	}, {
 		name: '血压',
 		dateTimeIndex: 0,
+		path: 'BloodHistory'
 	}, ]
 
 	const tabs = [{
@@ -270,13 +274,27 @@
 			this.heartRateOption = this.getOption1()
 			this.motionOption = this.getOption2()
 			this.bloodOption = this.getOptions(0)
-			this.toggleTabs(this.current)
 			this.chartHeight = uni.upx2px(500)
+			this.toggleTabs(this.current)
+			// this.getHistoryData()
 		},
 		onReady() {
 		},
 		methods: {
 				
+			getHistoryData() {
+				let path = tabbars[this.current].path
+				let currentTab = this.tabs.find(item => item.active) || {}
+				let params = {
+					Limit: 0,
+					Page: 10000,
+					StartTime: currentTab.createTime,
+					EndTime: currentTab.endTime
+				}
+				getHistoryData(path, params).then(res => {
+					console.log(res)
+				})
+			},
 			getOption1() {
 				var base = +new Date(2019, 9, 3);
 				var oneDay = 24 * 3600 * 1000;
@@ -452,6 +470,7 @@
 						item.active = false
 					}
 				})
+				this.getHistoryData()
 			},
 			getCharts() {
 				var chartData = [
