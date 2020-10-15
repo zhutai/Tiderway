@@ -11,7 +11,7 @@ const VERSION = config.VERSION
  * @param {Object} data - 获取设备列表  
  */
 export const getDeviceList = (data) => {
-  return http.post(`${VERSION}/Device​/deviceList`, data)
+  return http.post(`${VERSION}/Device/deviceList`, data)
 }
 
 /**
