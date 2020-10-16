@@ -6,7 +6,7 @@
 			<view class="user-center">
 				<image class="user-avatar" src="../../static/missing-face.png"></image>
 			</view>
-			<view class="bar-text" slot="left">切换设备</view>
+			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
 			<view class="bar-text" slot="right">添加设备</view>
 		</uni-nav-bar>
 		
@@ -80,6 +80,16 @@
 			</view>
 		</view>
 		
+		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
+			<view class="device-box">
+				<view class="device-title">我的设备列表</view>
+				<uni-list>
+					<uni-list-item v-for="(item, index) in deviceList" :key="index"
+					 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
+				</uni-list>
+			</view>
+		</uni-drawer>
+		
 		<view style="height: 900px;">
 			
 		</view>
@@ -89,6 +99,7 @@
 
 <script>
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+import { getDeviceList } from "@/api/device.js"
 
 const healthyList = [
 	{
@@ -163,11 +174,13 @@ export default {
 
 	data() {
 		return {
+			showLeft: false,
 			titleNViewBackground: '',
 			swiperCurrent: 0,
 			swiperLength: 0,
 			carouselList: [],
 			goodsList: [],
+			deviceList: [],
 			healthyList,
 			optionList,
 			radiaList
@@ -224,10 +237,32 @@ export default {
 			let goodsList = await this.$api.json('goodsList');
 			this.goodsList = goodsList || [];
 		},
+		showDrawer(e) {
+			this.$refs[e].open()
+		},
+		changeDrawer(bool) {
+			console.log(bool)
+			this.showLeft = bool
+			if (bool) {
+				getDeviceList({Page: 0, Limit: 1000 }).then(res => {
+					console.log(res.Data.DeviceList.splice(0, 10))
+					this.deviceList = res.Data.DeviceList.splice(0, 10) || []
+				})
+			}
+		},
 		change() {
 			console.log(197)
 		}
 	},
+	// #ifdef APP-PLUS
+	// app端拦截返回事件 ，仅app端生效
+	onBackPress() {
+		if (this.showLeft) {
+			this.$refs.showLeft.close()
+			return true
+		}
+	},
+	// #endif
 	// #ifndef MP
 	// 标题栏input搜索框点击
 	onNavigationBarSearchInputClicked: async function(e) {
@@ -333,6 +368,13 @@ export default {
 				transform: scale(0.8);
 				border: 1px solid #C0C4CC;
 			}
+		}
+	}
+	
+	.device-box {
+		.device-title {
+			padding: 32rpx;
+			font-size: 16px;
 		}
 	}
 	
