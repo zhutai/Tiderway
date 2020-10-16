@@ -5,15 +5,27 @@
 	import {
 		mapMutations
 	} from 'vuex';
+	import { getDeviceList } from "@/api/device.js"
 	export default {
 		methods: {
-			...mapMutations(['login'])
+			...mapMutations(['login', 'setDeviceImei'])
 		},
 		onLaunch: function() {
 			let userInfo = uni.getStorageSync('userInfo') || '';
 			if(userInfo){
 				//更新登陆状态
 				this.login(userInfo)
+				// 默认选中第一个设备数据
+				let imei = uni.getStorageSync('deviceImei') || '';
+				if (imei) {
+					this.setDeviceImei(imei)
+				} else{
+					getDeviceList({Page: 0, Limit: 10 }).then(res => {
+						let deviceList = res.Data.DeviceList || []
+						let str = deviceList.length ? deviceList[0].IMEI : ''
+						this.setDeviceImei(str, deviceList.length)
+					})
+				}
 			} else {
 				uni.navigateTo({ url: '/pages/public/login' }) 
 			}

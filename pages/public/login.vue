@@ -106,7 +106,8 @@
 				_this.isRotate = true
 				let params = {
 					LoginName: this.phoneData,
-					Pwd: md5(this.passData),
+					Pwd: this.passData,
+					// Pwd: md5(this.passData),
 					LoginType: 1
 				}
 				

@@ -1,5 +1,5 @@
 /**
- * 商品相关api
+ * 用户相关api
  */
 import http from '@/api/service.js'
 import config from '@/config.js'
