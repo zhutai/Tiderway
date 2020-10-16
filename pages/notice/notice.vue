@@ -60,7 +60,7 @@
 	},
 	{
 		state: 1,
-		text: '提示消息',
+		text: '报警消息',
 		loadingType: 'more',
 		orderList: []
 	}]
