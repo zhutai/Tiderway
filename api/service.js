@@ -52,11 +52,9 @@ http.setConfig((config) => { /* 设置全局配置 */
 http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使用async await 做异步操作 */
   config.header = {
     ...config.header,
+		imei: getImeiStorage() || '',
     Authorization: getTokenStorage()
   }
-	config.data = {
-		imei: getImeiStorage()
-	}
   /*
 	  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
 		  return Promise.reject(config)
@@ -69,7 +67,8 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
 
 http.interceptors.response.use(async (response) => { /* 请求之后拦截器。可以使用async await 做异步操作  */
 	if (response.statusCode === 200) { // 接口请求成功
-		if (response.data.Code === 200) { // 接口内部状态无异常
+		let codes = [0, 100, 200]
+		if (codes.includes(response.data.Code)) { // 接口内部状态无异常
 			return response.data
 		} else {
 			console.log(response)
