@@ -14,15 +14,29 @@ const getTokenStorage = () => {
   let token = ''
   try {
 		if (store.state.hasLogin) {
-			token = store.state.userInfo.Token
+			token = "Bearer " + store.state.userInfo.Token
 		} else {
 			let userInfo = uni.getStorageSync('userInfo') || {}
-			token = userInfo.Token || ''
+			token = userInfo.Token ? ("Bearer " + userInfo.Token) : ''
 		}
   } catch (e) {
 		console.log(e)
   }
   return token
+}
+
+const getImeiStorage = () => {
+  let deviceImei = ''
+  try {
+		if (store.state.deviceImei) {
+			deviceImei = store.state.deviceImei
+		} else {
+			deviceImei = uni.getStorageSync('deviceImei') || ''
+		}
+  } catch (e) {
+		console.log(e)
+  }
+  return deviceImei
 }
 
 const http = new Request()
@@ -38,8 +52,11 @@ http.setConfig((config) => { /* 设置全局配置 */
 http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使用async await 做异步操作 */
   config.header = {
     ...config.header,
-    token: getTokenStorage()
+    Authorization: getTokenStorage()
   }
+	config.data = {
+		imei: getImeiStorage()
+	}
   /*
 	  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
 		  return Promise.reject(config)
