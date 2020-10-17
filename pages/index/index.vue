@@ -83,11 +83,13 @@
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
 			<view class="device-box">
 				<view class="device-title">我的设备列表</view>
-				<scroll-view class="scroll-view_H" scroll-y="true" @scrolltolower="scrolltolower">
+				<scroll-view class="scroll-Y" scroll-y="true" @scrolltolower="scrolltolower">
+					<!-- <view v-for="index in 100">{{ index }}</view> -->
 					<uni-list>
 						<uni-list-item v-for="(item, index) in deviceList" :key="index"
 						 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
 					</uni-list>
+					<uni-load-more v-show="deviceLoading" :status="status" />
 				</scroll-view>
 			</view>
 		</uni-drawer>
@@ -180,19 +182,22 @@ const optionList = [
 		name: ' 设备设置'
 	}
 ]
-
+let page = 0
 import { getHealthInfo } from '@/api/device.js'
+
 
 export default {
 
 	data() {
 		return {
+			status: 'more',
 			showLeft: false,
 			titleNViewBackground: '',
 			swiperCurrent: 0,
 			swiperLength: 0,
 			carouselList: [],
 			goodsList: [],
+			deviceLoading: false,
 			deviceList: [],
 			healthyList,
 			optionList,
@@ -203,41 +208,22 @@ export default {
 		uniNavBar
 	},
 	onLoad() {
-		this.loadExecution()
+		// this.loadExecution()
 		this.loadData();
+		// #ifdef APP-PLUS
+		var ptObj = new plus.maps.Point('116.39747', '39.9085' );
+		plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
+			console.log(res)
+			alert(res)
+		},function () {
+			
+		})
+		// #endif
 	},
 	methods: {
-		loadExecution: function(){
-			/**
-			 * 获取本地存储中launchFlag的值
-			 * 若存在，说明不是首次启动，直接进入首页；
-			 * 若不存在，说明是首次启动，进入引导页；
-			 */
-			try {
-				// 获取本地存储中launchFlag标识
-			    const value = uni.getStorageSync('launchFlag');
-			    if (!value) {
-					// launchFlag=true直接跳转到首页
-					uni.reLaunch({
-						url: '/pages/index/guide'
-					});
-			    } else {
-					// launchFlag!=true显示引导页
-			      this.guidePages = true
-			    }
-			} catch(e) { 
-				// error 
-				uni.setStorage({ 
-					key: 'launchFlag', 
-					data: true, 
-					success: function () {
-						console.log('error时存储launchFlag');
-					} 
-				}); 
-				this.guidePages = true
-			}
-		},
 		scrolltolower() {
+			page += 1
+			this.getDeviceList()
 			console.log(241)
 		},
 		/**
@@ -258,12 +244,20 @@ export default {
 		changeDrawer(bool) {
 			this.showLeft = bool
 			if (bool) {
-				getDeviceList({Page: 0, Limit: 10 }).then(res => {
-					this.deviceList = res.Data.DeviceList || []
-				})
+				this.getDeviceList()
+			} else {
+				page = 0
 			}
 		},
-			
+		getDeviceList() {
+			this.status = 'loading'
+			getDeviceList({Page: page, Limit: 10 }).then(res => {
+				this.deviceLoading = true
+				let deviceList = res.Data.DeviceList || []
+				if (!deviceList.length) this.status = 'noMore'
+				this.deviceList = this.deviceList.concat(deviceList)
+			})
+		},
 		changeHealth(e) {
 			let index = e.detail.index
 		},
@@ -282,7 +276,7 @@ export default {
 	// app端拦截返回事件 ，仅app端生效
 	onBackPress() {
 		if (this.showLeft) {
-			this.$refs.showLeft.close()
+			this.$refs.showLeft.closwe()
 			return true
 		}
 	},
@@ -336,6 +330,10 @@ export default {
 	.text {
 		font-size: 12px;
 		color: #999;
+	}
+	
+	.scroll-Y {
+		height: 1214rpx;
 	}
 	
 	.bar-text {
@@ -397,6 +395,7 @@ export default {
 	.device-box {
 		.device-title {
 			padding: 32rpx;
+			height: 120rpx;
 			font-size: 16px;
 		}
 	}
