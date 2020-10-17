@@ -81,11 +81,12 @@
 		</view>
 		
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
+			<uni-status-bar />
 			<view class="device-box">
 				<view class="device-title">我的设备列表</view>
-				<scroll-view class="scroll-Y" scroll-y="true" @scrolltolower="scrolltolower">
+				<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
 					<!-- <view v-for="index in 100">{{ index }}</view> -->
-					<uni-list >
+					<uni-list class="device-list">
 						<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
 							<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
 								<view class="block">
@@ -205,6 +206,7 @@ export default {
 		return {
 			status: 'loading',
 			showLeft: false,
+			scrollHeight: 400,
 			titleNViewBackground: '',
 			swiperCurrent: 0,
 			swiperLength: 0,
@@ -224,6 +226,14 @@ export default {
 		...mapState(['deviceImei', 'deviceEmpey', 'userInfo'])
 	},
 	onLoad() {
+		uni.getSystemInfo({
+			success: (res) => {
+				let windowHeight = res.windowHeight
+				let titleHeight = uni.upx2px(120)
+				console.log(res)
+				this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
+			}
+		})
 	},
 	onShow() {
 		console.log(this.deviceImei)
@@ -261,7 +271,7 @@ export default {
 	},
 	methods: {
 		...mapMutations(['setDeviceImei']),
-		scrolltolower() {
+		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
 		},
@@ -290,19 +300,40 @@ export default {
 		async changeDrawer(bool) {
 			this.showLeft = bool
 			if (bool) {
-				this.getDeviceList()
+				this.getDeviceList(true)
 			} else {
 				page = 0
 				this.deviceList = []
 			}
 		},
-		getDeviceList() {
+		getDeviceList(isFirst) {
 			this.status = 'loading'
 			getDeviceList({Page: page, Limit: 10 }).then(res => {
 				this.deviceLoading = true
 				let deviceList = res.Data.DeviceList || []
 				if (!deviceList.length) this.status = 'noMore'
 				this.deviceList = this.deviceList.concat(deviceList)
+				if (isFirst) {
+					this.checkHeight()
+				}
+			})
+		},
+		checkHeight() {
+			uni.getSystemInfo({
+				success: (res) => {
+					let windowHeight = res.windowHeight
+					setTimeout(() => {
+						let obj = uni.createSelectorQuery().select('.device-list')
+						obj.boundingClientRect((data) => { // data - 各种参数
+							let height = data.height
+							if (height < windowHeight) {
+								let bool = (height + (height / (page || 1))) < windowHeight
+								page += 1;
+								this.getDeviceList(bool)
+							}
+						}).exec()
+					}, 0)
+				}
 			})
 		},
 		changeHealth(e) {
@@ -321,9 +352,9 @@ export default {
 	},
 	// #ifdef APP-PLUS
 	// app端拦截返回事件 ，仅app端生效
-	onBackPress() {
+	onHide() {
 		if (this.showLeft) {
-			this.$refs.showLeft.closwe()
+			this.$refs.showLeft.close()
 			return true
 		}
 	},
@@ -380,7 +411,7 @@ export default {
 	}
 	
 	.scroll-Y {
-		height: 1214rpx;
+		height: calc(100vh - 120rpx);
 	}
 	
 	.bar-text {
