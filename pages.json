@@ -144,7 +144,16 @@
 				"navigationBarTitleText": "商品列表"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/location/monitor",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "设备监控",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
