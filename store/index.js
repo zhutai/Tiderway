@@ -39,7 +39,7 @@ const store = new Vuex.Store({
 				key: 'userInfo'  
 			})
 		},
-		setDeviceImei(state, deviceImei, imeiLength = 1) {
+		setDeviceImei(state, { deviceImei, imeiLength }) {
 			state.deviceImei = deviceImei
 			state.deviceEmpey = !imeiLength
 			uni.setStorage({ //缓存用户登陆状态

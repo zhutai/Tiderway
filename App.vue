@@ -28,7 +28,8 @@
 						// launchFlag!=true显示引导页
 						this.loadUserInfo(option)
 				  }
-				} catch(e) { 
+				} catch(e) {
+					console.log(e)
 					// error 
 					uni.setStorage({ 
 						key: 'launchFlag', 
@@ -40,7 +41,7 @@
 				}
 			},
 			// 判断用户是否有登录信息，没有则跳转登录页面
-			loadUserInfo() {
+			loadUserInfo(option) {
 				let userInfo = uni.getStorageSync('userInfo') || '';
 				if(userInfo){
 					//更新登陆状态
@@ -48,13 +49,9 @@
 					// 默认选中第一个设备数据
 					let imei = uni.getStorageSync('deviceImei') || '';
 					if (imei) {
-						this.setDeviceImei(imei)
+						this.setDeviceImei({ deviceImei: imei, imeiLength: 1 })
 					} else{
-						getDeviceList({Page: 0, Limit: 10 }).then(res => {
-							let deviceList = res.Data.DeviceList || []
-							let str = deviceList.length ? deviceList[0].IMEI : ''
-							this.setDeviceImei(str, deviceList.length)
-						})
+						this.setDeviceImei({ deviceImei: imei, imeiLength: 0 })
 					}
 				} else {
 					let arr = ["pages/public/register", "pages/public/login"]
@@ -65,6 +62,7 @@
 			}
 		},
 		onLaunch: function(option) {
+			console.log(option)
 			this.loadExecution(option)
 		},
 		onShow: function() {

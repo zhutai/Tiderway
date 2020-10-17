@@ -37,11 +37,9 @@
 					<view class="title-dot-light">心率曲线(mmg)</view>
 				</view>
 				
-				<view class="chart">
-					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
-					<echarts-el :key="1" class="echarts" :option="heartRateOption" :style="{height: `${chartHeight}px`}"></echarts-el>
-					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
-					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
+				<view class="chart" :style="{height: `${chartHeight}px`}">
+					<echarts-el v-if="chartLoading && heartRateOption" key="1" class="echarts" :option="heartRateOption"></echarts-el>
+					<empty v-if="chartLoading && !heartRateOption" title=" 暂无图表数据"></empty>
 				</view>
 			</view>
 
@@ -81,11 +79,9 @@
 					<view class="title-dot-light">运动步数</view>
 				</view>
 				
-				<view class="chart">
-					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
-					<echarts-el :key="2"  class="echarts" :option="motionOption" :style="{height: `${chartHeight}px`}"></echarts-el>
-					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
-					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
+				<view class="chart" :style="{height: `${chartHeight}px`}">
+					<echarts-el v-if="chartLoading && motionOption" key="2" class="echarts" :option="motionOption"></echarts-el>
+					<empty v-if="chartLoading && !motionOption" title=" 暂无图表数据"></empty>
 				</view>
 			</view>
 			
@@ -125,11 +121,9 @@
 					<view class="title-dot-light">心率曲线(mmg)</view>
 				</view>
 				
-				<view class="chart">
-					<!-- <echarts class="echarts" :option="option" style="height: 300px;" @click="echartsClick"></echarts> -->
-					<echarts-el :key="3"  class="echarts" :option="bloodOption" :style="{height: `${chartHeight}px`}"></echarts-el>
-					<!-- 使用图表拖拽功能时，建议给canvas增加disable-scroll=true属性，在拖拽时禁止屏幕滚动 -->
-					<!-- <canvas canvas-id="canvasLineA" id="canvasLineA" disable-scroll=true @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas> -->
+				<view class="chart" :style="{height: `${chartHeight}px`}">
+					<echarts-el v-if="chartLoading && bloodOption" key="3" class="echarts" :option="bloodOption"></echarts-el>
+					<empty v-if="chartLoading && !bloodOption" title=" 暂无图表数据"></empty>
 				</view>
 			</view>
 			
@@ -158,9 +152,10 @@
 </template>
 
 <script>
-	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+	import empty from '@/components/empty.vue'
 	import uCharts from '@/components/u-charts/u-charts.js'
 	import Echarts from '@/components/echarts/echarts.vue'
+	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
 	import { dateRangeUtils } from '@/common/util.js'
 	import { getHistoryData } from '@/api/history.js'
@@ -222,19 +217,19 @@
 		name: '平均值',
 		unit: '次/分钟',
 		key: 'xinlu',
-		num: 90,
+		num: '--',
 		className: 'blue'
 	}, {
 		name: '最大值',
 		unit: '次/分钟',
 		key: 'xinlu',
-		num: 90,
+		num: '--',
 		className: 'green'
 	}, {
 		name: '最小值',
 		unit: '次/分钟',
 		key: 'xinlu',
-		num: 90,
+		num: '--',
 		className: 'yellow'
 	}]
 
@@ -246,6 +241,7 @@
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
 				tabs,
+				chartLoading: false,
 				bloodOption: null,
 				motionOption: null,
 				heartRateOption: null,
@@ -266,14 +262,12 @@
 			};
 		},
 		components: {
+			empty,
 			uniNavBar,
 			Echarts,
 			EchartsEl
 		},
 		onLoad() {
-			this.heartRateOption = this.getOption1()
-			this.motionOption = this.getOption2()
-			this.bloodOption = this.getOptions(0)
 			this.chartHeight = uni.upx2px(500)
 			this.toggleTabs(this.current)
 			// this.getHistoryData()
@@ -283,6 +277,7 @@
 		methods: {
 				
 			getHistoryData() {
+				uni.showLoading({title: ' 加载中...', mask: true})
 				let path = tabbars[this.current].path
 				let currentTab = this.tabs.find(item => item.active) || {}
 				let params = {
@@ -291,8 +286,22 @@
 					StartTime: currentTab.createTime,
 					EndTime: currentTab.endTime
 				}
+				this.chartLoading = false
 				getHistoryData(path, params).then(res => {
-					console.log(res)
+					this.chartLoading = true
+					if (path === 'HeartHistory') {
+						let HistoryList = res.Data.HistoryList
+						if (HistoryList.length) {
+							this.heartRateOption = this.getOption1()
+						} else {
+							this.heartRateOption = null
+						}
+					} else if (path === 'StepHistory') {
+						
+					} else {
+						
+					}
+					uni.hideLoading()
 				})
 			},
 			getOption1() {
@@ -795,11 +804,7 @@
 	page {
 		background: #f5f5f5;
 	}
-
-	// .container {
-	// 	background: #fff;
-	// }
-
+	
 	.navbar-segmented {
 		width: 100%;
 		padding: 0 72rpx;
@@ -851,6 +856,7 @@
 			width: 40%;
 			height: 100%;
 			padding: 24rpx;
+			line-height: 60rpx;
 			display: inline-block;
 			margin-right: 24rpx;
 			background: $color-white;
@@ -950,16 +956,5 @@
 		line-height: 16px;
 		text-align: center;
 		color: #fff;
-	}
-	
-	.echarts {
-		height: 500rpx;
-	}
-
-	#canvasLineA,
-	#echarts {
-		width: 375px;
-		height: 250px;
-		background-color: $color-white;
 	}
 </style>
