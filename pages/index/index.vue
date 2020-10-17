@@ -31,8 +31,8 @@
 				</view>
 			</uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item v-for="(item ,index) in healthyList" :key="index">
+				<uni-grid :column="4" :show-border="false" :square="false" @change="changeHealth">
+					<uni-grid-item v-for="(item ,index) in healthyList" :index="index" :key="index">
 						<view class="grid-item-box">
 							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
@@ -51,8 +51,8 @@
 				</view>
 			</uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item v-for="(item ,index) in radiaList" :key="index">
+				<uni-grid :column="3" :show-border="false" :square="false" @change="changeRadia">
+					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
 						<view class="grid-item-box">
 							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
@@ -68,8 +68,8 @@
 		<view class="example-body">
 			<uni-section title="设备功能表" type="line"></uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" >
-					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :key="index" @click.native="optionClick(item)">
+				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
+					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
 							<text class="block iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
@@ -83,10 +83,12 @@
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
 			<view class="device-box">
 				<view class="device-title">我的设备列表</view>
-				<uni-list>
-					<uni-list-item v-for="(item, index) in deviceList" :key="index"
-					 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
-				</uni-list>
+				<scroll-view class="scroll-view_H" scroll-y="true" @scrolltolower="scrolltolower">
+					<uni-list>
+						<uni-list-item v-for="(item, index) in deviceList" :key="index"
+						 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
+					</uni-list>
+				</scroll-view>
 			</view>
 		</uni-drawer>
 		
@@ -106,23 +108,31 @@ const healthyList = [
 		name: '步',
 		unit: 'step',
 		icon: 'iconbushu',
-		key: 'step',
+		key: 'Step',
 		color: '#4399fc',
-		num: 3264
+		num: '--'
+	},
+	{
+		name: ' 距离',
+		unit: 'step',
+		icon: 'iconbushu',
+		key: 'Distance',
+		color: '#95F204',
+		num: '--'
 	},{
 		name: '心率',
 		unit: 'bpm',
 		icon: 'iconjiankang',
-		key: 'bpm',
+		key: 'Heart',
 		color: '#95F204',
-		num: 90
+		num: '--'
 	},{
 		name: '血压',
 		unit: 'mmHg',
 		icon: 'iconxieya',
 		color: '#F59A23',
-		key: 'mmHg',
-		num: 36.5
+		key: 'Rate',
+		num: '--'
 	},
 ]
 
@@ -174,6 +184,8 @@ const optionList = [
 		url:'',
 	}
 ]
+
+import { getHealthInfo } from '@/api/device.js'
 
 export default {
 
@@ -229,36 +241,48 @@ export default {
 				this.guidePages = true
 			}
 		},
+		scrolltolower() {
+			console.log(241)
+		},
 		/**
 		 * 请求静态数据只是为了代码不那么乱
 		 * 分次请求未作整合
 		 */
 		async loadData() {
-			let carouselList = await this.$api.json('carouselList');
-			this.titleNViewBackground = carouselList[0].background;
-			this.swiperLength = carouselList.length;
-			this.carouselList = carouselList;
-			
-			let goodsList = await this.$api.json('goodsList');
-			this.goodsList = goodsList || [];
+			const result = await getHealthInfo()
+			let healthInfo = result.Data || {}
+			healthInfo.Rate = (healthInfo.Shrink + healthInfo.Diastole) / 2
+			this.healthyList.forEach(item => {
+				item.num = result.Data[item.key]
+			})
 		},
 		showDrawer(e) {
 			this.$refs[e].open()
 		},
 		changeDrawer(bool) {
-			console.log(bool)
 			this.showLeft = bool
 			if (bool) {
-				getDeviceList({Page: 0, Limit: 1000 }).then(res => {
-					console.log(res.Data.DeviceList.splice(0, 10))
-					this.deviceList = res.Data.DeviceList.splice(0, 10) || []
+				getDeviceList({Page: 0, Limit: 10 }).then(res => {
+					this.deviceList = res.Data.DeviceList || []
 				})
 			}
 		},
 		optionClick(item){
 			uni.navigateTo({url:item.url})
 		},
-		change(e) {
+			
+		changeHealth(e) {
+			let index = e.detail.index
+		},
+		changeRadia(e) {
+			let index = e.detail.index
+		},
+		changeOption(e) {
+			let index = e.detail.index
+			let item = this.optionList[index]
+			uni.navigateTo({
+				url: item.url
+			})
 		}
 	},
 	// #ifdef APP-PLUS
@@ -318,7 +342,6 @@ export default {
 	
 	.text {
 		font-size: 12px;
-		margin-top: 4px;
 		color: #999;
 	}
 	
