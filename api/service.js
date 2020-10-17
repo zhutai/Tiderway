@@ -55,6 +55,7 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
     Authorization: getTokenStorage()
   }
 	config.data = {
+		...config.data,
 		imei: getImeiStorage()
 	}
   /*

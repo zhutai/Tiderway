@@ -68,8 +68,8 @@
 		<view class="example-body">
 			<uni-section title="设备功能表" type="line"></uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :key="index">
+				<uni-grid :column="3" :show-border="false" :square="false" >
+					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :key="index" @click.native="optionClick(item)">
 						<view class="cate-item">
 							<text class="block iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
@@ -155,18 +155,23 @@ const optionList = [
 	{
 		icon: 'iconiconfontdingwei3',
 		name: '地图定位',
+		url: '/pages/location/monitor'
 	},{
 		icon: 'iconhuodongguiji',
 		name: '活动轨迹',
+		url:'',
 	},{
 		icon: 'iconboda',
 		name: '拨打设备',
+		url:'',
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: ' 亲情号码',
+		url:'',
 	},{
 		icon: 'iconshebeishezhi',
-		name: ' 设备设置'
+		name: ' 设备设置',
+		url:'',
 	}
 ]
 
@@ -250,8 +255,10 @@ export default {
 				})
 			}
 		},
-		change() {
-			console.log(197)
+		optionClick(item){
+			uni.navigateTo({url:item.url})
+		},
+		change(e) {
 		}
 	},
 	// #ifdef APP-PLUS
