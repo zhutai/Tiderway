@@ -107,10 +107,6 @@
 				</scroll-view>
 			</view>
 		</uni-drawer>
-		
-		<view style="height: 900px;">
-			
-		</view>
 
 	</view>
 </template>
