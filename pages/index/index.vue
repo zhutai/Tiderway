@@ -7,7 +7,7 @@
 				<image class="user-avatar" src="../../static/missing-face.png"></image>
 			</view>
 			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
-			<view class="bar-text" slot="right">添加设备</view>
+			<view class="bar-text" slot="right" @click="addDevice">添加设备</view>
 		</uni-nav-bar>
 		
 		<!--  设备状态显示 -->
@@ -274,6 +274,11 @@ export default {
 		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
+		},
+		addDevice() {
+			uni.navigateTo({
+				url:'/pages/device/add'
+			})
 		},
 		swtichDevice(item) {
 			if (item.IMEI) {

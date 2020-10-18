@@ -35,7 +35,7 @@ export const  getDeviceInfo = (data) => {
  * @param {Object} data - 绑定设备  
  */
 export const bindDevice = (data) => {
-  return http.post(`${VERSION}/Device​/bind`, data)
+  return http.post(`${VERSION}/Device/bind`, data)
 }
 
 /**
