@@ -34,7 +34,7 @@
 				<uni-grid :column="4" :show-border="false" :square="false" @change="changeHealth">
 					<uni-grid-item v-for="(item ,index) in healthyList" :index="index" :key="index">
 						<view class="grid-item-box">
-							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
 							<text class="block text">{{item.name}}</text>
 						</view>
@@ -54,7 +54,7 @@
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeRadia">
 					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
 						<view class="grid-item-box">
-							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
 							<text class="block text">{{item.name}}</text>
 							<text class="block text">({{item.unit}})</text>
@@ -71,7 +71,7 @@
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
-							<text class="block iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
 							<text style="padding-top: 12rpx;">{{ item.name }}</text>
 						</view>
@@ -81,30 +81,43 @@
 		</view>
 		
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
+			<uni-status-bar />
 			<view class="device-box">
 				<view class="device-title">我的设备列表</view>
-				<scroll-view class="scroll-Y" scroll-y="true" @scrolltolower="scrolltolower">
+				<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
 					<!-- <view v-for="index in 100">{{ index }}</view> -->
-					<uni-list>
-						<uni-list-item v-for="(item, index) in deviceList" :key="index"
-						 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
+					<uni-list class="device-list">
+						<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
+							<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
+								<view class="block">
+									<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
+									<text v-if="item.LoginName && !item.sex"
+									style="color: #fa436a"
+									class="iconfont iconiconfontdingwei3" />
+									<text style="color: #4399fc"
+									v-if="item.LoginName && item.sex" 
+									class="iconfont iconbushu" />
+									<text v-if="!item.LoginName">未绑定</text>
+								</view>
+								<text class="block">{{ item.IMEI }}</text>
+							</view>
+							<text slot="footer" class="device-right">在线</text>
+						</uni-list-item>
 					</uni-list>
-					<uni-load-more v-show="deviceLoading" :status="status" />
+					<uni-load-more :status="status" />
 				</scroll-view>
 			</view>
 		</uni-drawer>
-		
-		<view style="height: 900px;">
-			
-		</view>
 
 	</view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
-import { getDeviceList } from "@/api/device.js"
 
+let page = 0
 const healthyList = [
 	{
 		name: '步',
@@ -186,16 +199,14 @@ const optionList = [
 		url:'',
 	}
 ]
-let page = 0
-import { getHealthInfo } from '@/api/device.js'
-
 
 export default {
 
 	data() {
 		return {
-			status: 'more',
+			status: 'loading',
 			showLeft: false,
+			scrollHeight: 400,
 			titleNViewBackground: '',
 			swiperCurrent: 0,
 			swiperLength: 0,
@@ -211,24 +222,65 @@ export default {
 	components: {
 		uniNavBar
 	},
+	computed: {
+		...mapState(['deviceImei', 'deviceEmpey', 'userInfo'])
+	},
 	onLoad() {
-		// this.loadExecution()
-		this.loadData();
-		// #ifdef APP-PLUS
-		var ptObj = new plus.maps.Point('116.39747', '39.9085' );
-		plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
-			console.log(res)
-			alert(res)
-		},function () {
-			
+		uni.getSystemInfo({
+			success: (res) => {
+				let windowHeight = res.windowHeight
+				let titleHeight = uni.upx2px(120)
+				console.log(res)
+				this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
+			}
 		})
-		// #endif
+	},
+	onShow() {
+		console.log(this.deviceImei)
+		console.log(this.deviceEmpey)
+		if (this.deviceEmpey) {
+			uni.showModal({
+				title: "未添加设备",
+				content: "用户未添加设备，无法查看相应的设备信息，请添加设备后进行查看。",
+				showCancel: false,
+				confirmText: "确定",
+				success: function(res) {
+					console.log(res)
+					if (res.confirm) {
+						uni.navigateTo({
+							url: '/pages/set/set'
+						})
+					}
+				}
+			})
+		} else {
+			this.loadData();
+			// #ifdef APP-PLUS
+			var ptObj = new plus.maps.Point('116.39747', '39.9085' );
+			plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
+				console.log(res)
+				alert(res)
+			},function () {
+				
+			})
+			// #endif
+		}
+	},
+	onReady() {
+		console.log(3)
 	},
 	methods: {
-		scrolltolower() {
+		...mapMutations(['setDeviceImei']),
+		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
-			console.log(241)
+		},
+		swtichDevice(item) {
+			if (item.IMEI) {
+				this.setDeviceImei({ deviceImei: item.IMEI, imeiLength: 1 })
+				this.$refs.showLeft.close()
+				this.loadData();
+			}
 		},
 		/**
 		 * 请求静态数据只是为了代码不那么乱
@@ -245,21 +297,43 @@ export default {
 		showDrawer(e) {
 			this.$refs[e].open()
 		},
-		changeDrawer(bool) {
+		async changeDrawer(bool) {
 			this.showLeft = bool
 			if (bool) {
-				this.getDeviceList()
+				this.getDeviceList(true)
 			} else {
 				page = 0
+				this.deviceList = []
 			}
 		},
-		getDeviceList() {
+		getDeviceList(isFirst) {
 			this.status = 'loading'
 			getDeviceList({Page: page, Limit: 10 }).then(res => {
 				this.deviceLoading = true
 				let deviceList = res.Data.DeviceList || []
 				if (!deviceList.length) this.status = 'noMore'
 				this.deviceList = this.deviceList.concat(deviceList)
+				if (isFirst) {
+					this.checkHeight()
+				}
+			})
+		},
+		checkHeight() {
+			uni.getSystemInfo({
+				success: (res) => {
+					let windowHeight = res.windowHeight
+					setTimeout(() => {
+						let obj = uni.createSelectorQuery().select('.device-list')
+						obj.boundingClientRect((data) => { // data - 各种参数
+							let height = data.height
+							if (height < windowHeight) {
+								let bool = (height + (height / (page || 1))) < windowHeight
+								page += 1;
+								this.getDeviceList(bool)
+							}
+						}).exec()
+					}, 0)
+				}
 			})
 		},
 		changeHealth(e) {
@@ -278,9 +352,9 @@ export default {
 	},
 	// #ifdef APP-PLUS
 	// app端拦截返回事件 ，仅app端生效
-	onBackPress() {
+	onHide() {
 		if (this.showLeft) {
-			this.$refs.showLeft.closwe()
+			this.$refs.showLeft.close()
 			return true
 		}
 	},
@@ -328,16 +402,16 @@ export default {
 	
 	.block {
 		display: block;
-		text-align: center;
 	}
 	
 	.text {
-		font-size: 12px;
 		color: #999;
+		font-size: 12px;
+		text-align: center;
 	}
 	
 	.scroll-Y {
-		height: 1214rpx;
+		height: calc(100vh - 120rpx);
 	}
 	
 	.bar-text {
@@ -402,6 +476,24 @@ export default {
 			height: 120rpx;
 			font-size: 16px;
 		}
+		.device-left {
+			flex: 1;
+			color: #aaa;
+			.login-name {
+				color: $font-color-dark;
+				padding-right: 6px;
+			}
+		}
+		.select-device {
+			color: $font-color-spec;
+			.login-name {
+				color: $font-color-spec;
+			}
+		}
+		.device-right {
+			color: $font-color-spec;
+			align-self: center;
+		}
 	}
 	
 	.cell-more {
@@ -417,13 +509,14 @@ export default {
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
-		flex-wrap:wrap;
-		padding: 30upx 22upx; 
+		flex-wrap: wrap;
+		// padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			padding: 24rpx 0;
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;
 		}

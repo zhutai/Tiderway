@@ -52,7 +52,7 @@ http.setConfig((config) => { /* 设置全局配置 */
 http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使用async await 做异步操作 */
   config.header = {
     ...config.header,
-	imei: getImeiStorage() || '',
+		imei: getImeiStorage(),
     Authorization: getTokenStorage()
   }
   /*

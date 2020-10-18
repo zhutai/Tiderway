@@ -30,9 +30,17 @@ export const sendCode = (data) => {
 }
 
 /**
- * 修改密码
- * @param {Object} params - 修改密码  
+ * 找回密码
+ * @param {Object} params - 找回密码  
  */
 export const findPwd = (data) => {
   return http.post(`${VERSION}/User/findPwd`, data)
+}
+
+/**
+ * 修改密码
+ * @param {Object} params - 修改密码  
+ */
+export const editPwd = (data) => {
+  return http.post(`${VERSION}/User/editPwd`, data)
 }
