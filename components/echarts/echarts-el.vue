@@ -41,10 +41,7 @@
 			 */
 			init() {
 				// 根据id初始化图表
-				console.log(echarts)
 				this.chart = echarts.init(this.$el)
-				console.log(this.$el)
-				console.log(this.chart)
 				this.update(this.option)
 			},
 			/**
@@ -139,6 +136,7 @@
 						let value = '--'
 						if (params[i].data !== null) {
 							value = params[i].data
+							console.log(params[i])
 							// 保留两位小数
 							if (formatFloat2) {
 								value = this.formatFloat2(value)
