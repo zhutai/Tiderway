@@ -92,7 +92,7 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>心率的正常范围在90--120之间</text>
+					<text>运动正常范围在90--120之间</text>
 				</view>
 			</view>
 			
@@ -123,7 +123,7 @@
 				
 				<view class="chart" :style="{height: `${chartHeight}px`}">
 					<echarts-el v-if="chartLoading && bloodOption" key="3" class="echarts" :option="bloodOption"></echarts-el>
-					<empty v-if="chartLoading && !bloodOption" title=" 暂无图表数据"></empty>
+					<empty v-if="chartLoading && !bloodOption" title="暂无图表数据"></empty>
 				</view>
 			</view>
 			
@@ -134,7 +134,7 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>心率的正常范围在90--120之间</text>
+					<text>血压正常范围在90--120之间</text>
 				</view>
 			</view>
 			
@@ -309,7 +309,7 @@
 					} else {
 						let str = 'Shrink'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str)
+							let obj = this.dataFormat(HistoryList, str, 'Diastole')
 							this.bloodOption = this.getBooldParams(obj)
 						} else {
 							this.dataFormat(HistoryList, str)
@@ -320,13 +320,15 @@
 				})
 			},
 			// 对数据进行格式化赋值
-			dataFormat(HistoryList, key) {
+			dataFormat(HistoryList, key, key_2) {
 				let date = HistoryList.map(item => {
 					return item.RecivedAt.replace(' ', '\n')
 				})
 				let data = HistoryList.map(item => item[key]);
+				let data2 = null
+				if (key_2) data2 = HistoryList.map(item => item[key_2]);
 				this.computeData(data)
-				return { date, data }
+				return { date, data, data2 }
 			},
 			// 计算计数最大值最小值和平均值
 			computeData(data) {
@@ -357,7 +359,9 @@
 					item.num = arr[item.key]
 				})
 			},
-			getHeartRateParams({ data, date }) {
+			getBooldParams({ data, date, data2 }) {
+				let currentSize = 16;
+				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
 				return {
 					id: 'echartA',
 					tooltip: {
@@ -366,9 +370,9 @@
 						formatterStatus: true,
 						// formatterUnit: '元', // 自定义变量：数值后面的单位
 						// formatFloat2: false, // 自定义变量：是否格式化为两位小数
-						position: function (pt) {
-							return [pt[0], '10%'];
-						}
+						// position: function (pt) {
+						// 	return [pt[0], '10%'];
+						// }
 					},
 					grid: {
 						left: 20,
@@ -382,6 +386,15 @@
 						show: false,
 						text: '',
 					},
+					dataZoom: [
+						{
+							show: false,
+							startValue: startValue
+						},
+						{
+							type: 'inside'
+						}
+					],
 					xAxis: {
 						type: 'category',
 						boundaryGap: false,
@@ -403,7 +416,7 @@
 					},
 					series: [
 						{
-							name: '模拟数据',
+							name: '收缩压',
 							type: 'line',
 							smooth: true,
 							symbol: 'none',
@@ -420,7 +433,25 @@
 								color: 'rgb(255, 70, 131)'
 							}]],
 							data: data
-						}
+						},{
+							name: '舒张压',
+							type: 'line',
+							smooth: true,
+							symbol: 'none',
+							sampling: 'average',
+							itemStyle: {
+							color: 'rgb(180, 80, 11)'
+							},
+							// 自定义变量，以数组形式传递渐变参数
+							areaGradient: [0, 0, 0, 1,[{
+								offset: 0,
+								color: 'rgb(240, 173, 78)'
+							}, {
+								offset: 1,
+								color: 'rgb(255, 70, 131)'
+							}]],
+							data: data2
+						},
 					],
 				}
 			},
@@ -520,7 +551,7 @@
 				})
 				this.getHistoryData()
 			},
-			getBooldParams({ date, data }) {
+			getHeartRateParams({ date, data }) {
 				let currentSize = 16;
 				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
 				return {
@@ -575,30 +606,29 @@
 					visualMap: {
 						orient: 'horizontal',
 						bottom: 10,
+						left: '15%',
 						pieces: [{
 							gt: 0,
-							lte: 50,
-							color: '#096'
+							lte: 60,
+							label: '偏低',
+							color: '#4399fc'
 						}, {
-							gt: 50,
+							gt: 60,
 							lte: 100,
-							color: '#ffde33'
+							label: '正常',
+							color: '#4cd964'
 						}, {
 							gt: 100,
-							lte: 150,
+							lte: 120,
+							label: '较高',
 							color: '#ff9933'
 						}, {
-							gt: 150,
+							gt: 120,
 							lte: 200,
+							label: '危险',
 							color: '#cc0033'
-						}, {
-							gt: 200,
-							lte: 300,
-							color: '#660099'
-						}, {
-							gt: 300,
-							color: '#7e0023'
-						}],
+						}
+						],
 						outOfRange: {
 							color: '#999'
 						},
@@ -607,7 +637,7 @@
 						// }
 					},
 					series: {
-						name: '血压',
+						name: '心率',
 						type: 'line',
 						data: data,
 						markLine: {
@@ -650,13 +680,16 @@
 				console.log('弹窗关闭');
 			},
 			confirm(e) {
-				tabbars[this.current].dateTimeIndex = this.tabs.length - 1
-
-				var dataTime = {
-					createTime: e.range.before,
-					endTime: e.range.after
+				let { before, after } = e.range
+				if (before && after) {
+					tabbars[this.current].dateTimeIndex = this.tabs.length - 1
+					let dataTime = {
+						createTime: before,
+						endTime: after
+					}
+					this.toggleTabs(this.current, dataTime)
 				}
-				this.toggleTabs(this.current, dataTime)
+				
 			},
 			touchLineA(e) {
 				canvasObj['canvasLineA'].scrollStart(e);
