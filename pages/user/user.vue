@@ -4,7 +4,11 @@
 		<view class="cover-container">
 			<uni-list>
 				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
-				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow thumb="../../static/missing-face.png" to="../userinfo/userinfo" thumb-size="lg" />
+				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
+					 <template slot="header">
+					            <image class="slot-image" :src="userInfo.Avatar" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
+					        </template>
+					</uni-list-item>
 			</uni-list>
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
@@ -45,19 +49,29 @@
 			title: '我的设备',
 			tips: '',
 			url: '/pages/set/set'
-		},{
-			icon: 'iconGroup',
-			iconColor: '#9789f7',
-			title: '我的数据',
-			tips: '',
-			url: '/pages/set/set'
-		},{
+		}
+		// ,{
+		// 	icon: 'iconGroup',
+		// 	iconColor: '#9789f7',
+		// 	title: '我的数据',
+		// 	tips: '',
+		// 	url: '/pages/set/set'
+		// }
+		,{
 			icon: 'iconyijian',
 			iconColor: '#ee883b',
 			title: '意见反馈',
 			tips: '',
 			url: '/pages/user/feedback'
-		},{
+		}
+		,{
+			icon: 'iconGroup',
+			iconColor: '#9789f7',
+			title: '修改密码',
+			tips: '',
+			url: '/pages/public/forget'
+		}
+		,{
 			icon: 'iconshebeishezhi',
 			iconColor: '#54b4ef',
 			title: '设置',

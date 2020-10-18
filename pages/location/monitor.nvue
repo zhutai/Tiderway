@@ -1,9 +1,27 @@
 <template>
 	<view>
-		<view class="uni-common-mt">
+		<view>
 			<view>
-				<map :latitude="latitude" :longitude="longitude" :markers="covers">
+				<map :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
 				</map>
+				<view id="v_location"><text>刷新定位</text></view>
+
+				<view class="v_fixed">
+					<text>我的位置</text>
+					<text>立即定位</text>
+				</view>
+
+				<view class="v_fixed" style="right:0;">
+					<text @click.native="clickSatellite">切换图层</text>
+					<text>拨打电话</text>
+				</view>
+
+				<view style="position: fixed;bottom: 0;left:0;width: 100%;background-color: #FFFFFF;padding:20rpx;font-size: 16px;flex-direction: row;">
+						<view style="width: 70%;"><text>{{address}}</text></view>
+						<view style="text-align: right;width: 30%;"><text>导航</text></view>
+					</view>
+
+				</view>
 			</view>
 		</view>
 	</view>
@@ -19,11 +37,9 @@
 				title: 'map',
 				latitude: 39.909,
 				longitude: 116.39742,
-				covers: [{
-					callout: {
-						content: '你好',
-						display: 'ALWAYS',
-					},
+				address: '北京市天安门',
+				enableSatellite: false,
+				markers: [{
 					latitude: 39.9085,
 					longitude: 116.39747,
 					iconPath: '../../static/icon/0.png',
@@ -36,17 +52,64 @@
 			...mapState(['deviceImei', 'userInfo'])
 		},
 		async created() {
-			var result = await this.$http.post("v1.0/location/monitor", {})
-			
+			this.location()
 		},
 		methods: {
+			clickSatellite() {
+				this.enableSatellite = true;
+			},
+			async location() {
+				let result = await this.$http.post("v1.0/location/monitor", {})
 
+				let market = {
+					callout:{
+						content:result.Data.RecivedAt,
+						display:'ALWAYS',
+						padding:10
+					},
+					latitude: result.Data.Lat,
+					longitude: result.Data.Lng,
+					iconPath: '../../static/icon/0.png',
+					width: 30,
+					height: 30
+				}
+
+				this.latitude = result.Data.Lat
+				this.longitude = result.Data.Lng
+				this.markers = [market];
+
+				// #ifdef APP-PLUS
+				var point = new plus.maps.Point();
+				plus.maps.Map.reverseGeocode(point, {}, function(res) {
+					this.address = res.address;
+				})
+				// #endif
+
+			}
 		}
 	}
 </script>
-<style>
+<style lang="scss">
 	map {
-		width: 100%;
-		height: 600px;
+		width: 100vw;
+		height: 100vh;
+	}
+
+	#v_location {
+		position: fixed;
+		top: 84rpx;
+		left: 0;
+		padding: 12rpx;
+		z-index: 2;
+		background-color: #FFFFFF;
+		font-size: 16px;
+	}
+
+	.v_fixed {
+		position: fixed;
+		bottom: 200rpx;
+		padding: 12rpx;
+		z-index: 2;
+		background-color: #FFFFFF;
 	}
 </style>
