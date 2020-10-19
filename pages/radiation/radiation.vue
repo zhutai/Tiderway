@@ -19,7 +19,7 @@
 		</view>
 
 		<view class="motion" v-if="current === 0">
-			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
+			<view class="info-scroll" >
 				<view class="info-item" v-for="item in heartInfo">
 					<view class="info-num">
 						<text class="num">{{ item.num }}</text>
@@ -30,7 +30,7 @@
 						<text class="label">{{ item.name }}</text>
 					</view>
 				</view>
-			</scroll-view>
+			</view>
 			
 			<view class="content">
 				<view class="title-style">
@@ -521,12 +521,12 @@
 		white-space: nowrap;
 
 		.info-item {
-			width: 40%;
+			width: 30%;
 			height: 100%;
 			padding: 24rpx;
 			line-height: 60rpx;
 			display: inline-block;
-			margin-right: 24rpx;
+			margin-right: 2%;
 			background: $color-white;
 
 			&:first-child {
