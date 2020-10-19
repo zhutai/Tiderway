@@ -148,7 +148,7 @@ const healthyList = [
 		icon: 'iconxieya',
 		color: '#F59A23',
 		key: 'Rate',
-		num: '--'
+		num: '-'
 	},
 ]
 
@@ -157,16 +157,16 @@ const radiaList = [
 		name: '实时剂量',
 		unit: 'µSv/h',
 		icon: 'iconshijian1',
-		key: 'step',
+		key: 'Radio',
 		color: '#4399fc',
-		num: 3264
+		num: '--'
 	},{
 		name: '累计剂量',
 		unit: 'mSv',
 		icon: 'iconleiji',
 		color: '#F59A23',
-		key: 'mmHg',
-		num: 36.5
+		key: 'TotalRadio',
+		num: '--'
 	}
 ]
 
@@ -299,6 +299,9 @@ export default {
 			let healthInfo = result.Data || {}
 			healthInfo.Rate = (healthInfo.Shrink + healthInfo.Diastole) / 2
 			this.healthyList.forEach(item => {
+				item.num = result.Data[item.key]
+			})
+			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
 			})
 		},

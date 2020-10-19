@@ -325,9 +325,9 @@
 					}
 				} else {
 					arr = {
-						max: '-',
-						min: '-',
-						average: '-'
+						max: '--',
+						min: '--',
+						average: '--'
 					}
 				}
 				return arr
@@ -569,6 +569,7 @@
 
 				.unit {
 					font-size: 14px;
+					padding-left: 8rpx;
 					color: $font-color-light;
 				}
 			}
