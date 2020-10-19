@@ -153,7 +153,7 @@ const healthyList = [
 
 const radiaList = [
 	{
-		name: '峰值剂量',
+		name: '实时剂量',
 		unit: 'µSv/h',
 		icon: 'iconfengzhiguzhituli',
 		key: 'step',
@@ -168,7 +168,7 @@ const radiaList = [
 		num: 90
 	},{
 		name: '累计剂量',
-		unit: 'µSv/h',
+		unit: 'mSv',
 		icon: 'iconleiji',
 		color: '#F59A23',
 		key: 'mmHg',

@@ -160,7 +160,7 @@
 			value: 'data'
 		},{
 			key: 'Step',
-			value: 'data1',
+			value: 'data2',
 			custom: true
 		}]
 	}, {
@@ -174,7 +174,7 @@
 			value: 'data'
 		},{
 			key: 'Diastole',
-			value: 'data1'
+			value: 'data2'
 		}]
 	}, ]
 
@@ -682,10 +682,8 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
-					console.log(tabbars[this.current].units)
 					let HeartInfo = getHeartInfo(tabbars[this.current].units)
 					this.heartInfo = HeartInfo
-					console.log(HeartInfo)
 					this.toggleTabs(this.current)
 				}
 			},
@@ -819,8 +817,6 @@
 
 	.info-scroll {
 		padding: 12rpx 0;
-		// height: 208rpx;
-		// white-space: nowrap;
 
 		.info-item {
 			width: 30%;

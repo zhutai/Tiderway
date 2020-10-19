@@ -136,7 +136,7 @@
 						let value = '--'
 						if (params[i].data !== null) {
 							value = params[i].data
-							console.log(params[i])
+							// console.log(params[i])
 							// 保留两位小数
 							if (formatFloat2) {
 								value = this.formatFloat2(value)

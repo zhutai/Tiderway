@@ -1,42 +1,44 @@
 <template>
 	<view class="page-monitor">
 		<map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
-			<cover-image v-for="(item, index) in options" :style="{ bottom: `${ fixedHeight + (height * (index % 2))}px` }"
+			<cover-image v-for="(item, index) in options" :key="index" :style="{ bottom: `${ fixedHeight + (height * (index % 2))}px` }"
 				:class="item.icon" class="cover-image" 
-				src="../../static/missing-face.png" 
+				:src="item.imageUrl || '../../static/missing-face.png'" 
 				@click="handleClick(item)">
 			</cover-image>
 			<cover-view class="back-block"></cover-view>
 			<cover-view class="address">{{ address }}</cover-view>
-			<cover-image class="navigation cover-image" src="../../static/missing-face.png" ></cover-image>
+			<cover-image class="navigation cover-image" src="../../static/image/monitor/monitor_img5.png" ></cover-image>
 		</map>
 	</view>
 </template>
 <script>
-	import {
-		mapState
-	} from 'vuex';
-
+	import { mapState } from 'vuex';
+	
 	const options = [
-		{
-			name: '图层切换',
-			fun: "layerSwitch",
-			icon: 'float-left'
-		},
 		{
 			name: '刷新定位',
 			fun: "getLocation",
-			icon: 'float-left'
+			icon: 'float-left',
+			imageUrl: '../../static/image/monitor/monitor_img2.png'
+		},
+		{
+			name: '图层切换',
+			fun: "layerSwitch",
+			icon: 'float-left',
+			imageUrl: '../../static/image/monitor/monitor_img1.png'
 		},
 		{
 			name: '拨打电话',
 			fun: "callPhone",
-			icon: 'float-right'
+			icon: 'float-right',
+			imageUrl: '../../static/image/monitor/monitor_img4.png'
 		}
 		,{
-			name: '我的位置',
+			name: '设备响铃',
 			fun: "otherFun",
-			icon: 'float-right'
+			icon: 'float-right',
+			imageUrl: '../../static/image/monitor/monitor_img3.png'
 		},
 	]
 
@@ -78,8 +80,8 @@
 				this.$api.msg(item.name)
 			},
 			getLocation(item) {
-				location();
-				this.$api.msg(item.name)
+				this.location();
+				// this.$api.msg(item.name)
 			},
 			callPhone(item) {
 				this.$api.msg(item.name)
@@ -107,11 +109,12 @@
 				this.latitude = result.Data.Lat
 				this.longitude = result.Data.Lng
 				this.markers = [market];
-
+				// #ifdef APP-PLUS
 				var point = new plus.maps.Point(latitude,longitude);
 				plus.maps.Map.reverseGeocode(point, {}, function(res) {
 					this.address = res.address;
 				})
+				// #endif
 			}
 		}
 	}

@@ -17,20 +17,22 @@
 		<view class="date-time">
 			<text>{{ tabs[dateTimeIndex].createTime + ' 至 ' +  tabs[dateTimeIndex].endTime }}</text>
 		</view>
-
-		<view class="motion" v-if="current === 0">
-			<view class="info-scroll" >
-				<view class="info-item" v-for="item in heartInfo">
-					<view class="info-num">
-						<text class="num">{{ item.num }}</text>
-						<text class="unit">{{ item.unit }}</text>
-					</view>
-					<view class="info-label">
-						<text class="round" :class="item.className"></text>
-						<text class="label">{{ item.name }}</text>
-					</view>
+		
+		<view class="info-scroll" >
+			<view class="info-item" v-for="(item, index) in heartInfo" :key="index"
+			:class="{ 'no-margin' : !(index % 3) }">
+				<view class="info-num">
+					<text class="num">{{ item.num }}</text>
+					<text class="unit">{{ item.unit }}</text>
+				</view>
+				<view class="info-label">
+					<text class="round" :class="item.className"></text>
+					<text class="label">{{ item.name }}</text>
 				</view>
 			</view>
+		</view>
+
+		<view class="motion" v-if="current === 0">
 			
 			<view class="content">
 				<view class="title-style">
@@ -61,18 +63,6 @@
 		</view>
 
 		<view class="blood-pressure" v-if="current === 1">
-			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
-				<view class="info-item" v-for="item in heartInfo">
-					<view class="info-num">
-						<text class="num">{{ item.num }}</text>
-						<text class="unit">{{ item.unit }}</text>
-					</view>
-					<view class="info-label">
-						<text class="round" :class="item.className"></text>
-						<text class="label">{{ item.name }}</text>
-					</view>
-				</view>
-			</scroll-view>
 			
 			<view class="content">
 				<view class="title-style">
@@ -123,11 +113,23 @@
 	const tabbars = [{
 		name: '实时辐射',
 		dateTimeIndex: 0,
-		path: 'RadioHistory'
+		path: 'RadioHistory',
+		dateKey: 'RecivedAt',
+		units: [{ unit: 'μSv/h' }],
+		dataParams: [{
+			key: 'Radio',
+			value: 'data'
+		}]
 	}, {
 		name: '累计辐射',
 		dateTimeIndex: 0,
-		path: 'ReportRadioHistory'
+		path: 'ReportRadioHistory',
+		dateKey: 'ReportTime',
+		units: [{ unit: 'mSv' }],
+		dataParams: [{
+			key: 'Radio',
+			value: 'data'
+		}]
 	}]
 
 	const tabs = [{
@@ -167,30 +169,44 @@
 		active: false
 	}, ]
 
-	const heartInfo = [{
-		name: '平均值',
-		unit: '次/分钟',
-		key: 'average',
-		num: '--',
-		className: 'blue'
-	}, {
-		name: '最大值',
-		unit: '次/分钟',
-		key: 'max',
-		num: '--',
-		className: 'green'
-	}, {
-		name: '最小值',
-		unit: '次/分钟',
-		key: 'min',
-		num: '--',
-		className: 'yellow'
-	}]
+	const getHeartInfo = (companyArray) => {
+		const heartInfo = [{
+			name: '平均值',
+			unit: '',
+			key: 'average',
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '最大值',
+			unit: '',
+			key: 'max',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '最小值',
+			unit: '',
+			key: 'min',
+			num: '--',
+			className: 'yellow'
+		}]
+		let index = 0
+		const heartList = []
+		companyArray.forEach(item => {
+			heartInfo.forEach(list => {
+				let cruuent = Object.assign({}, list)
+				cruuent.unit = item.unit
+				heartList[index] = cruuent
+				index += 1
+			})
+		})
+		return heartList
+	}
 
 
 	export default {
 
 		data() {
+			let heartInfo = getHeartInfo([{ unit: 'μSv/h' }])
 			var titleNames = tabbars.map(item => item.name)
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
@@ -230,7 +246,8 @@
 		methods: {
 			getHistoryData() {
 				uni.showLoading({title: ' 加载中...', mask: true})
-				let path = tabbars[this.current].path
+				let tabbar = tabbars[this.current]
+				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
 				let params = {
 					Limit: 0,
@@ -245,21 +262,21 @@
 					if (path === 'RadioHistory') {
 						let str = 'RecivedAt'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str)
+							let obj = this.dataFormat(HistoryList, tabbar)
 							obj.seriesName = '实时辐射'
 							this.motionOption = this.getBooldParams(obj)
 						} else {
-							this.dataFormat(HistoryList, str)
+							this.dataFormat(HistoryList, tabbar)
 							this.motionOption = null
 						}
 					} else {
 						let str = 'ReportTime'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str)
+							let obj = this.dataFormat(HistoryList, tabbar)
 							obj.seriesName = '累计辐射'
 							this.bloodOption = this.getBooldParams(obj)
 						} else {
-							this.dataFormat(HistoryList, str)
+							this.dataFormat(HistoryList, tabbar)
 							this.bloodOption = null
 						}
 					}
@@ -267,13 +284,27 @@
 				})
 			},
 			// 对数据进行格式化赋值
-			dataFormat(HistoryList, key) {
+			dataFormat(HistoryList, tabbar) {
+				let { dateKey, dataParams } = tabbar
 				let date = HistoryList.map(item => {
-					return item[key].replace(' ', '\n')
+					return item[dateKey].replace(' ', '\n')
 				})
-				let data = HistoryList.map(item => item.Radio);
-				this.computeData(data)
-				return { date, data }
+				let obj = {}
+				dataParams.forEach((param, index) => {
+					let data = HistoryList.map(item => item[param.key]);
+					if (param.custom) {
+						data = data.map(item => item * 7);
+					}
+					obj[param.value] = data
+					let arr = this.computeData(data)
+					let startIndex = 3 * index
+					let endIndex = 3 * (index + 1)
+					let heartInfo = this.heartInfo.slice(startIndex, endIndex)
+					heartInfo.forEach(item => {
+						item.num = arr[item.key]
+					})
+				})
+				return { date, ...obj }
 			},
 			// 计算计数最大值最小值和平均值
 			computeData(data) {
@@ -299,10 +330,7 @@
 						average: '-'
 					}
 				}
-				
-				this.heartInfo.forEach(item => {
-					item.num = arr[item.key]
-				})
+				return arr
 			},
 			getBooldParams({ data, date, seriesName }) {
 				let currentSize = 20;
@@ -409,6 +437,8 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
+					let HeartInfo = getHeartInfo(tabbars[this.current].units)
+					this.heartInfo = HeartInfo
 					this.toggleTabs(this.current)
 				}
 			},
@@ -516,9 +546,7 @@
 	}
 
 	.info-scroll {
-		padding: 24rpx 0;
-		height: 208rpx;
-		white-space: nowrap;
+		padding: 12rpx 0;
 
 		.info-item {
 			width: 30%;
@@ -526,11 +554,11 @@
 			padding: 24rpx;
 			line-height: 60rpx;
 			display: inline-block;
-			margin-right: 2%;
+			margin: 12rpx 16rpx 12rpx 0;
 			background: $color-white;
 
-			&:first-child {
-				margin-left: 24rpx;
+			&.no-margin{
+				margin-left: 20rpx;
 			}
 
 			.info-num {
