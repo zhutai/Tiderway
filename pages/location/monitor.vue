@@ -3,8 +3,7 @@
 		<map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
 			<cover-image v-for="(item, index) in options" :key="index" :style="{ bottom: `${ fixedHeight + (height * (index % 2))}px` }"
 				:class="item.icon" class="cover-image" 
-				:src="item.imageUrl || '../../static/missing-face.png'" 
-				@click="handleClick(item)">
+				:src="item.imageUrl" @click="handleClick(item)">
 			</cover-image>
 			<cover-view class="back-block"></cover-view>
 			<cover-view class="address">{{ address }}</cover-view>
@@ -14,8 +13,8 @@
 </template>
 <script>
 	import { mapState } from 'vuex';
-	
-	const options = [
+	import { monitor } from '@/api/location'
+ 	const options = [
 		{
 			name: '刷新定位',
 			fun: "getLocation",
@@ -88,10 +87,9 @@
 			},
 			otherFun(item) {
 				this.$api.msg(item.name)
-				
 			},
 			async location() {
-				let result = await this.$http.post("v1.0/location/monitor", {})
+				let result = await monitor({})
 
 				let market = {
 					callout:{
