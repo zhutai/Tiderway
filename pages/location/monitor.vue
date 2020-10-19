@@ -34,7 +34,7 @@
 			icon: 'float-right'
 		}
 		,{
-			name: '其它功能',
+			name: '我的位置',
 			fun: "otherFun",
 			icon: 'float-right'
 		},
@@ -78,6 +78,7 @@
 				this.$api.msg(item.name)
 			},
 			getLocation(item) {
+				location();
 				this.$api.msg(item.name)
 			},
 			callPhone(item) {
@@ -85,6 +86,7 @@
 			},
 			otherFun(item) {
 				this.$api.msg(item.name)
+				
 			},
 			async location() {
 				let result = await this.$http.post("v1.0/location/monitor", {})
@@ -106,12 +108,10 @@
 				this.longitude = result.Data.Lng
 				this.markers = [market];
 
-				// #ifdef APP-PLUS
-				var point = new plus.maps.Point();
+				var point = new plus.maps.Point(latitude,longitude);
 				plus.maps.Map.reverseGeocode(point, {}, function(res) {
 					this.address = res.address;
 				})
-				// #endif
 			}
 		}
 	}
