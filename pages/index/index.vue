@@ -7,7 +7,7 @@
 				<image class="user-avatar" src="../../static/missing-face.png"></image>
 			</view>
 			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
-			<view class="bar-text" slot="right">添加设备</view>
+			<view class="bar-text" slot="right" @click="addDevice">添加设备</view>
 		</uni-nav-bar>
 		
 		<!--  设备状态显示 -->
@@ -31,10 +31,10 @@
 				</view>
 			</uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item v-for="(item ,index) in healthyList" :key="index">
+				<uni-grid :column="4" :show-border="false" :square="false" @change="changeHealth">
+					<uni-grid-item v-for="(item ,index) in healthyList" :index="index" :key="index">
 						<view class="grid-item-box">
-							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
 							<text class="block text">{{item.name}}</text>
 						</view>
@@ -51,10 +51,10 @@
 				</view>
 			</uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item v-for="(item ,index) in radiaList" :key="index">
+				<uni-grid :column="3" :show-border="false" :square="false" @change="changeRadia">
+					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
 						<view class="grid-item-box">
-							<text class="block iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
 							<text class="block text">{{item.num}}</text>
 							<text class="block text">{{item.name}}</text>
 							<text class="block text">({{item.unit}})</text>
@@ -68,10 +68,10 @@
 		<view class="example-body">
 			<uni-section title="设备功能表" type="line"></uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="change">
-					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :key="index">
+				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
+					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
-							<text class="block iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
+							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
 							<text style="padding-top: 12rpx;">{{ item.name }}</text>
 						</view>
@@ -81,48 +81,73 @@
 		</view>
 		
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
+			<uni-status-bar />
 			<view class="device-box">
-				<view class="device-title">我的设备列表</view>
-				<uni-list>
-					<uni-list-item v-for="(item, index) in deviceList" :key="index"
-					 :title="item.LoginName || item.IMEI" thumb="../../static/missing-face.png" thumb-size="lg" />
-				</uni-list>
+				<view class="device-title">设备列表</view>
+				<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
+					<!-- <view v-for="index in 100">{{ index }}</view> -->
+					<uni-list class="device-list">
+						<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
+							<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
+								<view class="block">
+									<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
+									<text v-if="item.LoginName && !item.sex"
+									style="color: #fa436a"
+									class="iconfont iconiconfontdingwei3" />
+									<text style="color: #4399fc"
+									v-if="item.LoginName && item.sex" 
+									class="iconfont iconbushu" />
+									<text v-if="!item.LoginName">未绑定</text>
+								</view>
+								<text class="block">{{ item.IMEI }}</text>
+							</view>
+							<text slot="footer" class="device-right">在线</text>
+						</uni-list-item>
+					</uni-list>
+					<uni-load-more :status="status" />
+				</scroll-view>
 			</view>
 		</uni-drawer>
-		
-		<view style="height: 900px;">
-			
-		</view>
 
 	</view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
-import { getDeviceList } from "@/api/device.js"
 
+let page = 0
 const healthyList = [
 	{
 		name: '步',
 		unit: 'step',
 		icon: 'iconbushu',
-		key: 'step',
+		key: 'Step',
 		color: '#4399fc',
-		num: 3264
+		num: '--'
+	},
+	{
+		name: ' 距离',
+		unit: 'step',
+		icon: 'iconbushu',
+		key: 'Distance',
+		color: '#95F204',
+		num: '--'
 	},{
 		name: '心率',
 		unit: 'bpm',
 		icon: 'iconjiankang',
-		key: 'bpm',
+		key: 'Heart',
 		color: '#95F204',
-		num: 90
+		num: '--'
 	},{
 		name: '血压',
 		unit: 'mmHg',
 		icon: 'iconxieya',
 		color: '#F59A23',
-		key: 'mmHg',
-		num: 36.5
+		key: 'Rate',
+		num: '--'
 	},
 ]
 
@@ -155,31 +180,38 @@ const optionList = [
 	{
 		icon: 'iconiconfontdingwei3',
 		name: '地图定位',
+		url: '/pages/location/monitor'
 	},{
 		icon: 'iconhuodongguiji',
 		name: '活动轨迹',
+		url:'',
 	},{
 		icon: 'iconboda',
 		name: '拨打设备',
+		url:'',
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: ' 亲情号码',
+		url:'',
 	},{
 		icon: 'iconshebeishezhi',
-		name: ' 设备设置'
+		name: ' 设备设置',
+		url:'',
 	}
 ]
 
 export default {
-
 	data() {
 		return {
+			status: 'loading',
 			showLeft: false,
+			scrollHeight: 400,
 			titleNViewBackground: '',
 			swiperCurrent: 0,
 			swiperLength: 0,
 			carouselList: [],
 			goodsList: [],
+			deviceLoading: false,
 			deviceList: [],
 			healthyList,
 			optionList,
@@ -189,39 +221,69 @@ export default {
 	components: {
 		uniNavBar
 	},
+	computed: {
+		...mapState(['deviceImei', 'deviceEmpey', 'userInfo'])
+	},
 	onLoad() {
-		this.loadExecution()
-		this.loadData();
+		uni.getSystemInfo({
+			success: (res) => {
+				let windowHeight = res.windowHeight
+				let titleHeight = uni.upx2px(120)
+				console.log(res)
+				this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
+			}
+		})
+	},
+	onShow() {
+		console.log(this.deviceImei)
+		console.log(this.deviceEmpey)
+		if (this.deviceEmpey) {
+			uni.showModal({
+				title: "未添加设备",
+				content: "用户未添加设备，无法查看相应的设备信息，请添加设备后进行查看。",
+				showCancel: false,
+				confirmText: "确定",
+				success: function(res) {
+					console.log(res)
+					if (res.confirm) {
+						uni.navigateTo({
+							url: '/pages/set/set'
+						})
+					}
+				}
+			})
+		} else {
+			this.loadData();
+			// #ifdef APP-PLUS
+			var ptObj = new plus.maps.Point('116.39747', '39.9085' );
+			plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
+				console.log(res)
+				alert(res)
+			},function () {
+				
+			})
+			// #endif
+		}
+	},
+	onReady() {
+		console.log(3)
 	},
 	methods: {
-		loadExecution: function(){
-			/**
-			 * 获取本地存储中launchFlag的值
-			 * 若存在，说明不是首次启动，直接进入首页；
-			 * 若不存在，说明是首次启动，进入引导页；
-			 */
-			try {
-				// 获取本地存储中launchFlag标识
-			    const value = uni.getStorageSync('launchFlag');
-			    if (!value) {
-					// launchFlag=true直接跳转到首页
-					uni.reLaunch({
-						url: '/pages/index/guide'
-					});
-			    } else {
-					// launchFlag!=true显示引导页
-			      this.guidePages = true
-			    }
-			} catch(e) { 
-				// error 
-				uni.setStorage({ 
-					key: 'launchFlag', 
-					data: true, 
-					success: function () {
-						console.log('error时存储launchFlag');
-					} 
-				}); 
-				this.guidePages = true
+		...mapMutations(['setDeviceImei']),
+		scrolltolower(e) {
+			page += 1
+			this.getDeviceList()
+		},
+		addDevice() {
+			uni.navigateTo({
+				url:'/pages/device/add'
+			})
+		},
+		swtichDevice(item) {
+			if (item.IMEI) {
+				this.setDeviceImei({ deviceImei: item.IMEI, imeiLength: 1 })
+				this.$refs.showLeft.close()
+				this.loadData();
 			}
 		},
 		/**
@@ -229,34 +291,72 @@ export default {
 		 * 分次请求未作整合
 		 */
 		async loadData() {
-			let carouselList = await this.$api.json('carouselList');
-			this.titleNViewBackground = carouselList[0].background;
-			this.swiperLength = carouselList.length;
-			this.carouselList = carouselList;
-			
-			let goodsList = await this.$api.json('goodsList');
-			this.goodsList = goodsList || [];
+			const result = await getHealthInfo()
+			let healthInfo = result.Data || {}
+			healthInfo.Rate = (healthInfo.Shrink + healthInfo.Diastole) / 2
+			this.healthyList.forEach(item => {
+				item.num = result.Data[item.key]
+			})
 		},
 		showDrawer(e) {
 			this.$refs[e].open()
 		},
-		changeDrawer(bool) {
-			console.log(bool)
+		async changeDrawer(bool) {
 			this.showLeft = bool
 			if (bool) {
-				getDeviceList({Page: 0, Limit: 1000 }).then(res => {
-					console.log(res.Data.DeviceList.splice(0, 10))
-					this.deviceList = res.Data.DeviceList.splice(0, 10) || []
-				})
+				this.getDeviceList(true)
+			} else {
+				page = 0
+				this.deviceList = []
 			}
 		},
-		change() {
-			console.log(197)
+		getDeviceList(isFirst) {
+			this.status = 'loading'
+			getDeviceList({Page: page, Limit: 10 }).then(res => {
+				this.deviceLoading = true
+				let deviceList = res.Data.DeviceList || []
+				if (!deviceList.length) this.status = 'noMore'
+				this.deviceList = this.deviceList.concat(deviceList)
+				if (isFirst) {
+					this.checkHeight()
+				}
+			})
+		},
+		checkHeight() {
+			uni.getSystemInfo({
+				success: (res) => {
+					let windowHeight = res.windowHeight
+					setTimeout(() => {
+						let obj = uni.createSelectorQuery().select('.device-list')
+						obj.boundingClientRect((data) => { // data - 各种参数
+							let height = data.height
+							if (height < windowHeight) {
+								let bool = (height + (height / (page || 1))) < windowHeight
+								page += 1;
+								this.getDeviceList(bool)
+							}
+						}).exec()
+					}, 0)
+				}
+			})
+		},
+		changeHealth(e) {
+			let index = e.detail.index
+		},
+		changeRadia(e) {
+			let index = e.detail.index
+		},
+		changeOption(e) {
+			let index = e.detail.index
+			let item = this.optionList[index]
+			uni.navigateTo({
+				url: item.url
+			})
 		}
 	},
 	// #ifdef APP-PLUS
 	// app端拦截返回事件 ，仅app端生效
-	onBackPress() {
+	onHide() {
 		if (this.showLeft) {
 			this.$refs.showLeft.close()
 			return true
@@ -306,13 +406,16 @@ export default {
 	
 	.block {
 		display: block;
-		text-align: center;
 	}
 	
 	.text {
-		font-size: 12px;
-		margin-top: 4px;
 		color: #999;
+		font-size: 12px;
+		text-align: center;
+	}
+	
+	.scroll-Y {
+		height: calc(100vh - 120rpx);
 	}
 	
 	.bar-text {
@@ -374,7 +477,26 @@ export default {
 	.device-box {
 		.device-title {
 			padding: 32rpx;
+			height: 120rpx;
 			font-size: 16px;
+		}
+		.device-left {
+			flex: 1;
+			color: #aaa;
+			.login-name {
+				color: $font-color-dark;
+				padding-right: 6px;
+			}
+		}
+		.select-device {
+			color: $font-color-spec;
+			.login-name {
+				color: $font-color-spec;
+			}
+		}
+		.device-right {
+			color: $font-color-spec;
+			align-self: center;
 		}
 	}
 	
@@ -391,13 +513,14 @@ export default {
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
-		flex-wrap:wrap;
-		padding: 30upx 22upx; 
+		flex-wrap: wrap;
+		// padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			padding: 24rpx 0;
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;
 		}

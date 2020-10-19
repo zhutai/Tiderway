@@ -1,87 +1,84 @@
 <template>
 	<view class="page-notice">
 		<view class="navbar">
-			<view 
-				v-for="(item, index) in navList" :key="index" 
-				class="nav-item" 
-				:class="{current: tabCurrentIndex === index}"
-				@click="tabClick(index)"
-			>
+			<view v-for="(item, index) in navList" :key="index" class="nav-item" :class="{current: tabCurrentIndex === index}"
+			 @click="tabClick(index)">
 				{{item.text}}
 			</view>
 		</view>
 		<swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
 			<swiper-item class="tab-content" v-for="(tabItem, tabIndex) in navList" :key="tabIndex">
-				<scroll-view 
-					class="list-scroll-content" 
-					scroll-y
-					@scrolltolower="loadData"
-				>
-				<view class="notice-item" v-if="!tabIndex">
-					<text class="time">昨天 12:30</text>
-					<view class="content">
-						<text class="title">新品上市，全场满199减50</text>
-						<view class="img-wrapper">
-							<image class="pic" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3761064275,227090144&fm=26&gp=0.jpg"></image>
-							<view class="cover">
-								活动结束
+				<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
+
+					<view v-if="!tabIndex">
+						<view class="notice-item" v-for="item in noticeList">
+							<text class="time">{{item.CreatedAt}}</text>
+							<view class="content">
+								<view class="bot b-t" style="border-bottom: 1px solid #D8D8D8;">
+									<text>{{item.Title}}</text>
+								</view>
+								<text class="title">{{item.Content}}</text>
 							</view>
 						</view>
-						<view class="bot b-t">
-							<text>查看详情</text>
-							<text class="more-icon yticon icon-you"></text>
-						</view>
 					</view>
-				</view>
-				<view v-else>
-					<uni-list>
-						<uni-list-chat v-for="item in [1,2,3,4,5,7]" :key="item.id" :title="'名称'" :time="'17:56'" 
-						:avatar="'https://img.36krcdn.com/20200410/v2_86bbf8245f754be79f3386a82b385093_img_000'" :note="'描述内容'" badge-positon="left" :badge-text="3">
-							<!-- <view class="chat-custom-right">
-								<text class="chat-custom-text">刚刚</text>
-								<uni-icons type="star-filled" color="#999" size="18"></uni-icons>
-							</view> -->
-						</uni-list-chat>
-					</uni-list>
-				</view>
+
+					<view v-else>
+						<uni-swipe-action>
+							<view class="content-box">
+								<text class="content-text">使使插槽</text>
+							</view>
+							<template v-slot:right>
+								<view class="slot-button"><text class="slot-button-text">删除</text></view>
+							</template>
+						</uni-swipe-action>
+					</view>
 				</scroll-view>
 			</swiper-item>
-			
+
 		</swiper>
 	</view>
 </template>
 
 <script>
 	const navList = [{
-		state: 0,
-		text: '系统消息',
-		loadingType: 'more',
-		orderList: []
-	},
-	{
-		state: 1,
-		text: '报警消息',
-		loadingType: 'more',
-		orderList: []
-	}]
+			state: 0,
+			text: '系统消息',
+			loadingType: 'more',
+			orderList: []
+		},
+		{
+			state: 1,
+			text: '预警列表',
+			loadingType: 'more',
+			orderList: []
+		}
+	]
 	export default {
 		data() {
 			return {
+				noticeList: [],
 				navList,
+				alarmList: [],
 				tabCurrentIndex: 0
 			}
 		},
+		async created() {
+			let nResult = await this.$http.post("v1.0/notice/list", {})
+			let aResult = await this.$http.post("v1.0/alarm/list", {page:0,limit:20})
+			this.noticeList = nResult.Data
+			this.alarmList = aResult.Data
+		},
 		methods: {
 			loadData() {
-				
+
 			},
 			//swiper 切换
-			changeTab(e){
+			changeTab(e) {
 				this.tabCurrentIndex = e.target.current;
 				this.loadData('tabChange');
 			},
 			//顶部tab点击
-			tabClick(index){
+			tabClick(index) {
 				this.tabCurrentIndex = index;
 			},
 		}
@@ -89,16 +86,17 @@
 </script>
 
 <style lang='scss'>
-	
-	page, .page-notice{
+	page,
+	.page-notice {
 		background: $page-color-base;
 		height: 100%;
 	}
-	
-	.swiper-box{
+
+	.swiper-box {
 		height: calc(100% - 40px);
 	}
-	.list-scroll-content{
+
+	.list-scroll-content {
 		height: 100%;
 	}
 
@@ -181,16 +179,17 @@
 	.more-icon {
 		font-size: 32upx;
 	}
-	
-	.navbar{
+
+	.navbar {
 		display: flex;
 		height: 40px;
 		padding: 0 5px;
 		background: #fff;
-		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		box-shadow: 0 1px 5px rgba(0, 0, 0, .06);
 		position: relative;
 		z-index: 10;
-		.nav-item{
+
+		.nav-item {
 			flex: 1;
 			display: flex;
 			justify-content: center;
@@ -199,9 +198,11 @@
 			font-size: 15px;
 			color: $font-color-dark;
 			position: relative;
-			&.current{
+
+			&.current {
 				color: $font-color-spec;
-				&:after{
+
+				&:after {
 					content: '';
 					position: absolute;
 					left: 50%;
@@ -214,5 +215,4 @@
 			}
 		}
 	}
-	
 </style>

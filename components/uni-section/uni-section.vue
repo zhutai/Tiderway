@@ -12,6 +12,7 @@
 </template>
 
 <script>
+
 	/**
 	 * Section 标题栏
 	 * @description 标题栏
@@ -55,25 +56,34 @@
 		}
 	}
 </script>
-<style scoped>
+<style lang="scss" scoped>
 	.uni-section {
 		position: relative;
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		/* margin-top: 10px; */
+		margin-top: 10px;
 		flex-direction: row;
 		align-items: center;
 		padding: 0 10px;
 		height: 44px;
 		background-color: #fff;
-		/* #ifdef APP-NVUE */
-		/* #endif */
 		font-weight: normal;
 	}
-
 	/* #ifndef APP-NVUE */
+	// .uni-section:after {
+	// 	position: absolute;
+	// 	bottom: 0;
+	// 	right: 0;
+	// 	left: 0;
+	// 	height: 1px;
+	// 	content: '';
+	// 	-webkit-transform: scaleY(.5);
+	// 	transform: scaleY(.5);
+	// 	background-color: $uni-border-color;
+	// }
 	/* #endif */
+
 	.uni-section__head {
 		flex-direction: row;
 		justify-content: center;
@@ -105,8 +115,8 @@
 	}
 
 	.uni-section__content-title {
-		font-size: 14px;
 		color: #333;
+		font-size: 14px;
 	}
 
 	.distraction {
@@ -115,7 +125,7 @@
 	}
 
 	.uni-section__content-sub {
-		font-size: 12px;
 		color: #999;
+		font-size: 12px;
 	}
 </style>

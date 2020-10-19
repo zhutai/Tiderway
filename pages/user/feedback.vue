@@ -1,11 +1,11 @@
 <template>
 	<view>
 		<view class="uni-common-mt">
-			<form>
-				<view class="uni-list">
-					<view class="uni-list-cell"  style="height: 50px;">
+			<form @submit="formSubmit">
+				<!-- 	<view class="uni-list">
+					<view class="uni-list-cell" style="height: 50px;">
 						<view class="uni-list-cell-left">
-							当前选择
+							反馈类型
 						</view>
 						<view class="uni-list-cell-db">
 							<picker @change="bindPickerChange" :value="pickerIndex" :range="pickerArray" range-key="name">
@@ -14,12 +14,24 @@
 						</view>
 					</view>
 				</view>
+ -->
+				<view class="uni-list list-pd">
+					<view class="uni-list-cell" style="height: 50px;">
+						<view class="uni-list-cell-left">
+							邮箱
+						</view>
+						<view class="uni-list-cell-right">
+							<input class="uni-input" placeholder="请输入邮箱" name="email" />
+						</view>
+					</view>
+				</view>
 
 				<view class="uni-list list-pd">
+					<view style="padding: 20rpx;margin-left: 10rpx;"> <text>反馈内容</text></view>
 					<view class="uni-textarea">
-						<textarea placeholder="请输入遇到的问题或建议" :value="feedbackValue" />
-					</view>
-					<view class="uni-list-cell cell-pd">
+						<textarea placeholder="请输入遇到的问题或建议" name="content" :value="feedbackValue" style="height: 300px;" />
+						</view>
+					<!-- <view class="uni-list-cell cell-pd">
 						<view class="uni-uploader">
 							<view class="uni-uploader-body">
 								<view class="uni-uploader__files">
@@ -34,11 +46,11 @@
 								</view>
 							</view>
 						</view>
-					</view>
+					</view> -->
 				</view>
 				
 				<view class="uni-button">
-					<button type="primary">提交</button>
+					<button form-type="submit" type="primary">提交</button>
 				</view>
 				
 			</form>
@@ -81,6 +93,10 @@
 				this.countIndex = 8;
 		},
 		methods: {
+			formSubmit: async function(e){
+				let result=await this.$http.post("v1.0/common/feedback",e.detail.value)
+				alert(result.Message)
+			},
 			sourceTypeChange: function(e) {
 				this.sourceTypeIndex = parseInt(e.detail.value)
 			},

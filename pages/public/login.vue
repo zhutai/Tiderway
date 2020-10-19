@@ -15,10 +15,10 @@
 			<!-- 其他登录 -->
 			<view class="other_login iconfont">
 				<view class="login_icon">
-					<view class="iconweixin" @tap="login_weixin"></view>
+					<text class="iconweixin" @tap="login_weixin"></text>
 				</view>
 				<view class="login_icon">
-					<view class="iconweibo" @tap="login_weibo"></view>
+					<text class="iconweibo" @tap="login_weibo"></text>
 				</view>
 				<!-- <view class="login_icon">
 					<view class="cuIcon-github" @tap="login_github"></view>
@@ -27,7 +27,7 @@
 
 			<!-- 底部信息 -->
 			<view class="footer">
-				<navigator url="forget" open-type="navigate">找回密码</navigator>
+				<navigator url="findPwd" open-type="navigate">找回密码</navigator>
 				<text>|</text>
 				<navigator url="register" open-type="navigate">注册账号</navigator>
 			</view>
@@ -41,6 +41,7 @@
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
 	import { login } from '@/api/user'
+	import { getDeviceList } from '@/api/device.js'
 	import { mapMutations } from 'vuex';
 	export default {
 		data() {
@@ -62,15 +63,14 @@
 			this.isLogin();
 		},
 		methods: {
-			...mapMutations(['login']),
+			...mapMutations(['login', 'setDeviceImei']),
 			isLogin() {
 				//判断缓存中是否登录过，直接登录
 				try {
 					const value = uni.getStorageSync('userInfo');
-					// console.log(value)
 					if (value) {
 						//有登录信息
-						console.log("已登录用户：",value);
+						// console.log("已登录用户：",value);
 						uni.reLaunch({
 							url: '/pages/index/index'
 						});
@@ -80,7 +80,6 @@
 				}
 			},
 			startLogin(e) {
-				console.log(e)
 				//登录
 				if (this.isRotate) {
 					//判断是否加载中，避免重复点击请求
@@ -102,8 +101,11 @@
 					});
 					return;
 				}
-
-				_this.isRotate = true
+				
+				this.handleLogin()
+			},
+			async handleLogin() {
+				this.isRotate = true
 				let params = {
 					LoginName: this.phoneData,
 					Pwd: this.passData,
@@ -111,61 +113,22 @@
 					LoginType: 1
 				}
 				
-				login(params).then(res => {
-					if (res && res.Data) {
-						_this.isRotate = false
-						this.login(res.Data)
-						uni.reLaunch({
-							url: '/pages/index/index'
-						})
-					}
-				}, err => {
-					_this.isRotate = false
-					// this.$api.msg(err.errMsg)
-				})
-				// setTimeout(function() {
-				// 	_this.isRotate = false
-				// }, 3000)  
-				// uni.showLoading({
-				// 	title: '登录中'
-				// });
-				// getLogin()
-				// .then(res => { 
-				// 	//console.log(res)  
-				// 	//简单验证下登录（不安全）
-				// 	if(_this.phoneData==res.data.username && _this.passData==res.data.password){
-				// 		let userdata={
-				// 			"username":res.data.username,
-				// 			"nickname":res.data.nickname,
-				// 			"accesstoken":res.data.accesstoken,
-				// 		} //保存用户信息和accesstoken
-				// 		_this.$store.dispatch("setUserData",userdata); //存入状态
-				// 		try {
-				// 			uni.setStorageSync('setUserData', userdata); //存入缓存
-				// 		} catch (e) {
-				// 			// error
-				// 		}
-				// 		uni.showToast({
-				// 			icon: 'success',
-				// 			position: 'bottom',
-				// 			title: '登录成功'
-				// 		});
-				// 		uni.reLaunch({
-				// 			url: '../../../pages/index',
-				// 		});
-				// 	}else{
-				// 		_this.passData=""
-				// 		uni.showToast({
-				// 			icon: 'error',
-				// 			position: 'bottom',
-				// 			title: '账号或密码错误，账号admin密码admin'
-				// 		});
-				// 	}
-				// 	uni.hideLoading();
-				// }).catch(err => {
-				// 	uni.hideLoading();
-				// })
-
+				try{
+					// 先登录再同时获取用户设备列表，默认选择第一个
+					let result = await login(params);
+					this.login(result.Data)
+					let res = await getDeviceList({Page: 0, Limit: 10 })
+					let deviceList = res.Data.DeviceList || []
+					let imei = deviceList.length ? deviceList[0].IMEI : ''
+					this.setDeviceImei({ deviceImei: imei, imeiLength: deviceList.length })
+					this.isRotate = false
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+				}catch(e){
+					console.log(e)
+					this.isRotate = false
+				}
 			},
 			login_weixin() {
 				//微信登录
@@ -195,7 +158,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	@import url("@/common/login.css");
 
 	/* 登录按钮 */

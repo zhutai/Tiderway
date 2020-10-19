@@ -14,15 +14,29 @@ const getTokenStorage = () => {
   let token = ''
   try {
 		if (store.state.hasLogin) {
-			token = store.state.userInfo.Token
+			token = "Bearer " + store.state.userInfo.Token
 		} else {
 			let userInfo = uni.getStorageSync('userInfo') || {}
-			token = userInfo.Token || ''
+			token = userInfo.Token ? ("Bearer " + userInfo.Token) : ''
 		}
   } catch (e) {
 		console.log(e)
   }
   return token
+}
+
+const getImeiStorage = () => {
+  let deviceImei = ''
+  try {
+		if (store.state.deviceImei) {
+			deviceImei = store.state.deviceImei
+		} else {
+			deviceImei = uni.getStorageSync('deviceImei') || ''
+		}
+  } catch (e) {
+		console.log(e)
+  }
+  return deviceImei
 }
 
 const http = new Request()
@@ -38,7 +52,8 @@ http.setConfig((config) => { /* 设置全局配置 */
 http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使用async await 做异步操作 */
   config.header = {
     ...config.header,
-    token: getTokenStorage()
+		imei: getImeiStorage(),
+    Authorization: getTokenStorage()
   }
   /*
 	  if (!token) { // 如果token不存在，return Promise.reject(config) 会取消本次请求
@@ -52,7 +67,8 @@ http.interceptors.request.use((config) => { /* 请求之前拦截器。可以使
 
 http.interceptors.response.use(async (response) => { /* 请求之后拦截器。可以使用async await 做异步操作  */
 	if (response.statusCode === 200) { // 接口请求成功
-		if (response.data.Code === 200) { // 接口内部状态无异常
+		let codes = [0, 100, 200]
+		if (codes.includes(response.data.Code)) { // 接口内部状态无异常
 			return response.data
 		} else {
 			console.log(response)

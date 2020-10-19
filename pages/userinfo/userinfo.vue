@@ -2,32 +2,30 @@
 	<view class="container">
 		<view class="list-cell b-b m-t" @click="navTo('头像')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">头像</text>
-			<image class="slot-image" src="../../static/missing-face.png" mode="widthFix"></image>
+			<image class="slot-image" :src="userInfo.Avatar" mode="widthFix" style="width: 40px;border-radius: 50%;"></image>
 			<!-- <text class="cell-more yticon icon-you"></text> -->
 		</view>
 		<view class="list-cell b-b" @click="navTo('手机号')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">手机号</text>
-			<text class="cell-tip">{{ userInfo.LoginName }}</text>
+			<text class="cell-tip">{{ userInfo.PhoneNum }}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell" @click="navTo('用户名')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">用户名</text>
+		<view class="list-cell" @click="navTo('昵称')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">昵称</text>
 			<text class="cell-tip">{{ userInfo.LoginName }}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 		
-		<view class="list-cell m-t">
+	<!-- 	<view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
 			<switch checked color="#4399fc" @change="switchChange" />
-		</view>
+		</view> -->
 		
-		<view class="list-cell m-t" @click="navTo('/pages/public/forget')" hover-class="cell-hover" :hover-stay-time="50">
+	<!-- 	<view class="list-cell m-t" @click="navTo('/pages/public/forget')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">修改密码</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell log-out-btn" @click="toLogout">
-			<text class="cell-tit">退出登录</text>
-		</view>
+		</view> -->
+	
 	</view>
 </template>
 

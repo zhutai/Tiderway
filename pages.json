@@ -73,9 +73,24 @@
 			}
 		},
 		{
+			"path": "pages/public/findPwd",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView": false,
+					"animationType": "slide-in-bottom"
+				}
+			}
+		},
+		{
 			"path": "pages/public/forget",
 			"style": {
 				"navigationBarTitleText": "修改密码"
+			}
+		},{
+			"path": "pages/device/add",
+			"style": {
+				"navigationBarTitleText": "添加设备"
 			}
 		},
 		{
@@ -144,7 +159,16 @@
 				"navigationBarTitleText": "商品列表"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/location/monitor",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "设备监控",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
