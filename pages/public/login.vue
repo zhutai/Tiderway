@@ -85,15 +85,15 @@
 					//判断是否加载中，避免重复点击请求
 					return false;
 				}
-				if (this.phoneData.length < 5) {
+				if (this.phoneData.length < 2) {
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '用户名不能小于6位'
+						title: '用户名不能小于2位'
 					});
 					return;
 				}
-				if (this.passData.length < 5) {
+				if (this.passData.length < 6) {
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
@@ -108,8 +108,8 @@
 				this.isRotate = true
 				let params = {
 					LoginName: this.phoneData,
-					// Pwd: this.passData,
-					Pwd: md5(this.passData),
+					Pwd: this.passData,
+					// Pwd: md5(this.passData),
 					LoginType: 1
 				}
 				

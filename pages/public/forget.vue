@@ -89,14 +89,14 @@
 			},
 			setPassWord() {
 				let params = {
-					newPwd: md5(this.newPassData),
+					newPwd: this.newPassData,
 					oldPwd: this.oldPassData,
 				}
 				this.isRotate = true
 				editPwd(params).then(res => {
 					this.isRotate = false
 					this.logout()
-					this.$api.mag('密码修改成功')
+					this.$api.msg('密码修改成功')
 					setTimeout(() => {
 						uni.reLaunch({
 							url: '/pages/public/login'

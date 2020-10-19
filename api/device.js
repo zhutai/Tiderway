@@ -35,7 +35,7 @@ export const  getDeviceInfo = (data) => {
  * @param {Object} data - 绑定设备  
  */
 export const bindDevice = (data) => {
-  return http.post(`${VERSION}/Device​/bind`, data)
+  return http.post(`${VERSION}/Device/bind`, data)
 }
 
 /**
@@ -44,4 +44,12 @@ export const bindDevice = (data) => {
  */
 export const unBindDevice = (path, data) => {
   return http.post(`${VERSION}/Device​/unBind`, data)
+}
+
+/**
+ * 设备监控
+ * @param {Object} data - 设备健康
+ */
+export const monitor = (path,data) => {
+  return http.post(`${VERSION}/Device​/monitor`, data)
 }

@@ -87,6 +87,11 @@
 			"style": {
 				"navigationBarTitleText": "修改密码"
 			}
+		},{
+			"path": "pages/device/add",
+			"style": {
+				"navigationBarTitleText": "添加设备"
+			}
 		},
 		{
 			"path": "pages/notice/notice",

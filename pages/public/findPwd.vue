@@ -125,13 +125,14 @@
 				let params = {
 					Phone: this.phoneData,
 					Code: this.verCode,
-					Pwd: md5(this.passData)
+					// Pwd: md5(this.passData)
+					Pwd: this.passData
 				}
 				this.isRotate = true
 				findPwd(params).then(res => {
 					this.isRotate = false
 					this.logout()
-					this.$api.mag('密码修改成功')
+					this.$api.msg('密码修改成功')
 					setTimeout(() => {
 						uni.reLaunch({
 							url: '/pages/public/login'

@@ -7,7 +7,7 @@
 				<image class="user-avatar" src="../../static/missing-face.png"></image>
 			</view>
 			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
-			<view class="bar-text" slot="right">添加设备</view>
+			<view class="bar-text" slot="right" @click="addDevice">添加设备</view>
 		</uni-nav-bar>
 		
 		<!--  设备状态显示 -->
@@ -69,11 +69,11 @@
 			<uni-section title="设备功能表" type="line"></uni-section>
 			<view class="grid-list">
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
-					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :index="index"  :key="index">
+					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
 							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
-							<text style="padding-top: 12rpx;">{{ item.name }}</text>
+							<text class="block" style="padding-top: 12rpx;">{{ item.name }}</text>
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -83,7 +83,7 @@
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
 			<uni-status-bar />
 			<view class="device-box">
-				<view class="device-title">我的设备列表</view>
+				<view class="device-title">设备列表</view>
 				<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
 					<!-- <view v-for="index in 100">{{ index }}</view> -->
 					<uni-list class="device-list">
@@ -101,7 +101,7 @@
 								</view>
 								<text class="block">{{ item.IMEI }}</text>
 							</view>
-							<text slot="footer" class="device-right">在线</text>
+							<text slot="footer" class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
 						</uni-list-item>
 					</uni-list>
 					<uni-load-more :status="status" />
@@ -153,7 +153,7 @@ const healthyList = [
 
 const radiaList = [
 	{
-		name: '峰值剂量',
+		name: '实时剂量',
 		unit: 'µSv/h',
 		icon: 'iconfengzhiguzhituli',
 		key: 'step',
@@ -168,7 +168,7 @@ const radiaList = [
 		num: 90
 	},{
 		name: '累计剂量',
-		unit: 'µSv/h',
+		unit: 'mSv',
 		icon: 'iconleiji',
 		color: '#F59A23',
 		key: 'mmHg',
@@ -201,10 +201,10 @@ const optionList = [
 ]
 
 export default {
-
 	data() {
 		return {
 			status: 'loading',
+			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
 			showLeft: false,
 			scrollHeight: 400,
 			titleNViewBackground: '',
@@ -248,7 +248,7 @@ export default {
 					console.log(res)
 					if (res.confirm) {
 						uni.navigateTo({
-							url: '/pages/set/set'
+							url: '/pages/device/add'
 						})
 					}
 				}
@@ -274,6 +274,11 @@ export default {
 		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
+		},
+		addDevice() {
+			uni.navigateTo({
+				url:'/pages/device/add'
+			})
 		},
 		swtichDevice(item) {
 			if (item.IMEI) {
@@ -392,9 +397,6 @@ export default {
 	page {
 		background: #f5f5f5;
 	}
-	.m-t{
-		margin-top: 16upx;
-	}
 	
 	.container {
 		background: #f5f5f5;
@@ -406,6 +408,7 @@ export default {
 	
 	.text {
 		color: #999;
+		padding-top: 4px;
 		font-size: 12px;
 		text-align: center;
 	}
@@ -437,8 +440,11 @@ export default {
 	}
 	
 	.user-center {
+		/* #ifndef APP-NVUE */
 		display: flex;
+		/* #endif */
 		flex: 1;
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 		image {
@@ -491,8 +497,11 @@ export default {
 			}
 		}
 		.device-right {
-			color: $font-color-spec;
+			color: #aaa;
 			align-self: center;
+		}
+		.blue {
+			color: $font-color-spec;
 		}
 	}
 	
@@ -504,90 +513,9 @@ export default {
 		}
 	}
 	
-	/* 分类 */
-	.cate-section {
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		flex-wrap: wrap;
-		// padding: 30upx 22upx; 
-		background: #fff;
-		.cate-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 24rpx 0;
-			font-size: $font-sm + 2upx;
-			color: $font-color-dark;
-		}
-		/* 原图标颜色太深,不想改图了,所以加了透明度 */
-		image {
-			width: 88upx;
-			height: 88upx;
-			margin-bottom: 14upx;
-			border-radius: 50%;
-			opacity: .7;
-			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
-		}
+	.cate-item {
+		padding: 24rpx 0;
+		color: $font-color-dark;
+		text-align: center;
 	}
-	.ad-1{
-		padding: 4upx 30upx 24upx;
-		background: #fff;
-		.s-header{
-			display:flex;
-			align-items:center;
-			height: 92upx;
-			line-height: 1;
-			.s-img{
-				width: 140upx;
-				height: 30upx;
-			}
-			.tip{
-				font-size: $font-base;
-				color: $font-color-light;
-				margin: 0 20upx 0 40upx;
-			}
-			.timer{
-				display:inline-block;
-				width: 40upx;
-				height: 36upx;
-				text-align:center;
-				line-height: 36upx;
-				margin-right: 14upx;
-				font-size: $font-sm+2upx;
-				color: #fff;
-				border-radius: 2px;
-				background: rgba(0,0,0,.8);
-			}
-			.icon-you{
-				font-size: $font-lg;
-				color: $font-color-light;
-				flex: 1;
-				text-align: right;
-			}
-		}
-		.floor-list{
-			white-space: nowrap;
-		}
-		.scoll-wrapper{
-			display:flex;
-			align-items: flex-start;
-		}
-		.floor-item{
-			width: 150upx;
-			margin-right: 20upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-dark;
-			line-height: 1.8;
-			image{
-				width: 150upx;
-				height: 150upx;
-				border-radius: 6upx;
-			}
-			.price{
-				color: $uni-color-primary;
-			}
-		}
-	}
-
 </style>
