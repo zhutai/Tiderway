@@ -17,20 +17,21 @@
 		<view class="date-time">
 			<text>{{ tabs[dateTimeIndex].createTime + ' 至 ' +  tabs[dateTimeIndex].endTime }}</text>
 		</view>
-
-		<view class="heart-rate" v-if="current === 0">
-			<view class="info-scroll">
-				<view class="info-item" v-for="item in heartInfo">
-					<view class="info-num">
-						<text class="num">{{ item.num }}</text>
-						<text class="unit">{{ item.unit }}</text>
-					</view>
-					<view class="info-label">
-						<text class="round" :class="item.className"></text>
-						<text class="label">{{ item.name }}</text>
-					</view>
+		
+		<view class="info-scroll">
+			<view class="info-item" v-for="(item, index) in heartInfo" :class="{ 'no-margin' : !(index % 3) }">
+				<view class="info-num">
+					<text class="num">{{ item.num }}</text>
+					<text class="unit">{{ item.unit }}</text>
+				</view>
+				<view class="info-label">
+					<text class="round" :class="item.className"></text>
+					<text class="label">{{ item.name }}</text>
 				</view>
 			</view>
+		</view>
+
+		<view class="heart-rate" v-if="current === 0">
 
 			<view class="content">
 				<view class="title-style">
@@ -61,18 +62,6 @@
 		</view>
 
 		<view class="motion" v-if="current === 1">
-			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
-				<view class="info-item" v-for="item in heartInfo">
-					<view class="info-num">
-						<text class="num">{{ item.num }}</text>
-						<text class="unit">{{ item.unit }}</text>
-					</view>
-					<view class="info-label">
-						<text class="round" :class="item.className"></text>
-						<text class="label">{{ item.name }}</text>
-					</view>
-				</view>
-			</scroll-view>
 			
 			<view class="content">
 				<view class="title-style">
@@ -103,18 +92,6 @@
 		</view>
 
 		<view class="blood-pressure" v-if="current === 2">
-			<scroll-view class="info-scroll" scroll-x="true" scroll-left="0">
-				<view class="info-item" v-for="item in heartInfo">
-					<view class="info-num">
-						<text class="num">{{ item.num }}</text>
-						<text class="unit">{{ item.unit }}</text>
-					</view>
-					<view class="info-label">
-						<text class="round" :class="item.className"></text>
-						<text class="label">{{ item.name }}</text>
-					</view>
-				</view>
-			</scroll-view>
 			
 			<view class="content">
 				<view class="title-style">
@@ -165,15 +142,40 @@
 	const tabbars = [{
 		name: '心率',
 		dateTimeIndex: 0,
-		path: 'HeartHistory'
+		dateKey: 'RecivedAt',
+		path: 'HeartHistory',
+		units: [{ unit: '次/分钟' }],
+		dataParams: [{
+			key: 'Heart',
+			value: 'data'
+		}]
 	}, {
 		name: '运动',
 		dateTimeIndex: 0,
-		path: 'StepHistory'
+		dateKey: 'RecivedAt',
+		path: 'StepHistory',
+		units: [{ unit: '步' }, { unit: 'm' }],
+		dataParams: [{
+			key: 'Step',
+			value: 'data'
+		},{
+			key: 'Step',
+			value: 'data1',
+			custom: true
+		}]
 	}, {
 		name: '血压',
 		dateTimeIndex: 0,
-		path: 'BloodHistory'
+		dateKey: 'RecivedAt',
+		path: 'BloodHistory',
+		units: [{ unit: 'mmHg' }, { unit: 'mmHg' }],
+		dataParams: [{
+			key: 'Shrink',
+			value: 'data'
+		},{
+			key: 'Diastole',
+			value: 'data1'
+		}]
 	}, ]
 
 	const tabs = [{
@@ -213,30 +215,43 @@
 		active: false
 	}, ]
 
-	const heartInfo = [{
-		name: '平均值',
-		unit: '次/分钟',
-		key: 'average',
-		num: '--',
-		className: 'blue'
-	}, {
-		name: '最大值',
-		unit: '次/分钟',
-		key: 'max',
-		num: '--',
-		className: 'green'
-	}, {
-		name: '最小值',
-		unit: '次/分钟',
-		key: 'min',
-		num: '--',
-		className: 'yellow'
-	}]
-
+	const getHeartInfo = (companyArray) => {
+		const heartInfo = [{
+			name: '平均值',
+			unit: '',
+			key: 'average',
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '最大值',
+			unit: '',
+			key: 'max',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '最小值',
+			unit: '',
+			key: 'min',
+			num: '--',
+			className: 'yellow'
+		}]
+		let index = 0
+		const heartList = []
+		companyArray.forEach(item => {
+			heartInfo.forEach(list => {
+				let cruuent = Object.assign({}, list)
+				cruuent.unit = item.unit
+				heartList[index] = cruuent
+				index += 1
+			})
+		})
+		return heartList
+	}
 
 	export default {
 
 		data() {
+			let heartInfo = getHeartInfo([{ unit: '次/分钟' }])
 			var titleNames = tabbars.map(item => item.name)
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
@@ -276,7 +291,8 @@
 		methods: {
 			getHistoryData() {
 				uni.showLoading({title: ' 加载中...', mask: true})
-				let path = tabbars[this.current].path
+				let tabbar = tabbars[this.current]
+				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
 				let params = {
 					Limit: 0,
@@ -289,30 +305,27 @@
 					this.chartLoading = true
 					let HistoryList = res.Data.HistoryList
 					if (path === 'HeartHistory') {
-						let str = 'Heart'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str)
+							let obj = this.dataFormat(HistoryList, tabbar)
 							this.heartRateOption = this.getHeartRateParams(obj)
 						} else {
-							this.dataFormat(HistoryList, str)
+							this.dataFormat(HistoryList, tabbar)
 							this.heartRateOption = null
 						}
 					} else if (path === 'StepHistory') {
-						let str = 'Step'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str)
+							let obj = this.dataFormat(HistoryList, tabbar)
 							this.motionOption = this.getStepParams(obj)
 						} else {
-							this.dataFormat(HistoryList, str)
+							this.dataFormat(HistoryList, tabbar)
 							this.motionOption = null
 						}
 					} else {
-						let str = 'Shrink'
 						if (HistoryList.length) {
-							let obj = this.dataFormat(HistoryList, str, 'Diastole')
+							let obj = this.dataFormat(HistoryList, tabbar)
 							this.bloodOption = this.getBooldParams(obj)
 						} else {
-							this.dataFormat(HistoryList, str)
+							this.dataFormat(HistoryList, tabbar)
 							this.bloodOption = null
 						}
 					}
@@ -320,15 +333,27 @@
 				})
 			},
 			// 对数据进行格式化赋值
-			dataFormat(HistoryList, key, key_2) {
+			dataFormat(HistoryList, tabbar) {
+				let { dateKey, dataParams } = tabbar
 				let date = HistoryList.map(item => {
-					return item.RecivedAt.replace(' ', '\n')
+					return item[dateKey].replace(' ', '\n')
 				})
-				let data = HistoryList.map(item => item[key]);
-				let data2 = null
-				if (key_2) data2 = HistoryList.map(item => item[key_2]);
-				this.computeData(data)
-				return { date, data, data2 }
+				let obj = {}
+				dataParams.forEach((param, index) => {
+					let data = HistoryList.map(item => item[param.key]);
+					if (param.custom) {
+						data = data.map(item => item * 7);
+					}
+					obj[param.value] = data
+					let arr = this.computeData(data)
+					let startIndex = 3 * index
+					let endIndex = 3 * (index + 1)
+					let heartInfo = this.heartInfo.slice(startIndex, endIndex)
+					heartInfo.forEach(item => {
+						item.num = arr[item.key]
+					})
+				})
+				return { date, ...obj }
 			},
 			// 计算计数最大值最小值和平均值
 			computeData(data) {
@@ -354,10 +379,7 @@
 						average: '-'
 					}
 				}
-				
-				this.heartInfo.forEach(item => {
-					item.num = arr[item.key]
-				})
+				return arr
 			},
 			getBooldParams({ data, date, data2 }) {
 				let currentSize = 16;
@@ -660,6 +682,10 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
+					console.log(tabbars[this.current].units)
+					let HeartInfo = getHeartInfo(tabbars[this.current].units)
+					this.heartInfo = HeartInfo
+					console.log(HeartInfo)
 					this.toggleTabs(this.current)
 				}
 			},
@@ -792,9 +818,9 @@
 	}
 
 	.info-scroll {
-		padding: 24rpx 0;
-		height: 208rpx;
-		white-space: nowrap;
+		padding: 12rpx 0;
+		// height: 208rpx;
+		// white-space: nowrap;
 
 		.info-item {
 			width: 30%;
@@ -802,11 +828,11 @@
 			padding: 24rpx;
 			line-height: 60rpx;
 			display: inline-block;
-			margin-right: 2%;
+			margin: 12rpx 16rpx 12rpx 0;
 			background: $color-white;
 
-			&:first-child {
-				margin-left: 24rpx;
+			&.no-margin{
+				margin-left: 20rpx;
 			}
 
 			.info-num {
