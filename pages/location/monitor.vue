@@ -55,8 +55,8 @@
 					latitude: 39.9085,
 					longitude: 116.39747,
 					iconPath: '../../static/icon/0.png',
-					width: 300,
-					height: 300
+					width: 40,
+					height: 40
 				}]
 			}
 		},
@@ -97,8 +97,8 @@
 					latitude: result.Data.Lat,
 					longitude: result.Data.Lng,
 					iconPath: '../../static/icon/0.png',
-					width: 30,
-					height: 30
+					width: 40,
+					height: 40
 				}
 
 				this.latitude = result.Data.Lat
