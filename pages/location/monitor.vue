@@ -55,8 +55,6 @@
 					latitude: 39.9085,
 					longitude: 116.39747,
 					iconPath: '../../static/icon/0.png',
-					width: 300,
-					height: 300
 				}]
 			}
 		},
@@ -88,30 +86,48 @@
 				this.$api.msg(item.name)
 				
 			},
+			//百度坐标转高德（传入经度、纬度）
+			bdToGaoDe(bd_lat,bd_lng) {
+			    var X_PI = Math.PI * 3000.0 / 180.0;
+			    var x = bd_lng - 0.0065;
+			    var y = bd_lat - 0.006;
+			    var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * X_PI);
+			    var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * X_PI);
+			    var gg_lng = z * Math.cos(theta);
+			    var gg_lat = z * Math.sin(theta);
+			    return {lng: gg_lng, lat: gg_lat}
+			},
 			async location() {
 				let result = await this.$http.post("v1.0/location/monitor", {})
 
+				var latlng=this.bdToGaoDe(result.Data.Lat,result.Data.Lng)
+				console.log(latlng)
 				let market = {
 					callout:{
 						content:result.Data.RecivedAt,
 						display:'ALWAYS',
 						padding:10
 					},
-					latitude: result.Data.Lat,
-					longitude: result.Data.Lng,
+					latitude: latlng.lat,
+					longitude: latlng.lng,
 					iconPath: '../../static/icon/0.png',
-					width: 30,
-					height: 30
+					width:300,
+					height:200
 				}
 
-				this.latitude = result.Data.Lat
-				this.longitude = result.Data.Lng
+				this.latitude =latlng.lat
+				this.longitude = latlng.lng
 				this.markers = [market];
-
-				var point = new plus.maps.Point(latitude,longitude);
-				plus.maps.Map.reverseGeocode(point, {}, function(res) {
-					this.address = res.address;
+				
+				// #ifdef APP-PLUS
+				var ptObj = new plus.maps.Point(this.latitude, this.longitude);
+				plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
+					console.log(res)
+					this.address=res.address
+				},function () {
+					
 				})
+				// #endif
 			}
 		}
 	}
