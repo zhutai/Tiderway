@@ -12,15 +12,10 @@
 		
 		<!--  设备状态显示 -->
 		<view class="device-info">
-			<view class="device-icon">
-				<uni-icons type="info" color="#8f8f94" size="48" />
-			</view>
-			<view class="device-text">
-				<text>很遗憾您的设备不在线~	~</text>
-			</view>
-			<view class="device-btn">
-				<button class="mini-btn" type="default" :plain="true" size="mini">查看原因</button>
-			</view>
+			<map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
+				<cover-view class="back-block"></cover-view>
+				<!-- <cover-view class="address">{{ address }}</cover-view> -->
+			</map>
 		</view>
 		
 		<view class="example-body">
@@ -44,20 +39,25 @@
 		</view>
 		
 		<view class="example-body">
-			<uni-section title="辐射数据" type="line">
+			<uni-section title="辐射数据" type="line" style="margin: 0;">
 				<view class="cell-more">
 					<text class="cell-text">更多</text>
 					<text class="cell-icon yticon icon-you"></text>
 				</view>
 			</uni-section>
 			<view class="grid-list">
-				<uni-grid :column="3" :show-border="false" :square="false" @change="changeRadia">
+				<uni-grid :column="2" :show-border="false" :square="false" @change="changeRadia">
 					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
-						<view class="grid-item-box">
-							<text class="block text iconfont" :style="{ color: item.color, fontSize: '24px' }" :class="item.icon"></text>
-							<text class="block text">{{item.num}}</text>
-							<text class="block text">{{item.name}}</text>
-							<text class="block text">({{item.unit}})</text>
+						<view class="radia-box">
+							<view class="box-left">
+								<text class="block iconfont" :style="{ color: item.color, fontSize: '36px' }" :class="item.icon"></text>
+							</view>
+							<view class="box-right">
+								<text class="block">{{item.name}}({{item.unit}})</text>
+								<text class="block">{{item.num}}</text>
+								<!-- <text class="block text"></text> -->
+							</view>
+							
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -69,11 +69,11 @@
 			<uni-section title="设备功能表" type="line"></uni-section>
 			<view class="grid-list">
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
-					<uni-grid-item class="cate-section" v-for="(item ,index) in optionList" :index="index"  :key="index">
+					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
 							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
 							<!-- <image :src="item.imageUrl"></image> -->
-							<text style="padding-top: 12rpx;">{{ item.name }}</text>
+							<text class="block" style="padding-top: 12rpx;">{{ item.name }}</text>
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -101,7 +101,7 @@
 								</view>
 								<text class="block">{{ item.IMEI }}</text>
 							</view>
-							<text slot="footer" class="device-right">在线</text>
+							<text slot="footer" class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
 						</uni-list-item>
 					</uni-list>
 					<uni-load-more :status="status" />
@@ -114,6 +114,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { monitor } from '@/api/location'
 import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 
@@ -147,33 +148,26 @@ const healthyList = [
 		icon: 'iconxieya',
 		color: '#F59A23',
 		key: 'Rate',
-		num: '--'
+		num: '-'
 	},
 ]
 
 const radiaList = [
 	{
-		name: '峰值剂量',
+		name: '实时剂量',
 		unit: 'µSv/h',
-		icon: 'iconfengzhiguzhituli',
-		key: 'step',
-		color: '#4399fc',
-		num: 3264
-	},{
-		name: '累计时间',
-		unit: 'Seconds',
 		icon: 'iconshijian1',
-		key: 'bpm',
-		color: '#95F204',
-		num: 90
+		key: 'Radio',
+		color: '#4399fc',
+		num: '--'
 	},{
 		name: '累计剂量',
-		unit: 'µSv/h',
+		unit: 'mSv',
 		icon: 'iconleiji',
 		color: '#F59A23',
-		key: 'mmHg',
-		num: 36.5
-	},
+		key: 'TotalRadio',
+		num: '--'
+	}
 ]
 
 const optionList = [
@@ -204,6 +198,7 @@ export default {
 	data() {
 		return {
 			status: 'loading',
+			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
 			showLeft: false,
 			scrollHeight: 400,
 			titleNViewBackground: '',
@@ -215,7 +210,19 @@ export default {
 			deviceList: [],
 			healthyList,
 			optionList,
-			radiaList
+			radiaList,
+			// 地图部分数据
+			latitude: 39.909,
+			longitude: 116.39742,
+			address: '北京市天安门',
+			enableSatellite: false,
+			markers: [{
+				latitude: 39.9085,
+				longitude: 116.39747,
+				iconPath: '../../static/icon/0.png',
+				width: 24,
+				height: 24
+			}]
 		};
 	},
 	components: {
@@ -235,8 +242,6 @@ export default {
 		})
 	},
 	onShow() {
-		console.log(this.deviceImei)
-		console.log(this.deviceEmpey)
 		if (this.deviceEmpey) {
 			uni.showModal({
 				title: "未添加设备",
@@ -247,22 +252,21 @@ export default {
 					console.log(res)
 					if (res.confirm) {
 						uni.navigateTo({
-							url: '/pages/set/set'
+							url: '/pages/device/add'
 						})
 					}
 				}
 			})
 		} else {
 			this.loadData();
-			// #ifdef APP-PLUS
-			var ptObj = new plus.maps.Point('116.39747', '39.9085' );
-			plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
-				console.log(res)
-				alert(res)
-			},function () {
-				
-			})
-			// #endif
+			this.location()
+			// // #ifdef APP-PLUS
+			// var ptObj = new plus.maps.Point('116.39747', '39.9085' );
+			// plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
+			// 	console.log(res)
+			// },function () {
+			// })
+			// // #endif
 		}
 	},
 	onReady() {
@@ -297,6 +301,36 @@ export default {
 			this.healthyList.forEach(item => {
 				item.num = result.Data[item.key]
 			})
+			this.radiaList.forEach(item => {
+				item.num = result.Data[item.key]
+			})
+		},
+		// 地图数据请求
+		async location() {
+			let result = await monitor({})
+		
+			let market = {
+				callout:{
+					content: result.Data.RecivedAt,
+					display: 'ALWAYS',
+					padding: 10
+				},
+				latitude: result.Data.Lat,
+				longitude: result.Data.Lng,
+				iconPath: '../../static/icon/0.png',
+				width: 30,
+				height: 30
+			}
+		
+			this.latitude = result.Data.Lat
+			this.longitude = result.Data.Lng
+			this.markers = [market];
+			// #ifdef APP-PLUS
+			var point = new plus.maps.Point(latitude,longitude);
+			plus.maps.Map.reverseGeocode(point, {}, function(res) {
+				this.address = res.address;
+			})
+			// #endif
 		},
 		showDrawer(e) {
 			this.$refs[e].open()
@@ -396,9 +430,6 @@ export default {
 	page {
 		background: #f5f5f5;
 	}
-	.m-t{
-		margin-top: 16upx;
-	}
 	
 	.container {
 		background: #f5f5f5;
@@ -408,8 +439,15 @@ export default {
 		display: block;
 	}
 	
+	.map {
+		width: 100vw;
+		height: 400rpx;
+		position: relative;
+	}
+	
 	.text {
 		color: #999;
+		padding-top: 4px;
 		font-size: 12px;
 		text-align: center;
 	}
@@ -427,7 +465,6 @@ export default {
 	.example-body {
 		margin-bottom: 24rpx;
 		.grid-list {
-			// height: 1500upx;
 			/* #ifndef APP-NVUE */
 			display: flex;
 			/* #endif */
@@ -437,12 +474,33 @@ export default {
 			padding-bottom: 24rpx;
 			font-size: 14px;
 			background-color: #ffffff;
+				
+			.radia-box {
+				/* #ifndef APP-NVUE */
+				display: flex;
+				/* #endif */
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+				// .box-left {
+					
+				// }
+				.box-right {
+					color: #666;
+					font-size: 14px;
+					padding-left: 24rpx;
+				}
+			}
 		}
 	}
 	
 	.user-center {
+		/* #ifndef APP-NVUE */
 		display: flex;
+		/* #endif */
 		flex: 1;
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 		image {
@@ -452,27 +510,27 @@ export default {
 		}
 	}
 	
-	.device-info {
-		padding: 16px;
-		text-align: center;
-		.device-icon {
-			font-size: 0;
-			padding-top: 12px;
-		}
-		.device-text {
-			font-size: 12px;
-			color: #C0C4CC;
-		}
-		.device-btn {
-			font-size: 0;
-			padding-top: 12px;
-			/deep/ uni-button[type=default] {
-				color: #C0C4CC;
-				transform: scale(0.8);
-				border: 1px solid #C0C4CC;
-			}
-		}
-	}
+	// .device-info {
+	// 	padding: 16px;
+	// 	text-align: center;
+	// 	.device-icon {
+	// 		font-size: 0;
+	// 		padding-top: 12px;
+	// 	}
+	// 	.device-text {
+	// 		font-size: 12px;
+	// 		color: #C0C4CC;
+	// 	}
+	// 	.device-btn {
+	// 		font-size: 0;
+	// 		padding-top: 12px;
+	// 		/deep/ uni-button[type=default] {
+	// 			color: #C0C4CC;
+	// 			transform: scale(0.8);
+	// 			border: 1px solid #C0C4CC;
+	// 		}
+	// 	}
+	// }
 	
 	.device-box {
 		.device-title {
@@ -495,8 +553,11 @@ export default {
 			}
 		}
 		.device-right {
-			color: $font-color-spec;
+			color: #aaa;
 			align-self: center;
+		}
+		.blue {
+			color: $font-color-spec;
 		}
 	}
 	
@@ -508,90 +569,9 @@ export default {
 		}
 	}
 	
-	/* 分类 */
-	.cate-section {
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		flex-wrap: wrap;
-		// padding: 30upx 22upx; 
-		background: #fff;
-		.cate-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 24rpx 0;
-			font-size: $font-sm + 2upx;
-			color: $font-color-dark;
-		}
-		/* 原图标颜色太深,不想改图了,所以加了透明度 */
-		image {
-			width: 88upx;
-			height: 88upx;
-			margin-bottom: 14upx;
-			border-radius: 50%;
-			opacity: .7;
-			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
-		}
+	.cate-item {
+		padding: 24rpx 0;
+		color: $font-color-dark;
+		text-align: center;
 	}
-	.ad-1{
-		padding: 4upx 30upx 24upx;
-		background: #fff;
-		.s-header{
-			display:flex;
-			align-items:center;
-			height: 92upx;
-			line-height: 1;
-			.s-img{
-				width: 140upx;
-				height: 30upx;
-			}
-			.tip{
-				font-size: $font-base;
-				color: $font-color-light;
-				margin: 0 20upx 0 40upx;
-			}
-			.timer{
-				display:inline-block;
-				width: 40upx;
-				height: 36upx;
-				text-align:center;
-				line-height: 36upx;
-				margin-right: 14upx;
-				font-size: $font-sm+2upx;
-				color: #fff;
-				border-radius: 2px;
-				background: rgba(0,0,0,.8);
-			}
-			.icon-you{
-				font-size: $font-lg;
-				color: $font-color-light;
-				flex: 1;
-				text-align: right;
-			}
-		}
-		.floor-list{
-			white-space: nowrap;
-		}
-		.scoll-wrapper{
-			display:flex;
-			align-items: flex-start;
-		}
-		.floor-item{
-			width: 150upx;
-			margin-right: 20upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-dark;
-			line-height: 1.8;
-			image{
-				width: 150upx;
-				height: 150upx;
-				border-radius: 6upx;
-			}
-			.price{
-				color: $uni-color-primary;
-			}
-		}
-	}
-
 </style>

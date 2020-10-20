@@ -62,7 +62,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		margin-top: 10px;
+		// margin-top: 10px;
 		flex-direction: row;
 		align-items: center;
 		padding: 0 10px;
