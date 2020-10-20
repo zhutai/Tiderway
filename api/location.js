@@ -12,3 +12,4 @@ const VERSION = config.VERSION
 export const monitor = (data) => {
   return http.post(`${VERSION}/location/monitor`, data)
 }
+

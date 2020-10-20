@@ -31,8 +31,25 @@ const prePage = () => {
 	return prePage.$vm;
 }
 
+/**
+ * 百度经纬度装高德
+ * @param {Number} bd_lat - 经度  
+ * @param {Number} bd_lng - 纬度  
+ */
+const bdToGaoDe=(bd_lat,bd_lng)=>{
+	var X_PI = Math.PI * 3000.0 / 180.0;
+	var x = bd_lng - 0.0065;
+	var y = bd_lat - 0.006;
+	var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * X_PI);
+	var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * X_PI);
+	var gg_lng = z * Math.cos(theta);
+	var gg_lat = z * Math.sin(theta);
+	return {lng: gg_lng, lat: gg_lat}
+}
+
 export {
 	msg,
 	json,
-	prePage
+	prePage,
+	bdToGaoDe
 }

@@ -50,11 +50,11 @@
 					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
 						<view class="radia-box">
 							<view class="box-left">
-								<text class="block iconfont" :style="{ color: item.color, fontSize: '36px' }" :class="item.icon"></text>
+								<text class="block iconfont" :style="{ color: item.color, fontSize: '32px' }" :class="item.icon"></text>
 							</view>
 							<view class="box-right">
-								<text class="block">{{item.name}}({{item.unit}})</text>
 								<text class="block">{{item.num}}</text>
+								<text class="block">{{item.name}}({{item.unit}})</text>
 								<!-- <text class="block text"></text> -->
 							</view>
 							
@@ -79,7 +79,7 @@
 				</uni-grid>
 			</view>
 		</view>
-		
+
 		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
 			<uni-status-bar />
 			<view class="device-box">
@@ -117,6 +117,7 @@ import { mapState, mapMutations } from 'vuex'
 import { monitor } from '@/api/location'
 import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+import { bdToGaoDe } from '@/mock'
 
 let page = 0
 const healthyList = [
@@ -309,21 +310,23 @@ export default {
 		async location() {
 			let result = await monitor({})
 		
+			var latlng = bdToGaoDe(result.Data.Lat, result.Data.Lng)
+			console.log(latlng)
 			let market = {
 				callout:{
 					content: result.Data.RecivedAt,
 					display: 'ALWAYS',
 					padding: 10
 				},
-				latitude: result.Data.Lat,
-				longitude: result.Data.Lng,
+				latitude: latlng.lat,
+				longitude: latlng.lng,
 				iconPath: '../../static/icon/0.png',
 				width: 30,
 				height: 30
 			}
 		
-			this.latitude = result.Data.Lat
-			this.longitude = result.Data.Lng
+			this.latitude = latlng.lat
+			this.longitude = latlng.lng
 			this.markers = [market];
 			// #ifdef APP-PLUS
 			var point = new plus.maps.Point(latitude,longitude);
