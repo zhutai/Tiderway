@@ -88,6 +88,16 @@
 				"navigationBarTitleText": "修改密码"
 			}
 		},{
+			"path": "pages/number/list",
+			"style": {
+				"navigationBarTitleText": "亲情号码"
+			}
+		},{
+			"path": "pages/number/edit",
+			"style": {
+				"navigationBarTitleText": "编辑亲情号码"
+			}
+		},{
 			"path": "pages/device/add",
 			"style": {
 				"navigationBarTitleText": "添加设备"

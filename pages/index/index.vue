@@ -186,7 +186,7 @@ const optionList = [
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: ' 亲情号码',
-		url:'',
+		url:'/pages/number/list',
 	},{
 		icon: 'iconshebeishezhi',
 		name: ' 设备设置',
