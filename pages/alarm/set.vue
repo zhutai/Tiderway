@@ -3,7 +3,7 @@
 		<view class="list-cell m-t" @click="actionSheetTap">
 			<text class="cell-tit">预警方式</text>
 			<view class="cell-value">{{ alarmTypeOptions[alarmTypeIndex].value }}</view>
-			<text class="cell-more yticon icon-you"></text>
+			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
 		
 		<view class="list-cell" v-for="(item, index) in cellList" :key="index"
@@ -14,7 +14,7 @@
 					<view class="uni-input">{{ item.num + item.unit }}</view>
 				</picker>
 			</view>
-			<text class="cell-more yticon icon-you"></text>
+			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
 		
 	</view>

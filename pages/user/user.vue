@@ -5,10 +5,10 @@
 			<uni-list>
 				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
 				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
-					 <template slot="header">
-					            <image class="slot-image" :src="userInfo.Avatar" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
-					        </template>
-					</uni-list-item>
+					<template slot="header">
+						<image class="slot-image" :src="userInfo.Avatar" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
+					</template>
+				</uni-list-item>
 			</uni-list>
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
@@ -155,50 +155,12 @@
 
 	.cover-container{
 		background: $page-color-base;
-		/* margin-top: -150upx; */
-		/* padding: 0 30upx; */
 		position:relative;
 		background: #f5f5f5;
-		/* padding-bottom: 20upx; */
-		.arc{
-			position:absolute;
-			left: 0;
-			top: -34upx;
-			width: 100%;
-			height: 36upx;
-		}
 	}
 	.history-section{
-		/* padding: 30upx 0 0; */
 		margin-top: 24upx;
-		/* margin-top: 20upx; */
 		background: #fff;
-		/* border-radius:10upx; */
-		.sec-header{
-			display:flex;
-			align-items: center;
-			font-size: $font-base;
-			color: $font-color-dark;
-			line-height: 40upx;
-			margin-left: 30upx;
-			.yticon{
-				font-size: 44upx;
-				color: #5eba8f;
-				margin-right: 16upx;
-				line-height: 40upx;
-			}
-		}
-		.h-list{
-			white-space: nowrap;
-			padding: 30upx 30upx 0;
-			image{
-				display:inline-block;
-				width: 160upx;
-				height: 160upx;
-				margin-right: 20upx;
-				border-radius: 10upx;
-			}
-		}
 	}
 	
 </style>

@@ -22,7 +22,7 @@
 			<uni-section title="健康数据" type="line">
 				<view class="cell-more">
 					<text class="cell-text">更多</text>
-					<text class="cell-icon yticon icon-you"></text>
+					<uni-icons type="arrowright" size="18" color="#C0C4CC" />
 				</view>
 			</uni-section>
 			<view class="grid-list health-data">
@@ -42,7 +42,7 @@
 			<uni-section title="辐射数据" type="line" style="margin: 0;">
 				<view class="cell-more">
 					<text class="cell-text">更多</text>
-					<text class="cell-icon yticon icon-you"></text>
+					<uni-icons type="arrowright" size="18" color="#C0C4CC" />
 				</view>
 			</uni-section>
 			<view class="grid-list radia-data">
@@ -553,10 +553,10 @@ export default {
 	}
 	
 	.cell-more {
-		.cell-text, .cell-icon {
+		.cell-text {
 			color: #C0C4CC;
 			align-self: center;
-			font-size: 12px;
+			font-size: 14px;
 		}
 	}
 	
