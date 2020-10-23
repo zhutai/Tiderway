@@ -102,6 +102,11 @@
 			"style": {
 				"navigationBarTitleText": "添加设备"
 			}
+		},{
+			"path": "pages/alarm/set",
+			"style": {
+				"navigationBarTitleText": "预警设置"
+			}
 		},
 		{
 			"path": "pages/notice/notice",

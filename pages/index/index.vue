@@ -25,7 +25,7 @@
 					<text class="cell-icon yticon icon-you"></text>
 				</view>
 			</uni-section>
-			<view class="grid-list">
+			<view class="grid-list health-data">
 				<uni-grid :column="4" :show-border="false" :square="false" @change="changeHealth">
 					<uni-grid-item v-for="(item ,index) in healthyList" :index="index" :key="index">
 						<view class="grid-item-box">
@@ -45,7 +45,7 @@
 					<text class="cell-icon yticon icon-you"></text>
 				</view>
 			</uni-section>
-			<view class="grid-list">
+			<view class="grid-list radia-data">
 				<uni-grid :column="2" :show-border="false" :square="false" @change="changeRadia">
 					<uni-grid-item v-for="(item ,index) in radiaList" :index="index" :key="index">
 						<view class="radia-box">
@@ -67,7 +67,7 @@
 		<!--  设备功能表模块 -->
 		<view class="example-body">
 			<uni-section title="设备功能表" type="line"></uni-section>
-			<view class="grid-list">
+			<view class="grid-list option-list">
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
@@ -186,11 +186,15 @@ const optionList = [
 		url:'',
 	},{
 		icon: 'iconqinqinghaomachaxun',
-		name: ' 亲情号码',
+		name: '亲情号码',
 		url:'/pages/number/list',
 	},{
 		icon: 'iconshebeishezhi',
-		name: ' 设备设置',
+		name: '预警设置',
+		url:'/pages/alarm/set',
+	},{
+		icon: 'iconshebeishezhi',
+		name: '设备设置',
 		url:'',
 	}
 ]
@@ -450,8 +454,8 @@ export default {
 	
 	.text {
 		color: #999;
-		padding-top: 4px;
-		font-size: 12px;
+		padding-top: 8rpx;
+		font-size: 14px;
 		text-align: center;
 	}
 	
@@ -486,15 +490,21 @@ export default {
 				justify-content: center;
 				align-items: center;
 				padding: 10px;
-				// .box-left {
-					
-				// }
 				.box-right {
 					color: #666;
 					font-size: 14px;
 					padding-left: 24rpx;
 				}
 			}
+		}
+		.health-data {
+			height: 176rpx;
+		}
+		.radia-data {
+			height: 140rpx;
+		}
+		.option-list {
+			height: 368rpx;
 		}
 	}
 	
@@ -512,28 +522,6 @@ export default {
 			border-radius: 50%;
 		}
 	}
-	
-	// .device-info {
-	// 	padding: 16px;
-	// 	text-align: center;
-	// 	.device-icon {
-	// 		font-size: 0;
-	// 		padding-top: 12px;
-	// 	}
-	// 	.device-text {
-	// 		font-size: 12px;
-	// 		color: #C0C4CC;
-	// 	}
-	// 	.device-btn {
-	// 		font-size: 0;
-	// 		padding-top: 12px;
-	// 		/deep/ uni-button[type=default] {
-	// 			color: #C0C4CC;
-	// 			transform: scale(0.8);
-	// 			border: 1px solid #C0C4CC;
-	// 		}
-	// 	}
-	// }
 	
 	.device-box {
 		.device-title {
