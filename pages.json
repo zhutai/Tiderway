@@ -102,6 +102,12 @@
 			"style": {
 				"navigationBarTitleText": "添加设备"
 			}
+		},
+		{
+			"path": "pages/location/monitor",
+			"style": {
+				"navigationBarTitleText": "地图定位"
+			}
 		},{
 			"path": "pages/alarm/set",
 			"style": {
