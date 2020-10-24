@@ -1,6 +1,6 @@
 <template>
 	<view v-if="token">
-		<web-view :src="webViewStr">
+		<web-view :src="webViewStr" @message="message">
 			
 		</web-view>
 	</view>
@@ -35,7 +35,8 @@
 					address: this.address
 				})
 			},
-			message() {
+			message(e) {
+				console.log(e)
 				this.$api.msg('message成功了')
 			},
 			clickSatellite() {
