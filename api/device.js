@@ -47,6 +47,14 @@ export const unBindDevice = (path, data) => {
 }
 
 /**
+ * 获取设备Token
+ * @param {Object} data - 获取设备Token  
+ */
+export const getDeviceToken = (path, data) => {
+  return http.post(`${VERSION}/Device/token`, data)
+}
+
+/**
  * 设备监控
  * @param {Object} data - 设备健康
  */

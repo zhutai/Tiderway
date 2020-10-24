@@ -1,20 +1,30 @@
 <template>
+	<view v-if="token">
+		<web-view :src="webViewStr">
+			
+		</web-view>
+	</view>
 	
 </template>
 <script>
 	import { mapState, mapMutations } from 'vuex'
-	
+	import { getDeviceToken } from '@/api/device.js'
 	export default {
 		data() {
 			return {
-			
+				token: '',
+				webViewStr: '',
 			}
 		},
 		computed: {
 			...mapState(['deviceImei', 'userInfo'])
 		},
-		async created() {
-		
+	  async onLoad() {
+			let result = await getDeviceToken()
+			this.token = result.Data
+			this.webViewStr = `http://web.tiderway.com/H5Location/H5Monitor?token=${this.token}`
+			// this.webViewStr = "http://web.tiderway.com/H5Location/H5Monitor?token=EmFOaO8hE5Hw2XzZrE2J6GJSHrX5zpWL12APP6c2oIE="
+			console.log(this.webViewStr)
 		},
 		methods: {
 			openLocation(e) {
@@ -24,6 +34,9 @@
 					name: "",
 					address: this.address
 				})
+			},
+			message() {
+				this.$api.msg('message成功了')
 			},
 			clickSatellite() {
 				this.enableSatellite = true;
