@@ -12,9 +12,7 @@
 			></text>
 			<text class="cell-tit clamp">{{title}}</text>
 			<text v-if="tips" class="cell-tip">{{tips}}</text>
-			<text class="cell-more yticon"
-				:class="typeList[navigateType]"
-			></text>
+			<uni-icons :type="typeList[navigateType]" size="18" color="#909399" />
 		</view>
 
 	</view>
@@ -29,10 +27,10 @@
 		data() {
 			return {
 				typeList: {
-					left: 'icon-zuo',
-					right: 'icon-you',
-					up: 'icon-shang',
-					down: 'icon-xia'
+					left: 'arrowleft',
+					right: 'arrowright',
+					up: 'arrowup',
+					down: 'arrowdown'
 				},
 			}
 		},

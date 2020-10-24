@@ -50,7 +50,7 @@
 				}
 				return;
 				uni.switchTab({
-				    url: '/pages/tabBar/component/component'
+				   url: '/pages/tabBar/component/component'
 				});
 			}
 		}
