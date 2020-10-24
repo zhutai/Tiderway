@@ -179,23 +179,23 @@ const optionList = [
 	},{
 		icon: 'iconhuodongguiji',
 		name: '活动轨迹',
-		url:'',
+		url: '',
 	},{
 		icon: 'iconboda',
 		name: '拨打设备',
-		url:'',
+		url: '',
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: '亲情号码',
-		url:'/pages/number/list',
+		url:' /pages/number/list',
 	},{
 		icon: 'iconshebeishezhi',
 		name: '预警设置',
-		url:'/pages/alarm/set',
+		url: '/pages/alarm/set',
 	},{
 		icon: 'iconshebeishezhi',
 		name: '设备设置',
-		url:'',
+		url: "/pages/device/setting"
 	}
 ]
 

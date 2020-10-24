@@ -104,6 +104,12 @@
 			}
 		},
 		{
+			"path": "pages/device/setting",
+			"style": {
+				"navigationBarTitleText": "设备设置"
+			}
+		},
+		{
 			"path": "pages/location/monitor",
 			"style": {
 				"navigationBarTitleText": "地图定位"
