@@ -1,6 +1,6 @@
 <template>
 	<view v-if="token">
-		<web-view :src="webViewStr">
+		<web-view :src="webViewStr" @message="message">
 			
 		</web-view>
 	</view>
@@ -22,7 +22,7 @@
 	  async onLoad() {
 			let result = await getDeviceToken()
 			this.token = result.Data
-			this.webViewStr = `http://web.tiderway.com/H5Location/H5Monitor?token=${this.token}`
+			this.webViewStr = `http://localhost:9521/H5Location/H5Monitor?token=${this.token}`
 			// this.webViewStr = "http://web.tiderway.com/H5Location/H5Monitor?token=EmFOaO8hE5Hw2XzZrE2J6GJSHrX5zpWL12APP6c2oIE="
 			console.log(this.webViewStr)
 		},
