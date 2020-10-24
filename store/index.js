@@ -8,6 +8,7 @@ const store = new Vuex.Store({
 	state: {
 		deviceEmpey: false,
 		deviceImei: '',
+		selectDevice: {},
 		hasLogin: false,
 		userInfo: {},
 	},
@@ -35,6 +36,7 @@ const store = new Vuex.Store({
 			state.hasLogin = false;
 			state.userInfo = {};
 			state.deviceImei = '';
+			state.selectDevice = {}
 			uni.removeStorage({  
 				key: 'userInfo'  
 			})

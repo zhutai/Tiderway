@@ -61,7 +61,7 @@
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '添加绑定成功'
+						title: '添加设备成功'
 					});
 				}, err => {
 					this.isRotate = false

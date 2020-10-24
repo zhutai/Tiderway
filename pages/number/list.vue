@@ -56,7 +56,6 @@
 		mounted() {
 		},
 		methods: {
-			...mapMutations(['login', 'setDeviceImei']),
 			JumpEdit() {
 				uni.navigateTo({
 					url: '/pages/number/edit'

@@ -9,7 +9,6 @@
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
 		<uni-popup id="popupShare" ref="popupShare" type="share" @change="change">
-			<!-- <uni-popup-share title="分享到" @select="select"></uni-popup-share>-->
 			<view class="cmd-body">
 				<scroll-view class="scroll-view" scroll-y="true">
 					<view class="uni-form-item uni-column" v-for="(item, index) in currentList" :key="index">
@@ -62,11 +61,21 @@
 								item.value = str[index]
 							}
 						})
-						// console.log(result)
 					}catch(e){
 						//TODO handle the exception
 					}
-					
+				} else {
+					uni.showModal({
+						content: "是否立即下发",
+						showCancel: true,
+						confirmText: "确定",
+						cancelText: "取消",
+						success: (res) => {
+							if (res.confirm) {
+								this.confirm()
+							}
+						}
+					})
 				}
 			},
 			parseData(str) {

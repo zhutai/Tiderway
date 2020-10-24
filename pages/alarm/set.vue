@@ -10,19 +10,23 @@
 			:class="{ 'm-t': item.space, 'b-b': item.isBorder }" @click="handleClick(item, index)">
 			<text class="cell-tit">{{ item.label }}</text>
 			<view class="cell-value">
-				<picker @change="bindPickerChange" :value="item.index" :range="item.options">
-					<view class="uni-input">{{ item.num + item.unit }}</view>
+				<picker v-if="item.min && item.max" @change="bindPickerChange" :value="item.index" :range="item.options">
+					<view class="uni-input">{{ (item.num || '-') + ' ' + item.unit }}</view>
 				</picker>
+				<text v-else>{{ (item.num || '-') + ' ' + item.unit }}</text>
 			</view>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
 		
+		<uni-popup id="dialogInput" ref="dialogInput" type="dialog">
+			<uni-popup-dialog mode="input" title="辐射值设置" :value="dialogInput" placeholder="请输入辐射值" @confirm="dialogInputConfirm"></uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
 	import { mapMutations } from 'vuex';
-	
+	import { getConfig, saveConfig } from '@/api/alarm.js'
 	const cellList = [
 		{
 			label: '心率低值',
@@ -33,7 +37,7 @@
 			num: 80,
 			index: 10,
 			unit: 'bpm',
-			key: 'alarmType',
+			key: 'HeartMin',
 			options: []
 		},
 		{
@@ -45,7 +49,7 @@
 			num: 80,
 			index: 20,
 			unit: 'bpm',
-			key: 'alarmType',
+			key: 'HeartMax',
 			options: []
 		},
 		{
@@ -57,7 +61,7 @@
 			num: 80,
 			index: 30,
 			unit: 'mmHg',
-			key: 'alarmType',
+			key: 'DiastoleMin',
 			options: []
 		},
 		{
@@ -69,7 +73,7 @@
 			num: 80,
 			index: 23,
 			unit: 'mmHg',
-			key: 'alarmType',
+			key: 'DiastoleMax',
 			options: []
 		},
 		{
@@ -81,7 +85,7 @@
 			num: 80,
 			index: 24,
 			unit: 'mmHg',
-			key: 'alarmType',
+			key: 'ShrinkMin',
 			options: []
 		},
 		{
@@ -93,36 +97,36 @@
 			num: 80,
 			index: 25,
 			unit: 'mmHg',
-			key: 'alarmType',
+			key: 'ShrinkMax',
 			options: []
 		},
 		{
 			label: '辐射低值',
 			space: true,
 			isBorder: true,
-			min: 60,
-			max: 90,
 			num: 80,
 			index: 26,
 			unit: 'µSv/h',
-			key: 'alarmType',
+			key: 'RadioMin',
 			options: []
 		},
 		{
 			label: '辐射高值',
 			space: false,
 			isBorder: false,
-			min: 60,
-			max: 90,
 			num: 80,
 			index: 27,
 			unit: 'µSv/h',
-			key: 'alarmType',
+			key: 'RadioMax',
 			options: []
 		},
 	]
 	
-	const alarmTypeOptions = [{
+	const alarmTypeOptions = [
+		{
+			key: 0,
+			value: '无'
+		},{
 		key: 1,
 		value: '声音'
 	}, {
@@ -131,6 +135,9 @@
 	}, {
 		key: 3,
 		value: '短信'
+	}, {
+		key: 4,
+		value: '推送和短信'
 	}]
 	
 	export default {
@@ -139,22 +146,64 @@
 				cellList,
 				activeIndex: 0,
 				alarmTypeIndex: 0,
-				alarmTypeOptions
+				alarmTypeOptions,
+				dialogInput: ''
 			};
+		},
+		onLoad(){
+			this.getConfig()
 		},
 		methods:{
 			...mapMutations(['logout']),
+			async getConfig() {
+				const config = await getConfig({UserId: 1})
+				this.configData = config.Data
+				this.alarmTypeIndex = this.configData.AlarmNotityType
+				this.cellList.forEach(item => {
+					item.num = this.configData[item.key]
+				})
+			},
+			async saveConfig(obj) {
+				obj.AlarmNotityType = this.alarmTypeIndex
+				let params = Object.assign(this.configData, obj)
+				saveConfig(params).then(res => {
+					console.log(res)
+				}, err => {
+					console.log(err)
+				})
+			},
+			confirmDialog(num) {
+				if (num) this.dialogInput = num
+				this.$refs.dialogInput.open()
+			},
+			async dialogInputConfirm(done, val) {
+				if (val) {
+					let activeIndex = this.activeIndex
+					let current = this.cellList.find((item, index) => index === activeIndex) || {}
+					current.num = val
+					let obj = {}
+					obj[current.key] = val
+					await this.saveConfig(obj)
+					done()
+				} else {
+					done()
+				}
+			},
 			handleClick(item, index) {
 				this.activeIndex = index
-				if (item.options.length === 0) {
-					let array = []
-					for(let i = item.min; i <= item.max; i++) {
-						array.push(i)
+				if (item.min && item.max) {
+					if (item.options.length === 0) {
+						let array = []
+						for(let i = item.min; i <= item.max; i++) {
+							array.push(i)
+						}
+						item.options = array
 					}
-					item.options = array
+					let findIndex = item.options.findIndex(list => list == item.num)
+					item.index = findIndex
+				} else {
+					this.confirmDialog(item.num)
 				}
-				let findIndex = item.options.findIndex(list => list == item.num)
-				item.index = findIndex
 			},
 			actionSheetTap(item) {
 				let itemLlst = this.alarmTypeOptions.map(item => item.value)
@@ -164,18 +213,22 @@
 					success: (e) => {
 						let tapIndex = e.tapIndex
 						this.alarmTypeIndex = tapIndex
+						this.saveConfig({})
 					}
 				})
 			},
 			bindPickerChange(e) {
 				let index = e.detail.value
 				let activeIndex = this.activeIndex
+				let obj = {}
 				this.cellList.forEach((item, listIndex) => {
 					if (activeIndex === listIndex) {
 						item.num = item.options[index]
 						item.index = index
 					}
+					obj[item.key] = item.num
 				})
+				this.saveConfig(obj)
 			}
 		}
 	}
