@@ -71,9 +71,12 @@
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
-							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
-							<!-- <image :src="item.imageUrl"></image> -->
-							<text class="block" style="padding-top: 12rpx;">{{ item.name }}</text>
+							<!-- <view> -->
+								<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
+							<!-- </view>
+							<view> -->
+								<text class="block">{{ item.name }}</text>
+							<!-- </view> -->
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -187,7 +190,7 @@ const optionList = [
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: '亲情号码',
-		url:' /pages/number/list',
+		url: '/pages/number/list',
 	},{
 		icon: 'iconshebeishezhi',
 		name: '预警设置',
@@ -390,6 +393,7 @@ export default {
 		changeOption(e) {
 			let index = e.detail.index
 			let item = this.optionList[index]
+			console.log(item)
 			uni.navigateTo({
 				url: item.url
 			})
@@ -504,7 +508,7 @@ export default {
 			height: 140rpx;
 		}
 		.option-list {
-			height: 368rpx;
+			// height: 368rpx;
 		}
 	}
 	

@@ -35,7 +35,8 @@
 					address: this.address
 				})
 			},
-			message() {
+			message(e) {
+				console.log(e)
 				this.$api.msg('message成功了')
 			},
 			clickSatellite() {
