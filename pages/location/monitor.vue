@@ -60,12 +60,7 @@
 				markers: [{
 					latitude: 39.9085,
 					longitude: 116.39747,
-					iconPath: '../../static/icon/0.png',
-<<<<<<< HEAD
-					width: 40,
-					height: 40
-=======
->>>>>>> 85d8b9ea837471a1fcad8f7eda4d0b22ad03b9a8
+					iconPath: '../../static/icon/0.png'
 				}]
 			}
 		},
@@ -116,14 +111,7 @@
 					},
 					latitude: latlng.lat,
 					longitude: latlng.lng,
-					iconPath: '../../static/icon/0.png',
-<<<<<<< HEAD
-					width: 40,
-					height: 40
-=======
-					height: uni.upx2px(100),
-					width: uni.upx2px(100)
->>>>>>> 85d8b9ea837471a1fcad8f7eda4d0b22ad03b9a8
+					iconPath: '../../static/icon/0.png'
 				}
 
 				this.latitude = latlng.lat
