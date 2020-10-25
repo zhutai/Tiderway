@@ -1,65 +1,90 @@
 <template>
 	<view v-if="token">
 		<web-view :src="webViewStr" @message="message">
-			
+
 		</web-view>
 	</view>
-	
+
 </template>
 <script>
-	import { mapState, mapMutations } from 'vuex'
-	import { getDeviceToken } from '@/api/device.js'
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+
+	import {
+		bdToGaoDe
+	} from 'mock'
+
+	import {
+		getDeviceToken
+	} from '@/api/device.js'
 	export default {
 		data() {
 			return {
 				token: '',
 				webViewStr: '',
+				curLat: 0,
+				curLng: 0,
+				longitude: 0,
+				latitude: 0,
+				h5Url: 'http://web.tiderway.com/H5Location/H5Monitor'
 			}
 		},
 		computed: {
 			...mapState(['deviceImei', 'userInfo'])
 		},
-	  async onLoad() {
+		async onLoad() {
+
 			let result = await getDeviceToken()
 			this.token = result.Data
-			this.webViewStr = `http://localhost:9521/H5Location/H5Monitor?token=${this.token}`
-			// this.webViewStr = "http://web.tiderway.com/H5Location/H5Monitor?token=EmFOaO8hE5Hw2XzZrE2J6GJSHrX5zpWL12APP6c2oIE="
+
+			let _this = this;
+			//#ifdef APP-PLUS
+			plus.geolocation.getCurrentPosition(function(position) {
+				console.log(position)
+
+				_this.curLat = position.coords.latitude
+				_this.curLng = position.coords.longitude
+				_this.webViewStr = `${_this.h5Url}?token=${_this.token}&lat=${_this.curLat}&lng=${_this.curLng}`
+				console.log(_this.webViewStr)
+			}, function(e) {
+				plus.nativeUI.alert("获取定位位置信息失败：" + e.message);
+
+				_this.webViewStr = `${_this.h5Url}?token=${_this.token}`
+			}, {
+				geocode: true
+			});
+			//#endif
+
+			//#ifdef !APP-PLUS
+			this.webViewStr = `${this.h5Url}?token=${this.token}`
+			//#endif
 			console.log(this.webViewStr)
 		},
 		methods: {
-			openLocation(e) {
-				uni.openLocation({
-					longitude: Number(this.longitude),
-					latitude: Number(this.latitude),
-					name: "",
-					address: this.address
-				})
-			},
 			message(e) {
 				console.log(e)
-				this.$api.msg('message成功了')
-			},
-			clickSatellite() {
-				this.enableSatellite = true;
-			},
-			handleClick(item) {
-				this[item.fun](item)
-			},
-			layerSwitch(item) {
-				this.enableSatellite = true;
-				//this.$api.msg(item.name)
-			},
-			getLocation(item) {
-				this.location();
-				// this.$api.msg(item.name)
-			},
-			callPhone(item) {
-				this.$api.msg(item.name)
-			},
-			otherFun(item) {
-				this.$api.msg(item.name)
-			},
 
+				let data = e.detail.data[0]
+				let action = data.action;
+				if (action == "to") {
+					var latlng = bdToGaoDe(data.lat, data.lng)
+					this.latitude = latlng.lat
+					this.longitude = latlng.lng
+
+					uni.openLocation({
+						longitude: Number(this.longitude),
+						latitude: Number(this.latitude),
+						name: "",
+						address: data.address
+					})
+				} else if (action == "call") {
+					uni.makePhoneCall({
+						phoneNumber: '18979915651'
+					})
+				}
+			},
 			async location() {
 				let result = await monitor({})
 				var latlng = bdToGaoDe(result.Data.Lat, result.Data.Lng)
@@ -77,25 +102,25 @@
 				this.latitude = latlng.lat
 				this.longitude = latlng.lng
 				this.markers = [market];
-				
-				let mapContent=uni.createMapContext("map",this)
+
+				let mapContent = uni.createMapContext("map", this)
 				console.log(mapContent)
-				
-				mapContent.moveToLocation({longitude:this.longitude,latitude:this.latitude})
-				
-				let point = new plus.maps.Point(this.longitude, this.latitude);
-				plus.maps.Map.reverseGeocode(point, {}, function(event) {
-					var address = event.address; // 转换后的地理位置
-					console.log("Address:" + address);
-					this.address = address
-				}, function(e) {
-					console.log("Failed:" + JSON.stringify(e));
-				});
+
+				//mapContent.moveToLocation({longitude:this.longitude,latitude:this.latitude})
+
+				// let point = new plus.maps.Point(this.longitude, this.latitude);
+				// plus.maps.Map.reverseGeocode(point, {}, function(event) {
+				// 	var address = event.address; // 转换后的地理位置
+				// 	console.log("Address:" + address);
+				// 	this.address = address
+				// }, function(e) {
+				// 	console.log("Failed:" + JSON.stringify(e));
+				// });
 
 			}
 		}
 	}
 </script>
 <style>
-	
+
 </style>
