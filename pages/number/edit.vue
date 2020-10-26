@@ -31,6 +31,7 @@
 </template>
 
 <script>
+	import { mapState } from 'vuex'
 	import { nativeCommon } from '@/utils/addressBook/nativeCommon.js'
 	import { setCmdSend } from '@/api/cmd.js'
 	export default {
