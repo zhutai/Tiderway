@@ -10,7 +10,7 @@
 					<view class="bottom flex">
 						<text class="phone">{{ item.phone }}</text>
 						<button class="mini-btn" type="primary" size="mini" @click="JumpEdit(index)">编辑</button>
-						<button class="mini-btn" type="default" size="mini" @click="handleDelete">删除</button>
+						<button class="mini-btn" type="default" size="mini" @click="handleDelete(index)">删除</button>
 					</view>
 				</view>
 			</view>
@@ -26,7 +26,7 @@
 <script>
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
-	import { getCmdList, getCmdCodeVlaue } from '@/api/cmd.js'
+	import { getCmdList, setCmdSend, getCmdCodeVlaue } from '@/api/cmd.js'
 	import { mapState, mapMutations } from 'vuex';
 	export default {
 		data() {
@@ -56,7 +56,7 @@
 				const phoneValues = await getCmdCodeVlaue({cmdCode: '1009'})
 				let array = []
 				if (phoneValues.Data) {
-					let phoneList = this.parseData(phoneValues.Data)
+					let phoneList = this.parseValues(phoneValues.Data)
 					const sosValues = await getCmdCodeVlaue({cmdCode: '1004'})
 					let str = sosValues.Data
 					phoneList.forEach((item, index) => {
@@ -86,6 +86,27 @@
 				})
 				return array
 			},
+			parseValues(str) {
+				let types = str.split(',')
+				let array = []
+				let arr1 = []
+				let arr2 = []
+				types.forEach((item, index) => {
+					if (index % 2) {
+						arr2.push(item)
+					} else {
+						arr1.push(item)
+					}
+				})
+				arr1.forEach((item, index) => {
+					let obj = {
+						label: item,
+						value: arr2[index]
+					}
+					array.push(obj)
+				})
+				return array
+			},
 			JumpEdit(index) {
 				let url = '/pages/number/edit'
 				if (typeof index === 'number') {
@@ -95,17 +116,40 @@
 					url: url
 				})
 			},
-			handleDelete() {
+			async savaConfig() {
+				let phoneData = []
+				this.numberList.forEach(item => {
+					let str = item.label + ',' + item.phone
+					phoneData.push(str)
+				})
+				let strPhone = phoneData.join(',')
+				let sosList = this.numberList.filter(item => {
+					if (item.isSos) {
+						return item.value
+					}
+				})
+				let sosStr = sosList.join(',')
+				try{
+					await setCmdSend({ CmdCode: '1009', CmdContent: strPhone, Source: 4 })
+					if (sosStr) {
+						await setCmdSend({ CmdCode: '1004', CmdContent: sosStr, Source: 4 })
+					}
+					uni.showToast("删除成功")
+					uni.setStorageSync('numberList', this.numberList)
+				}catch(e){
+					console.log(e)
+					//TODO handle the exception
+				}
+			},
+			handleDelete(index) {
 				uni.showModal({
 					content: "是否确认删除该号码",
 					confirmText: "确定",
 					cancelText: "取消",
-					success: function(res) {
+					success: (res) => {
 						if (res.confirm) {
-							// uni.showToast("删除成功")
-							// uni.navigateTo({
-							// 	url: '/pages/device/add'
-							// })
+							this.numberList.splice(index, 1)
+							this.savaConfig()
 						}
 					}
 				})

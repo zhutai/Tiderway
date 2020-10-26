@@ -85,13 +85,13 @@
 					let str = item.label + ',' + item.phone
 					phoneData.push(str)
 				})
-				let strPhone = phoneData.join('|')
+				let strPhone = phoneData.join(',')
 				let sosList = this.numberList.filter(item => {
 					if (item.isSos) {
 						return item.value
 					}
 				})
-				let sosStr = sosList.join('|')
+				let sosStr = sosList.join(',')
 				try{
 					await setCmdSend({ CmdCode: '1009', CmdContent: strPhone, Source: 4 })
 					if (sosStr) {

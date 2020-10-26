@@ -12,10 +12,14 @@
 		
 		<!--  设备状态显示 -->
 		<view class="device-info">
-			<map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
+			<view class="map">
+				<web-view v-if="token" :src="webViewStr">
+				</web-view>
+			</view>
+			
+			<!-- <map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
 				<cover-view class="back-block"></cover-view>
-				<!-- <cover-view class="address">{{ address }}</cover-view> -->
-			</map>
+			</map> -->
 		</view>
 		
 		<view class="example-body">
@@ -121,7 +125,7 @@ import { monitor } from '@/api/location'
 import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 import { bdToGaoDe } from '@/mock'
-
+import { getDeviceToken } from '@/api/device.js'
 let page = 0
 const healthyList = [
 	{
@@ -219,18 +223,9 @@ export default {
 			healthyList,
 			optionList,
 			radiaList,
-			// 地图部分数据
-			latitude: 39.909,
-			longitude: 116.39742,
-			address: '北京市天安门',
-			enableSatellite: false,
-			markers: [{
-				latitude: 39.9085,
-				longitude: 116.39747,
-				iconPath: '../../static/icon/0.png',
-				width: 24,
-				height: 24
-			}]
+			token: '',
+			webViewStr: '',
+			h5Url: 'http://web.tiderway.com/H5Location/H5Monitor'
 		};
 	},
 	components: {
@@ -240,11 +235,14 @@ export default {
 		...mapState(['deviceImei', 'deviceEmpey', 'userInfo'])
 	},
 	onLoad() {
+		getDeviceToken({}).then(res => {
+			this.token = res.Data
+			this.webViewStr = (this.h5Url += `?token=${this.token}&tool=0`)
+		})
 		uni.getSystemInfo({
 			success: (res) => {
 				let windowHeight = res.windowHeight
 				let titleHeight = uni.upx2px(120)
-				console.log(res)
 				this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
 			}
 		})
@@ -267,7 +265,7 @@ export default {
 			})
 		} else {
 			this.loadData();
-			this.location()
+			// this.location()
 			// // #ifdef APP-PLUS
 			// var ptObj = new plus.maps.Point('116.39747', '39.9085' );
 			// plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
