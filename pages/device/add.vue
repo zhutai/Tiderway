@@ -7,7 +7,7 @@
 			</view>
 			
 			<view class="main">
-				<wInput v-model="deviceCode" type="text" maxlength="11" placeholder="请输入设备编号"></wInput>
+				<wInput v-model="deviceCode" type="text" maxlength="16" placeholder="请输入设备编号"></wInput>
 			</view>
 			
 			<wButton class="wbutton" text="添加设备" :rotate="isRotate" @click="addDevice"></wButton>
@@ -32,13 +32,32 @@
 			wButton,
 		},
 		computed: {
-			...mapState['deviceImei']
+			...mapState(['deviceImei', 'userInfo'])
+		},
+		onLoad() {
+			console.log(this.userInfo)
+			let UserType = this.userInfo.UserType
+			if (UserType == 1 || UserType == 4) {
+				uni.showModal({
+					content: "抱歉，当前用户无法添加设备",
+					showCancel: false,
+					confirmText: "确定",
+					success: function(res) {
+						if (res.confirm) {
+							uni.navigateBack({
+								delta: 1
+							})
+						}
+					}
+				})
+			}
 		},
 		mounted() {
+			console.log(this.userInfo)
 		},
 		methods: {
-			...mapMutations(['login', 'setDeviceImei']),
-			addDevice() {
+			...mapMutations(['login', 'selectDevice']),
+			async addDevice() {
 				if (this.isRotate) {
 					//判断是否加载中，避免重复点击请求
 					return false;
@@ -53,9 +72,12 @@
 					return;
 				}
 				this.isRotate = true
-				bindDevice({ imei: deviceCode }).then(res => {
+				try{
+					await bindDevice({ imei: deviceCode })
 					if (!this.deviceImei) {
-						this.setDeviceImei({ deviceImei: deviceCode , imeiLength: 1 })
+						const result = await getDeviceList({Imei: deviceCode })
+						let deviceList = result.Data.DeviceList[0]
+						this.selectDevice({ deviceItem: deviceList , imeiLength: 1 })
 					}
 					this.isRotate = false
 					uni.showToast({
@@ -63,9 +85,9 @@
 						position: 'bottom',
 						title: '添加设备成功'
 					});
-				}, err => {
+				}catch(e){
 					this.isRotate = false
-				})
+				}
 			}
 		}
 	}

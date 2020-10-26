@@ -32,7 +32,7 @@
 			}
 		},
 		computed: {
-			...mapState(['deviceImei', 'userInfo'])
+			...mapState(['deviceImei', 'userInfo', 'deviceItem'])
 		},
 		async onLoad() {
 
@@ -80,9 +80,26 @@
 						address: data.address
 					})
 				} else if (action == "call") {
-					uni.makePhoneCall({
-						phoneNumber: '18979915651'
-					})
+					let phone = this.deviceItem.PhoneNum
+					phone += ''
+					if (phone) {
+						uni.makePhoneCall({
+							phoneNumber: phone
+						})
+					} else {
+						uni.showModal({
+							content: "用户未添加手机号码，暂时无法拨打，请添加手机号码后再进行拨打",
+							showCancel: false,
+							confirmText: "确定",
+							success: function(res) {
+								if (res.confirm) {
+									uni.navigateTo({
+										url: '/pages/device/setting'
+									})
+								}
+							}
+						})
+					}
 				}
 			},
 			async location() {

@@ -8,7 +8,7 @@ const store = new Vuex.Store({
 	state: {
 		deviceEmpey: false,
 		deviceImei: '',
-		selectDevice: {},
+		deviceItem: {},
 		hasLogin: false,
 		userInfo: {},
 	},
@@ -36,17 +36,21 @@ const store = new Vuex.Store({
 			state.hasLogin = false;
 			state.userInfo = {};
 			state.deviceImei = '';
-			state.selectDevice = {}
+			state.deviceItem = {}
 			uni.removeStorage({  
 				key: 'userInfo'  
 			})
+			uni.removeStorage({
+				key: 'deviceItem'  
+			})
 		},
-		setDeviceImei(state, { deviceImei, imeiLength }) {
-			state.deviceImei = deviceImei
+		selectDevice(state, { deviceItem, imeiLength }) {
+			state.deviceItem = deviceItem
+			state.deviceImei = deviceItem.IMEI
 			state.deviceEmpey = !imeiLength
 			uni.setStorage({ //缓存用户登陆状态
-				key: 'deviceImei',  
-				data: deviceImei  
+				key: 'deviceItem',  
+				data: deviceItem  
 			})
 		}
 	},

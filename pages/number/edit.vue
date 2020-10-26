@@ -31,7 +31,6 @@
 </template>
 
 <script>
-	import { mapState, mapMutations } from 'vuex';
 	import { nativeCommon } from '@/utils/addressBook/nativeCommon.js'
 	import { setCmdSend } from '@/api/cmd.js'
 	export default {
@@ -58,7 +57,6 @@
 		mounted() {
 		},
 		methods: {
-			...mapMutations(['login', 'setDeviceImei']),
 			edit() {
 				if (this.userName.length < 2) {
 					uni.showToast({

@@ -8,7 +8,7 @@
 	import { getDeviceList } from "@/api/device.js"
 	export default {
 		methods: {
-			...mapMutations(['login', 'setDeviceImei']),
+			...mapMutations(['login', 'selectDevice']),
 			 // 判断用户是否第一次进入程序，是则跳入程序引导页面
 			loadExecution: function(option){
 				/**
@@ -47,11 +47,11 @@
 					//更新登陆状态
 					this.login(userInfo)
 					// 默认选中第一个设备数据
-					let imei = uni.getStorageSync('deviceImei') || '';
-					if (imei) {
-						this.setDeviceImei({ deviceImei: imei, imeiLength: 1 })
+					let deviceItem = uni.getStorageSync('deviceItem') || {};
+					if (deviceItem.IMEI) {
+						this.selectDevice({ deviceItem: deviceItem, imeiLength: 1 })
 					} else{
-						this.setDeviceImei({ deviceImei: imei, imeiLength: 0 })
+						this.selectDevice({ deviceItem: {}, imeiLength: 0 })
 					}
 				} else {
 					let arr = ["pages/public/register", "pages/public/login"]
@@ -62,14 +62,13 @@
 			}
 		},
 		onLaunch: function(option) {
-			console.log(option)
 			this.loadExecution(option)
 		},
 		onShow: function() {
-			console.log('App Show')
+			// console.log('App Show')
 		},
 		onHide: function() {
-			console.log('App Hide')
+			// console.log('App Hide')
 		},
 	}
 </script>

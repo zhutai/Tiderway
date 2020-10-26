@@ -24,7 +24,7 @@
 		
 		<view class="example-body">
 			<uni-section title="健康数据" type="line">
-				<view class="cell-more">
+				<view class="cell-more" @click="moreClick('/pages/health/health')">
 					<text class="cell-text">更多</text>
 					<uni-icons type="arrowright" size="18" color="#C0C4CC" />
 				</view>
@@ -44,7 +44,7 @@
 		
 		<view class="example-body">
 			<uni-section title="辐射数据" type="line" style="margin: 0;">
-				<view class="cell-more">
+				<view class="cell-more" @click="moreClick('/pages/radiation/radiation')">
 					<text class="cell-text">更多</text>
 					<uni-icons type="arrowright" size="18" color="#C0C4CC" />
 				</view>
@@ -189,8 +189,7 @@ const optionList = [
 		url: '',
 	},{
 		icon: 'iconboda',
-		name: '拨打设备',
-		url: '',
+		name: '拨打设备'
 	},{
 		icon: 'iconqinqinghaomachaxun',
 		name: '亲情号码',
@@ -213,11 +212,6 @@ export default {
 			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
 			showLeft: false,
 			scrollHeight: 400,
-			titleNViewBackground: '',
-			swiperCurrent: 0,
-			swiperLength: 0,
-			carouselList: [],
-			goodsList: [],
 			deviceLoading: false,
 			deviceList: [],
 			healthyList,
@@ -232,13 +226,10 @@ export default {
 		uniNavBar
 	},
 	computed: {
-		...mapState(['deviceImei', 'deviceEmpey', 'userInfo'])
+		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem'])
 	},
 	onLoad() {
-		getDeviceToken({}).then(res => {
-			this.token = res.Data
-			this.webViewStr = (this.h5Url += `?token=${this.token}&tool=0`)
-		})
+		this.getWebViewToken()
 		uni.getSystemInfo({
 			success: (res) => {
 				let windowHeight = res.windowHeight
@@ -264,25 +255,22 @@ export default {
 				}
 			})
 		} else {
-			this.loadData();
-			// this.location()
-			// // #ifdef APP-PLUS
-			// var ptObj = new plus.maps.Point('116.39747', '39.9085' );
-			// plus.maps.Map.reverseGeocode(ptObj, {}, function(res) {
-			// 	console.log(res)
-			// },function () {
-			// })
-			// // #endif
+			this.loadData()
 		}
 	},
-	onReady() {
-		console.log(3)
-	},
 	methods: {
-		...mapMutations(['setDeviceImei']),
+		...mapMutations(['selectDevice']),
 		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
+		},
+		getWebViewToken() {
+			this.token = ''
+			getDeviceToken({}).then(res => {
+				this.token = res.Data
+				let url = this.h5Url + `?token=${this.token}&tool=0`
+				this.webViewStr = url
+			})
 		},
 		addDevice() {
 			uni.navigateTo({
@@ -291,8 +279,9 @@ export default {
 		},
 		swtichDevice(item) {
 			if (item.IMEI) {
-				this.setDeviceImei({ deviceImei: item.IMEI, imeiLength: 1 })
+				this.selectDevice({ deviceItem: item, imeiLength: 1 })
 				this.$refs.showLeft.close()
+				this.getWebViewToken()
 				this.loadData();
 			}
 		},
@@ -309,6 +298,11 @@ export default {
 			})
 			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
+			})
+		},
+		moreClick(url) {
+			uni.switchTab({
+				url: url
 			})
 		},
 		// 地图数据请求
@@ -346,6 +340,7 @@ export default {
 		async changeDrawer(bool) {
 			this.showLeft = bool
 			if (bool) {
+				this.status = 'loading'
 				this.getDeviceList(true)
 			} else {
 				page = 0
@@ -353,6 +348,7 @@ export default {
 			}
 		},
 		getDeviceList(isFirst) {
+			if (this.status != 'loading') return
 			this.status = 'loading'
 			getDeviceList({Page: page, Limit: 10 }).then(res => {
 				this.deviceLoading = true
@@ -391,10 +387,33 @@ export default {
 		changeOption(e) {
 			let index = e.detail.index
 			let item = this.optionList[index]
-			console.log(item)
-			uni.navigateTo({
-				url: item.url
-			})
+			if (item.url) {
+				console.log(item)
+				uni.navigateTo({
+					url: item.url
+				})
+			} else {
+				let phone = this.deviceItem.PhoneNum
+				phone += ''
+				if (phone) {
+					uni.makePhoneCall({
+						phoneNumber: phone
+					})
+				} else {
+					uni.showModal({
+						content: "用户未添加手机号码，暂时无法拨打，请添加手机号码后再进行拨打",
+						showCancel: false,
+						confirmText: "确定",
+						success: function(res) {
+							if (res.confirm) {
+								uni.navigateTo({
+									url: '/pages/device/setting'
+								})
+							}
+						}
+					})
+				}
+			}
 		}
 	},
 	// #ifdef APP-PLUS

@@ -63,7 +63,7 @@
 			this.isLogin();
 		},
 		methods: {
-			...mapMutations(['login', 'setDeviceImei']),
+			...mapMutations(['login', 'selectDevice']),
 			isLogin() {
 				//判断缓存中是否登录过，直接登录
 				try {
@@ -119,8 +119,8 @@
 					this.login(result.Data)
 					let res = await getDeviceList({Page: 0, Limit: 10 })
 					let deviceList = res.Data.DeviceList || []
-					let imei = deviceList.length ? deviceList[0].IMEI : ''
-					this.setDeviceImei({ deviceImei: imei, imeiLength: deviceList.length })
+					let deviceItem = deviceList.length ? deviceList[0] : {}
+					this.selectDevice({ deviceItem: deviceItem, imeiLength: deviceList.length })
 					this.isRotate = false
 					uni.reLaunch({
 						url: '/pages/index/index'
