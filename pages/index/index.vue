@@ -67,7 +67,7 @@
 		<!--  设备功能表模块 -->
 		<view class="example-body">
 			<uni-section title="设备功能表" type="line"></uni-section>
-			<view class="grid-list option-list">
+			<view class="option-list">
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
@@ -508,7 +508,8 @@ export default {
 			height: 140rpx;
 		}
 		.option-list {
-			// height: 368rpx;
+			height: 368rpx;
+			background-color: #fff;
 		}
 	}
 	

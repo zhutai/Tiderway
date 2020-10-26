@@ -4,19 +4,19 @@
 			<view class="content">
 				<view class="number-item" v-for="(item, index) in numberList" :key="index">
 					<view class="top flex">
-						<text class="title">{{ item.title }}</text>
+						<text class="title">{{ item.label }}</text>
 						<text class="sos" v-if="item.isSos">SOS</text>
 					</view>
 					<view class="bottom flex">
 						<text class="phone">{{ item.phone }}</text>
-						<button class="mini-btn" type="primary" size="mini" @click="JumpEdit">编辑</button>
+						<button class="mini-btn" type="primary" size="mini" @click="JumpEdit(index)">编辑</button>
 						<button class="mini-btn" type="default" size="mini" @click="handleDelete">删除</button>
 					</view>
 				</view>
 			</view>
-			<view class="flex add-number" v-if="numberList.length < 10">
+			<view class="flex add-number" v-if="numberList.length < 10 && loading" @click="JumpEdit(null)">
 				<uni-icons class="add-icon" type="plus" size="36" color="#606266" />
-				<text class="tips">{{ numberList.length ? `您已添加个${numberList.length}亲情号` : '`您暂未添加亲情号码' }}{{ `,还可以添加${10 - numberList.length}个亲情号码` }}</text>
+				<text class="tips">{{ numberList.length ? `您已添加个${numberList.length}亲情号` : '您暂未添加亲情号码' }}{{ `,还可以添加${10 - numberList.length}个亲情号码` }}</text>
 			</view>
 		</scroll-view>
 		
@@ -26,7 +26,7 @@
 <script>
 	import wInput from '@/components/watch-login/watch-input.vue' //input
 	import wButton from '@/components/watch-login/watch-button.vue' //button
-	import { bindDevice, getDeviceList } from '@/api/device.js'
+	import { getCmdList, getCmdCodeVlaue } from '@/api/cmd.js'
 	import { mapState, mapMutations } from 'vuex';
 	export default {
 		data() {
@@ -41,24 +41,58 @@
 		computed: {
 			...mapState['deviceImei']
 		},
-		onLoad() {
-			let numberList = []
-			for (let i = 0; i < 10; i++) {
-				let obj = {
-					title: '亲情号码' + i,
-					phone: 13678965689,
-					isSos: !!(i % 2)
-				}
-				numberList.push(obj)
-			}
-			this.numberList = numberList
+		onShow() {
+			this.getNumberList()
 		},
 		mounted() {
 		},
 		methods: {
-			JumpEdit() {
+			async getNumberList() {
+				uni.showLoading({title: ' 加载中...', mask: true})
+				this.loading = false
+				const result = await getCmdList({ cmdCode: '1009' })
+				let cmdList = result.Data.CmdList
+				let numberList = this.parseData(cmdList[0].CmdTemplate)
+				const phoneValues = await getCmdCodeVlaue({cmdCode: '1009'})
+				let array = []
+				if (phoneValues.Data) {
+					let phoneList = this.parseData(phoneValues.Data)
+					const sosValues = await getCmdCodeVlaue({cmdCode: '1004'})
+					let str = sosValues.Data
+					phoneList.forEach((item, index) => {
+						let obj = {
+							label: item.label,
+							phone: item.value,
+							isSos: str.includes(item.value)
+						}
+						array.push(obj)
+					})
+				}
+				this.numberList = array
+				this.loading = true
+				uni.hideLoading()
+				uni.setStorageSync('numberList', this.numberList)
+			},
+			parseData(str) {
+				let types = str.split('|')
+				let array = []
+				types.forEach(item => {
+					let arr = item.split(',')
+					let obj = {
+						label: arr[0] || '',
+						value: arr[1] || '',
+					}
+					array.push(obj)
+				})
+				return array
+			},
+			JumpEdit(index) {
+				let url = '/pages/number/edit'
+				if (typeof index === 'number') {
+					url += `?index=${index}`
+				}
 				uni.navigateTo({
-					url: '/pages/number/edit'
+					url: url
 				})
 			},
 			handleDelete() {
