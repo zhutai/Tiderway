@@ -14,23 +14,46 @@
 						<view class="notice-item" v-for="item in noticeList">
 							<text class="time">{{item.CreatedAt}}</text>
 							<view class="content">
+								<text class="title">{{ item.Title }}</text>
+								<view class="img-wrapper">
+									<image class="pic" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3761064275,227090144&fm=26&gp=0.jpg"></image>
+									<view class="cover">
+										活动结束
+									</view>
+								</view>
+								<text class="introduce">{{ item.Content }}</text>
+								<view class="bot b-t">
+									<text>查看详情</text>
+									<text class="more-icon yticon icon-you"></text>
+								</view>
+							</view>
+						</view>
+						
+						<!-- <view class="notice-item" v-for="item in noticeList">
+							<text class="time">{{item.CreatedAt}}</text>
+							<view class="content">
 								<view class="bot b-t" style="border-bottom: 1px solid #D8D8D8;">
 									<text>{{item.Title}}</text>
 								</view>
 								<text class="title">{{item.Content}}</text>
 							</view>
-						</view>
+						</view> -->
 					</view>
 
 					<view v-else>
-						<uni-swipe-action>
+						<uni-swipe-action-item @click="bindClick">
+							<template v-slot:left>
+								<view class="slot-button">
+									<text class="slot-button-text" @click="bindClick({position:'left',content:{text:'置顶'}})">置顶</text>
+								</view>
+							</template>
 							<view class="content-box">
-								<text class="content-text">使使插槽</text>
+								<text class="content-text">使用插槽</text>
 							</view>
 							<template v-slot:right>
 								<view class="slot-button"><text class="slot-button-text">删除</text></view>
 							</template>
-						</uni-swipe-action>
+						</uni-swipe-action-item>
 					</view>
 				</scroll-view>
 			</swiper-item>
@@ -76,6 +99,9 @@
 			changeTab(e) {
 				this.tabCurrentIndex = e.target.current;
 				this.loadData('tabChange');
+			},
+			bindClick(e) {
+				
 			},
 			//顶部tab点击
 			tabClick(index) {
