@@ -160,9 +160,7 @@
 
 <style lang="scss" scoped>
 	.flex {
-		/* #ifndef APP-PLUS */
 		display: flex;
-		/* #endif */
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
@@ -175,9 +173,8 @@
 				color: $font-color-dark;
 				border-left: 12rpx solid $font-color-spec;
 				padding: 12rpx;
-				margin-bottom: 12rpx;
+				margin: 12rpx 0;
 				.top {
-					
 					.title {
 						font-size: 14px;
 						padding: 12rpx 0;

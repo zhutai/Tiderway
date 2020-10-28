@@ -344,6 +344,7 @@
 					if (param.custom) {
 						data = data.map(item => item * 7);
 					}
+					console.log(param)
 					obj[param.value] = data
 					let arr = this.computeData(data)
 					let startIndex = 3 * index
@@ -357,6 +358,7 @@
 			},
 			// 计算计数最大值最小值和平均值
 			computeData(data) {
+				console.log(data)
 				let arr = null
 				if (data.length) {
 					let max = Math.max.apply(null, data);
@@ -365,7 +367,6 @@
 					data.forEach(item => {
 						total += item
 					})
-					
 					let average = (total / data.length) || 0
 					arr = {
 						max: Math.floor(max),

@@ -6,7 +6,7 @@
 				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
 				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
 					<template slot="header">
-						<image class="slot-image" :src="userInfo.Avatar" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
+						<image class="slot-image" src="https://tider-avatar.oss-cn-shenzhen.aliyuncs.com/defaulthead.jpg" @error="imageError" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
 					</template>
 				</uni-list-item>
 			</uni-list>
@@ -100,6 +100,7 @@
 			}
 		},
 		onLoad(){
+			console.log(this.userInfo)
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -129,6 +130,9 @@
 			 * 统一跳转接口,拦截未登录路由
 			 * navigator标签现在默认没有转场动画，所以用view
 			 */
+			imageError(err) {
+				console.log(err)
+			},
 			navTo(url){
 				// if(!this.hasLogin){
 				// 	url = '/pages/public/login';
