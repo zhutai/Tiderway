@@ -129,16 +129,17 @@
 		},{
 		key: 1,
 		value: '声音'
-	}, {
-		key: 2,
-		value: '推送'
-	}, {
-		key: 3,
-		value: '短信'
-	}, {
-		key: 4,
-		value: '推送和短信'
-	}]
+		}, {
+			key: 2,
+			value: '推送'
+		}, {
+			key: 3,
+			value: '短信'
+		}, {
+			key: 4,
+			value: '推送和短信'
+		},
+	]
 	
 	export default {
 		data() {

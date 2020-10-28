@@ -44,3 +44,11 @@ export const findPwd = (data) => {
 export const editPwd = (data) => {
   return http.post(`${VERSION}/User/editPwd`, data)
 }
+
+/**
+ * 系统消息列表
+ * @param {Object} params - 系统消息列表  
+ */
+export const getNoticeList = (data) => {
+  return http.post(`${VERSION}/Notice/list`, data)
+}
