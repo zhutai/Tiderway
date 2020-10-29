@@ -48,8 +48,8 @@
 			iconColor: '#5fcda2',
 			title: '我的设备',
 			tips: '',
-			url: '/pages/set/set'
-		}
+			url: '/pages/device/list'
+		}  
 		// ,{
 		// 	icon: 'iconGroup',
 		// 	iconColor: '#9789f7',

@@ -43,7 +43,8 @@ export const bindDevice = (data) => {
  * @param {Object} data - 解绑设备  
  */
 export const unBindDevice = (path, data) => {
-  return http.post(`${VERSION}/Device​/unBind`, data)
+	
+  return http.post(`${VERSION}/Device/unBind`, data)
 }
 
 /**

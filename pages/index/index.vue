@@ -16,10 +16,6 @@
 				<web-view v-if="token" :src="webViewStr">
 				</web-view>
 			</view>
-			
-			<!-- <map class="map" :latitude="latitude" :longitude="longitude" :enable-satellite="enableSatellite" :markers="markers">
-				<cover-view class="back-block"></cover-view>
-			</map> -->
 		</view>
 		
 		<view class="example-body">

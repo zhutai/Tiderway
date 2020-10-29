@@ -104,6 +104,12 @@
 			}
 		},
 		{
+			"path": "pages/device/list",
+			"style": {
+				"navigationBarTitleText": "我的设备"
+			}
+		},
+		{
 			"path": "pages/device/setting",
 			"style": {
 				"navigationBarTitleText": "设备设置"
