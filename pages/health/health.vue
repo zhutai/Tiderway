@@ -55,7 +55,7 @@
 				</view>
 			</view>
 
-			<view class="bar-fixed">
+			<view class="bar-fixed" @click="telemetering">
 				<text>远程测量</text>
 			</view>
 
@@ -215,11 +215,13 @@
 		active: false
 	}, ]
 
-	const getHeartInfo = (companyArray) => {
+	const getHeartInfo = (companyArray, params) => {
+		console.log(companyArray)
+		let param = params || { name: '平均值', key: 'average' }
 		const heartInfo = [{
-			name: '平均值',
+			name: param.name,
 			unit: '',
-			key: 'average',
+			key: param.key,
 			num: '--',
 			className: 'blue'
 		}, {
@@ -339,14 +341,15 @@
 					return item[dateKey].replace(' ', '\n')
 				})
 				let obj = {}
+				console.log(dataParams)
 				dataParams.forEach((param, index) => {
 					let data = HistoryList.map(item => item[param.key]);
 					if (param.custom) {
-						data = data.map(item => item * 7);
+						data = data.map(item => item / 7);
 					}
 					console.log(param)
 					obj[param.value] = data
-					let arr = this.computeData(data)
+					let arr = this.computeData(data, param)
 					let startIndex = 3 * index
 					let endIndex = 3 * (index + 1)
 					let heartInfo = this.heartInfo.slice(startIndex, endIndex)
@@ -356,9 +359,17 @@
 				})
 				return { date, ...obj }
 			},
+			telemetering() {
+				uni.showLoading({
+					title: '正在测量中',
+				})
+				setTimeout(() => {
+					uni.hideLoading()
+					this.$api.msg('运程测量功能暂未开放')
+				}, 1000)
+			},
 			// 计算计数最大值最小值和平均值
-			computeData(data) {
-				console.log(data)
+			computeData(data, param) {
 				let arr = null
 				if (data.length) {
 					let max = Math.max.apply(null, data);
@@ -373,11 +384,17 @@
 						min: Math.floor(min),
 						average: Math.floor(average)
 					}
+					if (param.key === 'Step') {
+						arr.current = Math.floor(data[0])
+					}
 				} else {
 					arr = {
 						max: '--',
 						min: '--',
 						average: '--'
+					}
+					if (param.key === 'Step') {
+						arr.current = '--'
 					}
 				}
 				return arr
@@ -622,6 +639,7 @@
 								color: '#666'
 							}  
 						},
+						max: 200,
 						splitLine: {
 							show: true
 						}
@@ -665,17 +683,27 @@
 						data: data,
 						markLine: {
 							silent: true,
-							// data: [{
-							// 	yAxis: 50
-							// }, {
-							// 	yAxis: 100
-							// }, {
-							// 	yAxis: 150
-							// }, {
-							// 	yAxis: 200
-							// }, {
-							// 	yAxis: 300
-							// }]
+							data: [{
+								yAxis: 60,
+								lineStyle: {
+									color: '#4399fc'
+								}
+							}, {
+								yAxis: 100,
+								lineStyle: {
+									color: '#4cd964'
+								}
+							}, {
+								yAxis: 120,
+								lineStyle: {
+									color: '#ff9933'
+								}
+							}, {
+								yAxis: 200,
+								lineStyle: {
+									color: '#cc0033'
+								}
+							}]
 						}
 					}
 				}
@@ -683,7 +711,10 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
-					let HeartInfo = getHeartInfo(tabbars[this.current].units)
+					console.log()
+					let selectCurrent = tabbars[this.current]
+					let param = selectCurrent.path === "StepHistory" ? { name: '当前值', key: 'current' } : null
+					let HeartInfo = getHeartInfo(selectCurrent.units, param)
 					this.heartInfo = HeartInfo
 					this.toggleTabs(this.current)
 				}
@@ -822,7 +853,7 @@
 		.info-item {
 			width: 30%;
 			height: 100%;
-			padding: 24rpx;
+			padding: 20rpx;
 			line-height: 60rpx;
 			display: inline-block;
 			margin: 12rpx 16rpx 12rpx 0;
@@ -834,7 +865,7 @@
 
 			.info-num {
 				.num {
-					font-size: 24px;
+					font-size: 22px;
 					color: $font-color-dark;
 				}
 

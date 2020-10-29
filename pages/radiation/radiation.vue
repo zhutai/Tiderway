@@ -36,7 +36,11 @@
 			
 			<view class="content">
 				<view class="title-style">
-					<view class="title-dot-light">实时辐射</view>
+					<text class="title-dot-light">实时辐射</text>
+					<view class="select-time" @click="actionSheetTap">
+						<text>{{ actionSheet[sheetIndex].value }}</text>
+						<uni-icons type="arrowdown" size="16" color="#909399" />
+					</view>
 				</view>
 				
 				<view class="chart" :style="{height: `${chartHeight}px`}">
@@ -67,6 +71,10 @@
 			<view class="content">
 				<view class="title-style">
 					<view class="title-dot-light">累计辐射</view>
+					<view class="select-time" @click="actionSheetTap">
+						<text>{{ actionSheet[sheetIndex].value }}</text>
+						<uni-icons type="arrowdown" size="16" color="#909399" />
+					</view>
 				</view>
 				
 				<view class="chart" :style="{height: `${chartHeight}px`}">
@@ -202,6 +210,28 @@
 		return heartList
 	}
 
+	const actionSheet = [
+		{
+			key: 1,
+			value: '小时',
+		},
+		{
+			key: 2,
+			value: '天',
+		},
+		{
+			key: 3,
+			value: '周',
+		},
+		{
+			key: 4,
+			value: '月',
+		},
+		{
+			key: 5,
+			value: '年',
+		}
+	]
 
 	export default {
 
@@ -211,6 +241,8 @@
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
 				tabs,
+				sheetIndex: 0,
+				actionSheet,
 				chartLoading: false,
 				bloodOption: null,
 				motionOption: null,
@@ -244,6 +276,18 @@
 		onReady() {
 		},
 		methods: {
+			actionSheetTap() {
+				let itemLlst = this.actionSheet.map(item => item.value)
+				uni.showActionSheet({
+					title:'请选择图表时间点',
+					itemList: itemLlst,
+					success: (e) => {
+						let tapIndex = e.tapIndex
+						this.sheetIndex = tapIndex
+						this.getHistoryData()
+					}
+				})
+			},
 			getHistoryData() {
 				uni.showLoading({title: ' 加载中...', mask: true})
 				let tabbar = tabbars[this.current]
@@ -253,7 +297,8 @@
 					Limit: 0,
 					Page: 10000,
 					StartTime: currentTab.createTime,
-					EndTime: currentTab.endTime
+					EndTime: currentTab.endTime,
+					type: this.actionSheet[this.sheetIndex].key
 				}
 				this.chartLoading = false
 				getHistoryData(path, params).then(res => {
@@ -319,9 +364,9 @@
 					
 					let average = (total / data.length) || 0
 					arr = {
-						max: Math.floor(max),
-						min: Math.floor(min),
-						average: Math.floor(average)
+						max: Math.floor(max * 100) / 100,
+						min: Math.floor(min * 100) / 100,
+						average: Math.floor(average * 100) / 100
 					}
 				} else {
 					arr = {
@@ -551,7 +596,7 @@
 		.info-item {
 			width: 30%;
 			height: 100%;
-			padding: 24rpx;
+			padding: 20rpx;
 			line-height: 60rpx;
 			display: inline-block;
 			margin: 12rpx 16rpx 12rpx 0;
@@ -563,7 +608,7 @@
 
 			.info-num {
 				.num {
-					font-size: 24px;
+					font-size: 22px;
 					color: $font-color-dark;
 				}
 
@@ -630,13 +675,17 @@
 		padding: 24rpx;
 		flex-wrap: nowrap;
 		background: $color-white;
-
+		display: flex;
+		justify-content: space-between;
 		.title-dot-light {
 			height: 18px;
 			font-size: 14px;
 			padding-left: 6px;
 			color: $font-color-dark;
 			border-left: 8rpx solid $font-color-spec;
+		}
+		.select-time {
+			color: $font-color-light;
 		}
 	}
 

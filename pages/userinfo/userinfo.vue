@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="list-cell b-b m-t" @click="navTo('头像')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">头像</text>
-			<image class="slot-image" :src="userInfo.Avatar" mode="widthFix" style="width: 40px;border-radius: 50%;"></image>
+			<image class="slot-image" :src="userInfo.Avatar" ></image>
 		</view>
 		<view class="list-cell b-b" @click="navTo('手机号')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">手机号</text>
@@ -18,11 +18,22 @@
 </template>
 
 <script>
+	import permision from "@/utils/permission.js"
 	import { mapState, mapMutations } from 'vuex';
+	var sourceType = [
+		['camera'],
+		['album'],
+		['camera', 'album']
+	]
+	var sizeType = [
+		['compressed'],
+		['original'],
+		['compressed', 'original']
+	]
 	export default {
 		data() {
 			return {
-				
+				imageList: []
 			};
 		},
 		computed:{
@@ -30,12 +41,52 @@
 		},
 		methods:{
 			...mapMutations(['logout']),
-
 			navTo(url){
-				uni.navigateTo({
-					url
+				uni.navigateTo({ url })
+			},
+			//switch
+			switchChange(e){
+				let statusTip = e.detail.value ? '打开': '关闭';
+				this.$api.msg(`${statusTip}消息推送`);
+			},
+			// 添加图片
+			chooseImage: async function() {
+				uni.chooseImage({
+					sourceType: sourceType[2],
+					sizeType: sizeType[2],
+					count: this.imageList.length  ? 0 : 1,
+					success: (res) => {
+						console.log(res)
+						this.imageList = this.imageList.concat(res.tempFilePaths);
+					},
+					fail: (err) => {
+						// #ifdef APP-PLUS
+						if (err['code'] && err.code !== 0) {
+							this.checkPermission(err.code);
+						}
+						// #endif
+					}
 				})
-				// this.$api.msg(`跳转到${url}`);
+			},
+			async checkPermission(code) {
+				let type = code ? code - 1 : 2;
+				let status = permision.isIOS ? await permision.requestIOS(sourceType[type][0]) :
+				await permision.requestAndroid(type === 0 ? 'android.permission.CAMERA' : 'android.permission.READ_EXTERNAL_STORAGE');
+			
+				if (status === null || status === 1) {
+					status = 1;
+				} else {
+					uni.showModal({
+						content: "没有开启权限",
+						confirmText: "设置",
+						success: function(res) {
+							if (res.confirm) {
+								permision.gotoAppSetting();
+							}
+						}
+					})
+				}
+				return status;
 			},
 			//退出登录
 			toLogout(){
@@ -56,12 +107,6 @@
 				    }
 				});
 			},
-			//switch
-			switchChange(e){
-				let statusTip = e.detail.value ? '打开': '关闭';
-				this.$api.msg(`${statusTip}消息推送`);
-			},
-
 		}
 	}
 </script>
@@ -72,12 +117,11 @@
 	}
 	
 	.slot-image {
-		/* #ifndef APP-NVUE */
 		display: block;
-		/* #endif */
 		margin-right: 10px;
 		width: 80rpx;
 		height: 80rpx;
+		border-radius: 50%;
 	}
 	
 	.list-cell{
