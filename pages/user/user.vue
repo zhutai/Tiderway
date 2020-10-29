@@ -82,7 +82,7 @@
 			iconColor: '#795548',
 			title: '关于',
 			tips: '',
-			url: '/pages/set/set'
+			url: '/pages/user/about'
 		},
 	]
 	

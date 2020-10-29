@@ -147,6 +147,11 @@
 			"style": {
 				"navigationBarTitleText": "意见反馈"
 			}
+		}, {
+			"path": "pages/user/about",
+			"style": {
+				"navigationBarTitleText": "关于"
+			}
 		}
   ],
 	"globalStyle": {

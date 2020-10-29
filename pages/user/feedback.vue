@@ -240,8 +240,8 @@
 	
 	uni-textarea {
 		width: 100%;
-		padding: 32rpx;
-		padding-bottom: 0;
+		padding: 0 32rpx;
+		padding-bottom: 24rpx;
 		max-height: 80px;
 	}
 	
