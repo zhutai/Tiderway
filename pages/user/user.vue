@@ -6,7 +6,7 @@
 				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
 				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
 					<template slot="header">
-						<image class="slot-image" src="https://tider-avatar.oss-cn-shenzhen.aliyuncs.com/defaulthead.jpg" @error="imageError" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
+						<image class="slot-image" :src="userInfo.Avatar || defaultAvatar" @error="imageError" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
 					</template>
 				</uni-list-item>
 			</uni-list>
@@ -35,7 +35,7 @@
 <script>  
 	import listCell from '@/components/mix-list-cell';
   import { mapState } from 'vuex';
-	
+	const defaultAvatar = require('@/static/image/userAvatar.png')
 	const cellList = [
 		{
 			icon: 'iconxiaoxi',
@@ -49,14 +49,7 @@
 			title: '我的设备',
 			tips: '',
 			url: '/pages/device/list'
-		}  
-		// ,{
-		// 	icon: 'iconGroup',
-		// 	iconColor: '#9789f7',
-		// 	title: '我的数据',
-		// 	tips: '',
-		// 	url: '/pages/set/set'
-		// }
+		}
 		,{
 			icon: 'iconyijian',
 			iconColor: '#ee883b',
@@ -86,42 +79,19 @@
 		},
 	]
 	
-	let startY = 0, moveY = 0, pageAtTop = true;
-    export default {
+  export default {
 		components: {
 			listCell
 		},
 		data(){
 			return {
 				cellList,
-				coverTransform: 'translateY(0px)',
-				coverTransition: '0s',
-				moving: false,
+				defaultAvatar
 			}
 		},
 		onLoad(){
 			console.log(this.userInfo)
 		},
-		// #ifndef MP
-		onNavigationBarButtonTap(e) {
-			const index = e.index;
-			if (index === 0) {
-				this.navTo('/pages/set/set');
-			}else if(index === 1){
-				// #ifdef APP-PLUS
-				const pages = getCurrentPages();
-				const page = pages[pages.length - 1];
-				const currentWebview = page.$getAppWebview();
-				currentWebview.hideTitleNViewButtonRedDot({
-					index
-				});
-				// #endif
-				uni.navigateTo({
-					url: '/pages/notice/notice'
-				})
-			}
-		},
-		// #endif
     computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
@@ -134,9 +104,6 @@
 				console.log(err)
 			},
 			navTo(url){
-				// if(!this.hasLogin){
-				// 	url = '/pages/public/login';
-				// }
 				uni.navigateTo({ url })  
 			}
     }  

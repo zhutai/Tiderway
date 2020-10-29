@@ -1,15 +1,15 @@
 <template>
 	<view class="container">
-		<view class="list-cell b-b m-t" @click="navTo('头像')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">头像</text>
 			<image class="slot-image" :src="userInfo.Avatar" ></image>
 		</view>
-		<view class="list-cell b-b" @click="navTo('手机号')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">手机号</text>
 			<text class="cell-tip">{{ userInfo.PhoneNum }}</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
-		<view class="list-cell" @click="navTo('昵称')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">昵称</text>
 			<text class="cell-tip">{{ userInfo.LoginName }}</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />

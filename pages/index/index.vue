@@ -4,7 +4,7 @@
 		<!--  自定义顶部栏 -->
 		<uni-nav-bar fixed :border="false" :statusBar="true">
 			<view class="user-center">
-				<image class="user-avatar" src="../../static/missing-face.png"></image>
+				<image class="user-avatar" :src="userInfo.Avatar || defaultAvatar"></image>
 			</view>
 			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
 			<view class="bar-text" slot="right" @click="addDevice">添加设备</view>
@@ -122,6 +122,7 @@ import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 import { bdToGaoDe } from '@/mock'
 import { getDeviceToken } from '@/api/device.js'
+const defaultAvatar = require('@/static/image/userAvatar.png')
 let page = 0
 const healthyList = [
 	{
@@ -152,7 +153,7 @@ const healthyList = [
 		icon: 'iconxieya',
 		color: '#F59A23',
 		key: 'Rate',
-		num: '-'
+		num: '--'
 	},
 ]
 
@@ -191,7 +192,7 @@ const optionList = [
 		name: '亲情号码',
 		url: '/pages/number/list',
 	},{
-		icon: 'iconshebeishezhi',
+		icon: 'iconjianyixiaxian',
 		name: '预警设置',
 		url: '/pages/alarm/set',
 	},{
@@ -204,6 +205,7 @@ var wv;
 export default {
 	data() {
 		return {
+			defaultAvatar,
 			status: 'loading',
 			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
 			showLeft: false,
