@@ -60,6 +60,7 @@ export default {
 		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem'])
 	},
 	onLoad() {
+		page = 0
 		uni.getSystemInfo({
 			success: (res) => {
 				let windowHeight = res.windowHeight

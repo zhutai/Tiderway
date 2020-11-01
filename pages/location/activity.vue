@@ -86,7 +86,9 @@
 		},
 		methods: {
 			back(){
-				uni.navigateBack()
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			handleDate() {
 				

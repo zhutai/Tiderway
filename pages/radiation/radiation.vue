@@ -273,7 +273,8 @@
 			this.chartHeight = uni.upx2px(500)
 			this.toggleTabs(this.current)
 		},
-		onReady() {
+		onShow() {
+			this.getHistoryData(false)
 		},
 		methods: {
 			actionSheetTap() {
@@ -288,8 +289,8 @@
 					}
 				})
 			},
-			getHistoryData() {
-				uni.showLoading({title: ' 加载中...', mask: true})
+			getHistoryData(isloading) {
+				if (isloading) uni.showLoading({title: ' 加载中...', mask: true})
 				let tabbar = tabbars[this.current]
 				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}

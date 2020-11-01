@@ -13,7 +13,7 @@
 					<input class="uni-input" type="number" v-model="mobile" placeholder="请输入手机号码" />
 				</view>
 			</view>
-			<view class="books" v-if="isApp">
+			<view class="books" v-if="isApp" @click="getContacts">
 				<uni-icons class="add-icon" type="person" size="16" color="#4499fc" />
 				<text>从通讯录中快速选择</text>
 			</view>
@@ -40,7 +40,7 @@
 				userName: '',
 				mobile: '',
 				switchBool: false,
-				isApp: false
+				isApp: true
 			};
 		},
 		components: {
@@ -135,13 +135,13 @@
 			// 获取通讯录
 			getContacts() {
 				// 获取通讯录对象
-				// #ifdef APP-NVUE
 				var that = this
 				nativeCommon.contacts.getContact(function(name,phoneNumber){
+					let phones = phoneNumber.split(" ")
+					let phone = phones.join("")
 					that.userName = name
-					that.mobile = phoneNumber;
+					that.mobile = Number(phone);
 				})
-				// #endif
 			}
 		}
 	}
