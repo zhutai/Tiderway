@@ -15,10 +15,10 @@
 							<text class="time">{{item.CreatedAt}}</text>
 							<view class="content">
 								<text class="title">{{ item.Title }}</text>
-								<view class="img-wrapper">
+							<!-- 	<view class="img-wrapper">
 									<image class="pic" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3761064275,227090144&fm=26&gp=0.jpg"></image>
 									<view class="cover">活动结束</view>
-								</view>
+								</view> -->
 								<text class="introduce">{{ item.Content }}</text>
 								<view class="bot b-t">
 									<text>查看详情</text>
@@ -35,13 +35,12 @@
 							@change="change" @click="bindClick($event, index)">
 								<view class="content-box">
 									<view class="content-title">
-										<text class="content-imei">{{ item.IMEI }}</text>
+										<text class="content-text">{{ alarmType[item.AlarmType] }}</text>
+										<text class="content-text color1" v-if="item.AlarmValue">-{{ item.AlarmValue }}</text>
 										<text class="content-status" :class="`color${item.Status}`">{{ item.Status === 1 ? '待处理' : item.Status === 2 ? '已处理' : '已清除' }}</text>
 									</view>
 									<view class="content-title">
-										<text class="content-text" v-if="!item.Note">{{ alarmType[item.AlarmType] }}</text>
-										<text class="content-text" v-else>{{ item.Note }}</text>
-										<text class="content-text color1" v-if="item.AlarmValue">-{{ item.AlarmValue }}</text>
+										<text class="content-imei">{{ item.IMEI }}</text>
 										<text class="content-time">{{ item.AlarmedAt }}</text>
 									</view>
 								</view>
@@ -295,12 +294,12 @@
 		justify-content: space-between;
 	}
 	.content-imei {
-		font-size: 16px;
+		font-size: 14px;
 		line-height: 60rpx;
 		color: $font-color-dark;
 	}
 	.content-text {
-		font-size: 14px;
+		font-size: 16px;
 		color: $font-color-base;
 	}
 	.content-time {
