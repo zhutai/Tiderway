@@ -111,6 +111,9 @@
 		},{
 			"path": "pages/device/list",
 			"style": {
+				// "app-plus": {
+				// 	"titleNView": false
+				// },
 				"navigationBarTitleText": "设备列表"
 			}
 		},
