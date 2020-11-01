@@ -12,7 +12,7 @@
 		
 		<!--  设备状态显示 -->
 		<view class="device-info">
-			<view class="map">
+			<view class="map" >
 				<web-view v-if="token" :src="webViewStr">
 				</web-view>
 			</view>
@@ -183,7 +183,7 @@ const optionList = [
 	},{
 		icon: 'iconhuodongguiji',
 		name: '活动轨迹',
-		url: '',
+		url: '/pages/location/activity',
 	},{
 		icon: 'iconboda',
 		name: '拨打设备'
@@ -205,6 +205,7 @@ var wv;
 export default {
 	data() {
 		return {
+			ifMap: true,
 			defaultAvatar,
 			status: 'loading',
 			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
@@ -290,6 +291,7 @@ export default {
 			if (item.IMEI) {
 				this.selectDevice({ deviceItem: item, imeiLength: 1 })
 				this.$refs.showLeft.close()
+				this.ifMap = true
 				this.getWebViewToken()
 				this.loadData();
 			}
@@ -344,6 +346,7 @@ export default {
 			// #endif
 		},
 		showDrawer(e) {
+			this.ifMap = false
 			this.$refs[e].open()
 		},
 		async changeDrawer(bool) {
@@ -353,6 +356,7 @@ export default {
 				this.getDeviceList(true)
 			} else {
 				page = 0
+				this.ifMap = true
 				this.deviceList = []
 			}
 		},
@@ -429,6 +433,7 @@ export default {
 	// app端拦截返回事件 ，仅app端生效
 	onHide() {
 		if (this.showLeft) {
+			this.ifMap = true
 			this.$refs.showLeft.close()
 			return true
 		}

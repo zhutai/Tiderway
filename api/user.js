@@ -46,6 +46,14 @@ export const editPwd = (data) => {
 }
 
 /**
+ * 设置头像
+ * @param {Object} params - 设置头像  
+ */
+export const setAvatar = (data) => {
+  return http.post(`${VERSION}/User/setAvatar`, data)
+}
+
+/**
  * 系统消息列表
  * @param {Object} params - 系统消息列表  
  */

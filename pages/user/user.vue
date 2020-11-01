@@ -34,7 +34,7 @@
 </template>  
 <script>  
 	import listCell from '@/components/mix-list-cell';
-  import { mapState } from 'vuex';
+  import { mapGetters } from 'vuex';
 	const defaultAvatar = require('@/static/image/userAvatar.png')
 	const cellList = [
 		{
@@ -48,7 +48,7 @@
 			iconColor: '#5fcda2',
 			title: '我的设备',
 			tips: '',
-			url: '/pages/device/list'
+			url: '/pages/device/myDevice'
 		}
 		,{
 			icon: 'iconyijian',
@@ -93,7 +93,7 @@
 			console.log(this.userInfo)
 		},
     computed: {
-			...mapState(['hasLogin','userInfo'])
+			...mapGetters(['hasLogin','userInfo'])
 		},
     methods: {
 			/**
