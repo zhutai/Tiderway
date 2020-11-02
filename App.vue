@@ -62,7 +62,8 @@
 			}
 		},
 		onLaunch: function(option) {
-			this.loadExecution(option)
+			// this.loadExecution(option)
+			this.loadUserInfo(option)
 		},
 		onShow: function() {
 			// console.log('App Show')

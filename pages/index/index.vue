@@ -222,7 +222,10 @@ export default {
 				}
 			})
 		} else {
-			this.loadData()
+			// console.log(this.deviceImei)
+			if (this.deviceImei) {
+				this.loadData()
+			}
 			let bool = uni.getStorageSync('isSwitchDevice')
 			if (bool) {
 				this.getWebViewToken()

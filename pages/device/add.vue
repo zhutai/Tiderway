@@ -37,7 +37,7 @@
 		onLoad() {
 			console.log(this.userInfo)
 			let UserType = this.userInfo.UserType
-			if (UserType == 1 || UserType == 4) {
+			if (UserType == 1 || UserType == 2) {
 				uni.showModal({
 					content: "抱歉，当前用户无法添加设备",
 					showCancel: false,
