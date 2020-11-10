@@ -1,142 +1,210 @@
 <template>
-	<view class="device-list">
-		<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
-			<view>
-				<uni-swipe-action>
-					<uni-swipe-action-item :right-options="options" :auto-close="true"
-					v-for="(item, index) in deviceList" :key="item.IMEI + index" @click="bindClick($event, index)">
-						<view class="content-box" :class="{'b-b': index !== deviceList.length - 1 }">
-							<view class="avatar">
-								<text v-if="item.UserName">{{ item.UserName.slice(0,1) }}</text>
-								<text v-else>空</text>
-							</view>
-							<view class="content">
-								<text class="block">{{ item.UserName || '暂未绑定' }}</text>
-								<text class="block">IMEI: {{ item.IMEI }}</text>
-							</view>
-							<view class="deviceType">
-								<text class="block iconfont icontubiaozhizuomoban-1-05 icon-device"></text>
-								<text class="block">{{ item.ModelName }}</text>
-							</view>
-						</view>
-					</uni-swipe-action-item>
-				</uni-swipe-action>
+	<view class="container">
+		<!-- <uni-nav-bar fixed :statusBar="true" left-icon="arrowleft" @clickLeft="back">
+			<view class="input-view">
+				<uni-icons class="input-uni-icon" type="search" size="20" color="#999" />
+				<input confirm-type="search" class="nav-bar-input" type="text" placeholder="输入设备编号进行搜索" @confirm="confirm">
 			</view>
-			<uni-load-more :status="status" />
-		</scroll-view>
-		<view class="button-list">
-			<button class="mini-btn" type="primary"  @click="addDevece">绑定设备</button>
+		</uni-nav-bar> -->
+		<uni-search-bar radius="100" @confirm="search" placeholder="输入设备编号进行搜索" bgColor="#f8f8f8" @input="input" @cancel="cancel" />
+		<view class="device-box">
+			<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
+				<uni-list class="device-list">
+					<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
+						<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
+							<view class="block">
+								<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
+								<text v-if="item.LoginName && !item.sex"
+								style="color: #fa436a"
+								class="iconfont iconiconfontdingwei3" />
+								<text style="color: #4399fc"
+								v-if="item.LoginName && item.sex" 
+								class="iconfont iconbushu" />
+								<text v-if="!item.LoginName">未绑定</text>
+							</view>
+							<text class="block">{{ item.IMEI }}</text>
+						</view>
+						<text slot="footer" class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
+					</uni-list-item>
+				</uni-list>
+				<uni-load-more :status="status" />
+			</scroll-view>
 		</view>
+
 	</view>
 </template>
 
 <script>
-	import { mapState } from 'vuex';
-	import { getDeviceList, unBindDevice } from '@/api/device.js'
-	const options = [
-		{
-			text: '解绑',
-			style: {
-				backgroundColor: '#dd524d'
+import { mapState, mapMutations } from 'vuex'
+import { getHealthInfo, getDeviceList } from '@/api/device.js'
+import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+const defaultAvatar = require('@/static/image/userAvatar.png')
+let page = 0
+
+export default {
+	data() {
+		return {
+			status: 'loading',
+			searchValue: '',
+			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
+			showLeft: false,
+			scrollHeight: 400,
+			deviceLoading: false,
+			deviceList: []
+		};
+	},
+	components: {
+		uniNavBar
+	},
+	computed: {
+		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem'])
+	},
+	onLoad() {
+		page = 0
+		uni.getSystemInfo({
+			success: (res) => {
+				let windowHeight = res.windowHeight
+				console.log(res)
+				this.scrollHeight = windowHeight - 52
 			}
-		}
-	]
-	export default {
-		data() {
-			return {
-				page: 0,
-				options,
-				deviceList: [],
-				loading: false,
-				status: 'loading',
-			}
-		},
-		async onLoad() {
-			uni.showLoading({
-				title: '加载中...'
-			})
+		})
+		this.getDeviceList()
+	},
+	methods: {
+		...mapMutations(['selectDevice']),
+		scrolltolower(e) {
+			page += 1
 			this.getDeviceList()
-			uni.hideLoading()
 		},
-		computed: {
-			...mapState(['deviceImei', 'userInfo'])
-		},
-		methods: {
-			async getDeviceList() {
-				this.loading = true
-				let result = await getDeviceList({page: this.page, limit: 20, imei: this.deviceImei })
-				let deviceList = result.Data.DeviceList
-				if (!deviceList.length || deviceList.length < 20) this.status = 'noMore'
-				this.deviceList = this.deviceList.concat(deviceList)
-				this.loading = false
-			},
-			loadData() {
-				if (this.loading || this.status == 'noMore') return;
-				this.page += 1
-				this.getDeviceList()
-			},
-			addDevece() {
-				uni.navigateTo({
-					url: '/pages/device/add'
-				})
-			},
-			async bindClick(e, index) {
-				if (!e.index) {
-					let current = this.deviceList[index]
-					await unBindDevice({ imei: current.IMEI })
-					this.deviceList.splice(index, 1)
-					this.$api.msg('解绑成功')
+		swtichDevice(item) {
+			if (item.IMEI) {
+				if (this.deviceImei && item.IMEI) {
+					if (this.deviceImei !== item.IMEI) {
+						this.$api.msg('设备切换成功')
+						uni.setStorage({ key: 'isSwitchDevice', data: true })
+					}
 				}
-			},
+				this.selectDevice({ deviceItem: item, imeiLength: 1 })
+			}
+		},
+		back() {
+			uni.navigateBack()
+		},
+		search(e) {
+			this.searchValue = e.value
+			this.clearSearch()
+		},
+		input(e) {
+			this.searchValue = e.value
+		},
+		cancel() {
+			this.searchValue = ''
+			this.clearSearch()
+		},
+		clearSearch() {
+			page = 0
+			this.deviceList = []
+			this.status = 'loading'
+			this.deviceLoading = false
+			this.getDeviceList()
+		},
+		getDeviceList() {
+			if (this.status != 'loading' || this.deviceLoading) return
+			this.status = 'loading'
+			this.deviceLoading = true
+			let size = 20
+			getDeviceList({Page: page, Limit: size, Imei: this.searchValue }).then(res => {
+				let deviceList = res.Data.DeviceList || []
+				if (!deviceList.length || deviceList.length < size) this.status = 'noMore'
+				this.deviceList = this.deviceList.concat(deviceList)
+				this.deviceLoading = false
+			})
 		}
 	}
+}
 </script>
 
-<style lang='scss' scoped>
-	page,
-	.device-list {
-		background: $page-color-base;
-		height: 100%;
-	}
-
-	.list-scroll-content {
-		height: calc(100% - 58px);
-	}
-
-	.content-box {
-		width: 100%;
-		display: flex;
-		padding: 24rpx;
-		background-color: #fff;
-	}
-	.avatar {
-		height: 88rpx;
-		width: 88rpx;
-		text-align: center;
-		line-height: 88rpx;
-		border-radius: 50%;
-		background: $font-color-spec;
+<style lang="scss">
+	
+	page {
+		background: #f5f5f5;
 	}
 	
-	.content {
-		flex: 1;
-		padding-left: 20rpx;
+	.container {
+		background: #f5f5f5;
 	}
 	
 	.block {
 		display: block;
+	}
+	
+	.text {
+		color: #999;
+		padding-top: 8rpx;
 		font-size: 14px;
-		line-height: 44rpx;
-		color: $font-color-dark;
-	}
-	
-	.icon-device {
-		color: $font-color-spec;
 		text-align: center;
-		font-size: 18px;
 	}
 	
-	.button-list {
-		padding: 12rpx 60rpx;
+	.bar-text {
+		width: auto;
+		font-size: 14px;
+		color: $font-color-spec;
+	}
+	
+	.device-box {
+		.device-title {
+			padding: 32rpx;
+			height: 120rpx;
+			font-size: 16px;
+		}
+		.device-left {
+			flex: 1;
+			color: #aaa;
+			.login-name {
+				color: $font-color-dark;
+				padding-right: 6px;
+			}
+		}
+		.select-device {
+			color: $font-color-spec;
+			.login-name {
+				color: $font-color-spec;
+			}
+		}
+		.device-right {
+			color: #aaa;
+			align-self: center;
+		}
+		.blue {
+			color: $font-color-spec;
+		}
+	}
+	.input-view {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		flex: 1;
+		background-color: #f8f8f8;
+		height: 30px;
+		border-radius: 32rpx;
+		padding: 0 24rpx;
+		flex-wrap: nowrap;
+		align-items: center;
+		margin: 16rpx 24rpx;
+		line-height: 48px;
+	}
+	
+	.nav-bar-input {
+		height: 30px;
+		line-height: 30px;
+		padding: 0 6px;
+		font-size: 14px;
+		color: #666;
+		background-color: #f8f8f8;
+	}
+	
+	.input-uni-icon {
+		line-height: 24px;
 	}
 </style>

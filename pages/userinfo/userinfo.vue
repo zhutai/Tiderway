@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">头像</text>
-			<image class="slot-image" :src="userInfo.Avatar" ></image>
+			<image class="slot-image" :src="avartImageUrl || defaultAvatar" @click="chooseImage"></image>
 		</view>
 		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">手机号</text>
@@ -19,7 +19,9 @@
 
 <script>
 	import permision from "@/utils/permission.js"
+	import { setAvatar } from "@/api/user.js"
 	import { mapState, mapMutations } from 'vuex';
+	const defaultAvatar = require('@/static/image/userAvatar.png')
 	var sourceType = [
 		['camera'],
 		['album'],
@@ -33,14 +35,19 @@
 	export default {
 		data() {
 			return {
-				imageList: []
+				imageList: [],
+				avartImageUrl: '',
+				defaultAvatar
 			};
 		},
 		computed:{
 			...mapState(['userInfo']),
 		},
+		onLoad() {
+			this.avartImageUrl = this.userInfo.Avatar
+		},
 		methods:{
-			...mapMutations(['logout']),
+			...mapMutations(['login']),
 			navTo(url){
 				uni.navigateTo({ url })
 			},
@@ -50,23 +57,55 @@
 				this.$api.msg(`${statusTip}消息推送`);
 			},
 			// 添加图片
-			chooseImage: async function() {
+			chooseImage() {
 				uni.chooseImage({
 					sourceType: sourceType[2],
 					sizeType: sizeType[2],
-					count: this.imageList.length  ? 0 : 1,
+					count: 1,
 					success: (res) => {
-						console.log(res)
-						this.imageList = this.imageList.concat(res.tempFilePaths);
+						let avartImageUrl = res.tempFilePaths[0]
+						this.avartImageUrl = avartImageUrl
+						this.handleFile(avartImageUrl).then(res => {
+							this.uploadImage(res)
+						})
 					},
 					fail: (err) => {
-						// #ifdef APP-PLUS
 						if (err['code'] && err.code !== 0) {
 							this.checkPermission(err.code);
 						}
-						// #endif
 					}
 				})
+			},
+			handleFile(path) {  
+				return new Promise((resolve, reject) => {  
+					plus.zip.compressImage({  
+						src: path,  
+						dst: `_doc/temp/${+new Date()}.jpg`,  
+						quality: 70,  
+					},  
+					({ target, size }) => {  
+						plus.io.resolveLocalFileSystemURL(target, (file) => {  
+							const fileReader = new plus.io.FileReader();  
+							fileReader.readAsDataURL(file);  
+							fileReader.onloadend = ({ target: { result } }) => {
+								resolve(result);  
+							};  
+						});  
+					},  
+					(e) => {  
+						reject(e);  
+					});  
+				});  
+			},
+			async uploadImage(imageBase64) {
+				uni.showLoading({
+					title: '上传中...'
+				})
+				const result = await setAvatar({ base64Str: imageBase64 })
+				this.avartImageUrl = result.Data
+				let userInfo = Object.assign({}, this.userInfo, { Avatar: this.avartImageUrl })
+				this.login(userInfo)
+				uni.hideLoading()
 			},
 			async checkPermission(code) {
 				let type = code ? code - 1 : 2;
@@ -91,20 +130,20 @@
 			//退出登录
 			toLogout(){
 				uni.showModal({
-				    content: '确定要退出登录么',
-				    success: (e)=>{
-				    	if(e.confirm){
-				    		this.logout();
-				    		setTimeout(()=>{
-									uni.navigateTo({
-										url: '/pages/public/login',
-										fail(err) {
-											console.log(err)
-										}
-									})
-				    		}, 200)
-				    	}
-				    }
+					content: '确定要退出登录么',
+					success: (e)=>{
+						if(e.confirm){
+							this.logout();
+							setTimeout(()=>{
+								uni.navigateTo({
+									url: '/pages/public/login',
+									fail(err) {
+										console.log(err)
+									}
+								})
+							}, 200)
+						}
+					}
 				});
 			},
 		}

@@ -125,7 +125,6 @@ var nativeCommon = {
 		},
 		android: { //供android系统调用
 			visitContacts: function(callBack) {
-				console.log(1);
 				plus.contacts.getAddressBook(plus.contacts.ADDRESSBOOK_PHONE,(book)=>{
 					var REQUESTCODE = 1000;
 					var main = plus.android.runtimeMainActivity();

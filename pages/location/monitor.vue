@@ -60,19 +60,17 @@
 			//#ifdef !APP-PLUS
 			this.webViewStr = `${this.h5Url}?token=${this.token}`
 			//#endif
-			console.log(this.webViewStr)
+			// console.log(this.webViewStr)
 		},
 		methods: {
 			message(e) {
-				console.log(e)
-
 				let data = e.detail.data[0]
 				let action = data.action;
 				if (action == "to") {
 					var latlng = bdToGaoDe(data.lat, data.lng)
 					this.latitude = latlng.lat
 					this.longitude = latlng.lng
-
+		
 					uni.openLocation({
 						longitude: Number(this.longitude),
 						latitude: Number(this.latitude),
@@ -115,16 +113,16 @@
 					longitude: latlng.lng,
 					iconPath: '../../static/icon/0.png'
 				}
-
+		
 				this.latitude = latlng.lat
 				this.longitude = latlng.lng
 				this.markers = [market];
-
+		
 				let mapContent = uni.createMapContext("map", this)
 				console.log(mapContent)
-
+		
 				//mapContent.moveToLocation({longitude:this.longitude,latitude:this.latitude})
-
+		
 				// let point = new plus.maps.Point(this.longitude, this.latitude);
 				// plus.maps.Map.reverseGeocode(point, {}, function(event) {
 				// 	var address = event.address; // 转换后的地理位置
@@ -133,7 +131,7 @@
 				// }, function(e) {
 				// 	console.log("Failed:" + JSON.stringify(e));
 				// });
-
+		
 			}
 		}
 	}

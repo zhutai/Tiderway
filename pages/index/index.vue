@@ -6,13 +6,13 @@
 			<view class="user-center">
 				<image class="user-avatar" :src="userInfo.Avatar || defaultAvatar"></image>
 			</view>
-			<view class="bar-text" slot="left" @click="showDrawer('showLeft')">切换设备</view>
-			<view class="bar-text" slot="right" @click="addDevice">添加设备</view>
+			<view class="bar-text" slot="left" @click="jumpDevice('/pages/device/list')">切换设备</view>
+			<view class="bar-text" slot="right" @click="jumpDevice('/pages/device/add')">添加设备</view>
 		</uni-nav-bar>
 		
 		<!--  设备状态显示 -->
 		<view class="device-info">
-			<view class="map">
+			<view class="map" >
 				<web-view v-if="token" :src="webViewStr">
 				</web-view>
 			</view>
@@ -57,7 +57,6 @@
 								<text class="block">{{item.name}}({{item.unit}})</text>
 								<!-- <text class="block text"></text> -->
 							</view>
-							
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -71,56 +70,22 @@
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
-							<!-- <view> -->
 								<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
-							<!-- </view>
-							<view> -->
 								<text class="block">{{ item.name }}</text>
-							<!-- </view> -->
 						</view>
 					</uni-grid-item>
 				</uni-grid>
 			</view>
 		</view>
 
-		<uni-drawer ref="showLeft" mode="left" :width="260" @change="changeDrawer($event,'showLeft')">
-			<uni-status-bar />
-			<view class="device-box">
-				<view class="device-title">设备列表</view>
-				<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
-					<!-- <view v-for="index in 100">{{ index }}</view> -->
-					<uni-list class="device-list">
-						<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
-							<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
-								<view class="block">
-									<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
-									<text v-if="item.LoginName && !item.sex"
-									style="color: #fa436a"
-									class="iconfont iconiconfontdingwei3" />
-									<text style="color: #4399fc"
-									v-if="item.LoginName && item.sex" 
-									class="iconfont iconbushu" />
-									<text v-if="!item.LoginName">未绑定</text>
-								</view>
-								<text class="block">{{ item.IMEI }}</text>
-							</view>
-							<text slot="footer" class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
-						</uni-list-item>
-					</uni-list>
-					<uni-load-more :status="status" />
-				</scroll-view>
-			</view>
-		</uni-drawer>
-
 	</view>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { monitor } from '@/api/location'
+// import { monitor } from '@/api/location'
 import { getHealthInfo, getDeviceList } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
-import { bdToGaoDe } from '@/mock'
 import { getDeviceToken } from '@/api/device.js'
 const defaultAvatar = require('@/static/image/userAvatar.png')
 let page = 0
@@ -183,7 +148,7 @@ const optionList = [
 	},{
 		icon: 'iconhuodongguiji',
 		name: '活动轨迹',
-		url: '',
+		url: '/pages/location/activity',
 	},{
 		icon: 'iconboda',
 		name: '拨打设备'
@@ -205,6 +170,7 @@ var wv;
 export default {
 	data() {
 		return {
+			ifMap: true,
 			defaultAvatar,
 			status: 'loading',
 			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
@@ -238,14 +204,7 @@ export default {
 		})
 	},
 	onReady() {
-		// #ifdef APP-PLUS
-		var currentWebview = this.$scope.$getAppWebview() 
-		//此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效，非v3编译模式使用this.$mp.page.$getAppWebview()
-		setTimeout(() => {
-			wv = currentWebview.children()[0]
-			wv.setStyle({top: 45 + this.statusBarHeight, height: uni.upx2px(400)})
-		}, 400); //如果是页面初始化调用时，需要延时一下
-		// #endif
+		this.setWebViewHeight()
 	},
 	onShow() {
 		if (this.deviceEmpey) {
@@ -255,7 +214,6 @@ export default {
 				showCancel: false,
 				confirmText: "确定",
 				success: function(res) {
-					console.log(res)
 					if (res.confirm) {
 						uni.navigateTo({
 							url: '/pages/device/add'
@@ -264,7 +222,16 @@ export default {
 				}
 			})
 		} else {
-			this.loadData()
+			// console.log(this.deviceImei)
+			if (this.deviceImei) {
+				this.loadData()
+			}
+			let bool = uni.getStorageSync('isSwitchDevice')
+			if (bool) {
+				this.getWebViewToken()
+				uni.removeStorageSync('isSwitchDevice')
+				this.setWebViewHeight()
+			}
 		}
 	},
 	methods: {
@@ -272,6 +239,16 @@ export default {
 		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
+		},
+		setWebViewHeight() {
+			// #ifdef APP-PLUS
+			var currentWebview = this.$scope.$getAppWebview() 
+			//此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效，非v3编译模式使用this.$mp.page.$getAppWebview()
+			setTimeout(() => {
+				wv = currentWebview.children()[0]
+				wv.setStyle({top: 45 + this.statusBarHeight, height: uni.upx2px(400)})
+			}, 400); //如果是页面初始化调用时，需要延时一下
+			// #endif
 		},
 		getWebViewToken() {
 			this.token = ''
@@ -281,23 +258,11 @@ export default {
 				this.webViewStr = url
 			})
 		},
-		addDevice() {
+		jumpDevice(url) {
 			uni.navigateTo({
-				url:'/pages/device/add'
+				url: url
 			})
 		},
-		swtichDevice(item) {
-			if (item.IMEI) {
-				this.selectDevice({ deviceItem: item, imeiLength: 1 })
-				this.$refs.showLeft.close()
-				this.getWebViewToken()
-				this.loadData();
-			}
-		},
-		/**
-		 * 请求静态数据只是为了代码不那么乱
-		 * 分次请求未作整合
-		 */
 		async loadData() {
 			const result = await getHealthInfo()
 			let healthInfo = result.Data || {}
@@ -314,79 +279,6 @@ export default {
 				url: url
 			})
 		},
-		// 地图数据请求
-		async location() {
-			let result = await monitor({})
-		
-			var latlng = bdToGaoDe(result.Data.Lat, result.Data.Lng)
-			console.log(latlng)
-			let market = {
-				callout:{
-					content: result.Data.RecivedAt,
-					display: 'ALWAYS',
-					padding: 10
-				},
-				latitude: latlng.lat,
-				longitude: latlng.lng,
-				iconPath: '../../static/icon/0.png',
-				width: 30,
-				height: 30
-			}
-		
-			this.latitude = latlng.lat
-			this.longitude = latlng.lng
-			this.markers = [market];
-			// #ifdef APP-PLUS
-			var point = new plus.maps.Point(latitude,longitude);
-			plus.maps.Map.reverseGeocode(point, {}, function(res) {
-				this.address = res.address;
-			})
-			// #endif
-		},
-		showDrawer(e) {
-			this.$refs[e].open()
-		},
-		async changeDrawer(bool) {
-			this.showLeft = bool
-			if (bool) {
-				this.status = 'loading'
-				this.getDeviceList(true)
-			} else {
-				page = 0
-				this.deviceList = []
-			}
-		},
-		getDeviceList(isFirst) {
-			if (this.status != 'loading') return
-			this.status = 'loading'
-			getDeviceList({Page: page, Limit: 10 }).then(res => {
-				this.deviceLoading = true
-				let deviceList = res.Data.DeviceList || []
-				if (!deviceList.length) this.status = 'noMore'
-				this.deviceList = this.deviceList.concat(deviceList)
-				if (isFirst) {
-					this.checkHeight()
-				}
-			})
-		},
-		checkHeight() {
-			uni.getSystemInfo({
-				success: (res) => {
-					let windowHeight = res.windowHeight
-					setTimeout(() => {
-						let obj = uni.createSelectorQuery().select('.device-list')
-						obj.boundingClientRect((data) => { // data - 各种参数
-							let height = data.height
-							if (height < windowHeight) {
-								let bool = (height + (height / (page || 1))) < windowHeight
-								page += 1;
-								this.getDeviceList(bool)
-							}
-						}).exec()
-					}, 0)
-				}
-			})
-		},
 		changeHealth(e) {
 			let index = e.detail.index
 		},
@@ -397,7 +289,6 @@ export default {
 			let index = e.detail.index
 			let item = this.optionList[index]
 			if (item.url) {
-				console.log(item)
 				uni.navigateTo({
 					url: item.url
 				})
@@ -415,9 +306,9 @@ export default {
 						confirmText: "确定",
 						success: function(res) {
 							if (res.confirm) {
-								uni.navigateTo({
-									url: '/pages/device/setting'
-								})
+								// uni.navigateTo({
+								// 	url: '/pages/device/setting'
+								// })
 							}
 						}
 					})
@@ -429,6 +320,7 @@ export default {
 	// app端拦截返回事件 ，仅app端生效
 	onHide() {
 		if (this.showLeft) {
+			this.ifMap = true
 			this.$refs.showLeft.close()
 			return true
 		}

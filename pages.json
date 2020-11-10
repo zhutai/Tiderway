@@ -104,9 +104,17 @@
 			}
 		},
 		{
-			"path": "pages/device/list",
+			"path": "pages/device/myDevice",
 			"style": {
 				"navigationBarTitleText": "我的设备"
+			}
+		},{
+			"path": "pages/device/list",
+			"style": {
+				// "app-plus": {
+				// 	"titleNView": false
+				// },
+				"navigationBarTitleText": "设备列表"
 			}
 		},
 		{
@@ -119,6 +127,15 @@
 			"path": "pages/location/monitor",
 			"style": {
 				"navigationBarTitleText": "地图定位"
+			}
+		},
+		{
+			"path": "pages/location/activity",
+			"style": {
+				"navigationBarTitleText": "活动轨迹",
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		},{
 			"path": "pages/alarm/set",
