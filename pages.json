@@ -112,7 +112,7 @@
 		{
 			"path": "pages/device/setting",
 			"style": {
-				"navigationBarTitleText": "设备设置"
+				"navigationBarTitleText": "设备配置"
 			}
 		},
 		{
@@ -172,16 +172,16 @@
 				"text": "首页"
 			},
 			{
-				"pagePath": "pages/health/health",
-				"iconPath": "static/image/tabbar/tab-healthy.png",
-				"selectedIconPath": "static/image/tabbar/tab-select-healthy.png",
-				"text": "健康"
-			},
-			{
 				"pagePath": "pages/radiation/radiation",
 				"iconPath": "static/image/tabbar/tab-radiation.png",
 				"selectedIconPath": "static/image/tabbar/tab-select-radiation.png",
 				"text": "辐射"
+			},
+			{
+				"pagePath": "pages/health/health",
+				"iconPath": "static/image/tabbar/tab-healthy.png",
+				"selectedIconPath": "static/image/tabbar/tab-select-healthy.png",
+				"text": "健康"
 			},
 			{
 				"pagePath": "pages/user/user",

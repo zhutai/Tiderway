@@ -10,6 +10,25 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.iconnan:before {
+  content: "\e6a6";
+}
+
+.iconnv:before {
+  content: "\e6a7";
+}
+
+.iconchizi:before {
+  content: "\e626";
+}
+
+.iconrili:before {
+  content: "\e604";
+}
+
+.iconsaomiao:before {
+  content: "\e64b";
+}
 
 .iconbukejian1:before {
   content: "\e63f";

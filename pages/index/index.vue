@@ -66,7 +66,7 @@
 		
 		<!--  设备功能表模块 -->
 		<view class="example-body">
-			<uni-section title="设备功能表" type="line"></uni-section>
+			<uni-section title="功能列表" type="line"></uni-section>
 			<view class="option-list">
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
@@ -136,7 +136,7 @@ const healthyList = [
 	{
 		name: ' 距离',
 		unit: 'step',
-		icon: 'iconbushu',
+		icon: 'iconchizi',
 		key: 'Distance',
 		color: '#95F204',
 		num: '--'
@@ -145,7 +145,7 @@ const healthyList = [
 		unit: 'bpm',
 		icon: 'iconjiankang',
 		key: 'Heart',
-		color: '#95F204',
+		color: '#9c9bf5',
 		num: '--'
 	},{
 		name: '血压',
@@ -189,7 +189,7 @@ const optionList = [
 		name: '拨打设备'
 	},{
 		icon: 'iconqinqinghaomachaxun',
-		name: '亲情号码',
+		name: 'SOS号码',
 		url: '/pages/number/list',
 	},{
 		icon: 'iconjianyixiaxian',
@@ -197,7 +197,7 @@ const optionList = [
 		url: '/pages/alarm/set',
 	},{
 		icon: 'iconshebeishezhi',
-		name: '设备设置',
+		name: '设备配置',
 		url: "/pages/device/setting"
 	}
 ]
