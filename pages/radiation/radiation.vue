@@ -36,7 +36,7 @@
 			
 			<view class="content">
 				<view class="title-style">
-					<text class="title-dot-light">实时辐射</text>
+					<text class="title-dot-light">实时剂量</text>
 					<view class="select-time" @click="actionSheetTap">
 						<text>{{ actionSheet[sheetIndex].value }}</text>
 						<uni-icons type="arrowdown" size="16" color="#909399" />
@@ -90,7 +90,7 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>累计辐射正常范围在</text>
+					<text>累计剂量正常范围在</text>
 				</view>
 			</view>
 			
@@ -119,7 +119,7 @@
 	var _self;
 
 	const tabbars = [{
-		name: '实时辐射',
+		name: '实时剂量',
 		dateTimeIndex: 0,
 		path: 'RadioHistory',
 		dateKey: 'RecivedAt',
@@ -309,7 +309,7 @@
 						let str = 'RecivedAt'
 						if (HistoryList.length) {
 							let obj = this.dataFormat(HistoryList, tabbar)
-							obj.seriesName = '实时辐射'
+							obj.seriesName = '实时剂量'
 							this.motionOption = this.getBooldParams(obj)
 						} else {
 							this.dataFormat(HistoryList, tabbar)
@@ -319,7 +319,7 @@
 						let str = 'ReportTime'
 						if (HistoryList.length) {
 							let obj = this.dataFormat(HistoryList, tabbar)
-							obj.seriesName = '累计辐射'
+							obj.seriesName = '累计剂量'
 							this.bloodOption = this.getBooldParams(obj)
 						} else {
 							this.dataFormat(HistoryList, tabbar)

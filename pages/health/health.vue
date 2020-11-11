@@ -47,11 +47,13 @@
 			<view class="content">
 				<view class="title-style">
 					<view class="title-dot-light">
-						<text>标准范围说明</text>
+						<text>心率范围说明</text>
 					</view>
 				</view>
 				<view class="describe">
-					<text>心率的正常范围在90--120之间</text>
+					<text>心率范围是指正常成年人在静息状态下60-100次/分钟，平均一般在75次/分钟。
+					正常人心率也可能超过100次/分钟（比如情绪激动、运动、刺激性饮品），有些情形也会低于60次/分钟（比如睡眠中），经常运动的人心率也会偏低。
+					心率会因为性别、年龄和体质不同会有差异，初生儿的心率很快，可达130次/分钟，成年人女性比男性快。</text>
 				</view>
 			</view>
 
@@ -77,11 +79,13 @@
 			<view class="content">
 				<view class="title-style">
 					<view class="title-dot-light">
-						<text>标准范围说明</text>
+						<text>运动监测说明</text>
 					</view>
 				</view>
 				<view class="describe">
-					<text>运动正常范围在90--120之间</text>
+					<text>国际卫生组织将行走定义为“世界上最好的运动”。
+《中国成人活动指南》、《中国居民膳食指南》建议一般健康人每天应达到6000步的活动量。
+每天走6000步≈3至4千米行走距离≈30分钟中等强度运动，步行是一种简单易行的有效运动方式。</text>
 				</view>
 			</view>
 			
@@ -107,11 +111,11 @@
 			<view class="content">
 				<view class="title-style">
 					<view class="title-dot-light">
-						<text>标准范围说明</text>
+						<text>血压范围说明</text>
 					</view>
 				</view>
 				<view class="describe">
-					<text>血压正常范围在90--120之间</text>
+					<text>高血压定义：为多次重复测量后诊室收缩压≥140 mmHg和／或诊室舒张压≥90 mmHg，根据血压升高水平，将高血压分为 1 级、2 级和 3 级。</text>
 				</view>
 			</view>
 			
@@ -746,30 +750,7 @@
 					}
 					this.toggleTabs(this.current, dataTime)
 				}
-				
 			},
-			touchLineA(e) {
-				canvasObj['canvasLineA'].scrollStart(e);
-			},
-			moveLineA(e) {
-				// console.log(e)
-				canvasObj['canvasLineA'].scroll(e);
-				// canvasObj['canvasLineA'].showToolTip(e, {
-				// 	format: function(item, category) {
-				// 		return category + ' ' + item.name + ':' + item.data
-				// 	}
-				// });
-			},
-			touchEndLineA(e) {
-				console.log(e)
-				canvasObj['canvasLineA'].scrollEnd(e);
-				//下面是toolTip事件，如果滚动后不需要显示，可不填写
-				canvasObj['canvasLineA'].showToolTip(e, {
-					format: function(item, category) {
-						return category + ' ' + item.name + ':' + item.data
-					}
-				});
-			}
 		},
 		// #ifndef MP
 		// 标题栏input搜索框点击

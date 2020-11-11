@@ -49,22 +49,19 @@
 			title: '我的设备',
 			tips: '',
 			url: '/pages/device/myDevice'
-		}
-		,{
+		},{
+			icon: 'iconGroup',
+			iconColor: '#9789f7',
+			title: '我的数据',
+			tips: '',
+			url: '/pages/public/forget'
+		},{
 			icon: 'iconyijian',
 			iconColor: '#ee883b',
 			title: '意见反馈',
 			tips: '',
 			url: '/pages/user/feedback'
-		}
-		,{
-			icon: 'iconGroup',
-			iconColor: '#9789f7',
-			title: '修改密码',
-			tips: '',
-			url: '/pages/public/forget'
-		}
-		,{
+		},{
 			icon: 'iconshebeishezhi',
 			iconColor: '#54b4ef',
 			title: '设置',
@@ -76,7 +73,7 @@
 			title: '关于',
 			tips: '',
 			url: '/pages/user/about'
-		},
+		}
 	]
 	
   export default {

@@ -1,11 +1,5 @@
 <template>
 	<view class="container">
-		<!-- <uni-nav-bar fixed :statusBar="true" left-icon="arrowleft" @clickLeft="back">
-			<view class="input-view">
-				<uni-icons class="input-uni-icon" type="search" size="20" color="#999" />
-				<input confirm-type="search" class="nav-bar-input" type="text" placeholder="输入设备编号进行搜索" @confirm="confirm">
-			</view>
-		</uni-nav-bar> -->
 		<uni-search-bar radius="100" @confirm="search" placeholder="输入设备编号进行搜索" bgColor="#f8f8f8" @input="input" @cancel="cancel" />
 		<view class="device-box">
 			<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
@@ -16,10 +10,10 @@
 								<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
 								<text v-if="item.LoginName && !item.sex"
 								style="color: #fa436a"
-								class="iconfont iconiconfontdingwei3" />
+								class="iconfont iconnv" />
 								<text style="color: #4399fc"
 								v-if="item.LoginName && item.sex" 
-								class="iconfont iconbushu" />
+								class="iconfont iconnan" />
 								<text v-if="!item.LoginName">未绑定</text>
 							</view>
 							<text class="block">{{ item.IMEI }}</text>
@@ -162,7 +156,6 @@ export default {
 			color: #aaa;
 			.login-name {
 				color: $font-color-dark;
-				padding-right: 6px;
 			}
 		}
 		.select-device {

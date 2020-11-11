@@ -14,6 +14,17 @@
 			<text class="cell-tip">{{ userInfo.LoginName }}</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
+		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50" @click="jumpPws">
+			<text class="cell-tit">修改密码</text>
+			<uni-icons type="arrowright" size="18" color="#909399" />
+		</view>
+		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">绑定微信</text>
+			<uni-icons type="arrowright" size="18" color="#909399" />
+		</view>
+		<view class="list-cell log-out-btn" @click="toLogout">
+			<text class="cell-tit">退出登录</text>
+		</view>
 	</view>
 </template>
 
@@ -126,6 +137,11 @@
 					})
 				}
 				return status;
+			},
+			jumpPws() {
+				uni.navigateTo({
+					url: '/pages/public/forget'
+				})
 			},
 			//退出登录
 			toLogout(){

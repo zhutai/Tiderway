@@ -11,10 +11,26 @@
 		</uni-nav-bar>
 		
 		<!--  设备状态显示 -->
-		<view class="device-info">
-			<view class="map" >
-				<web-view v-if="token" :src="webViewStr">
-				</web-view>
+		<view class="example-body">
+			<view class="device-info">
+				<view class="device-online">
+					<view class="countdown">
+						<view class="box"><text class="dotdot"></text></view>
+						<text class="seconds">172</text>
+						<view class="timeRefSeconds">μSv/h</view>
+					</view>
+				</view>
+				<view class="info-list">
+					<view class="info-item" :class="index % 2 ? 'right-radius' : 'left-radius'" v-for="(item, index) in infoList" :style="{backgroundColor: item.color}">
+						<view class="left-icon">
+							<text class="iconfont" :class="item.icon"></text>
+						</view>
+						<view class="right-text">
+							<text class="title">{{ item.name }}：</text>
+							<text class="value">{{ item.value + item.unit }}</text>
+						</view>
+					</view>
+				</view>
 			</view>
 		</view>
 		
@@ -140,6 +156,45 @@ const radiaList = [
 	}
 ]
 
+const infoList = [
+	{
+		icon: 'icontubiaozhizuomoban-1-05',
+		name: '状态',
+		key: 'Status',
+		value: '',
+		unit: '',
+		color: '#4399fc'
+	},{
+		icon: 'iconiconfontdingwei3',
+		name: '电量',
+		key: 'Battery',
+		value: '',
+		unit: '%',
+		color: '#43ff9c'
+	},{
+		icon: 'iconiconfontdingwei3',
+		name: '电压',
+		key: 'Battery',
+		value: '',
+		unit: 'V',
+		color: '#F59A23'
+	},{
+		icon: 'iconiconfontdingwei3',
+		name: '预警次数',
+		key: 'Battery',
+		value: '',
+		unit: '次',
+		color: '#ec6e6e'
+	},{
+		icon: 'iconiconfontdingwei3',
+		name: '环境温度',
+		key: 'Battery',
+		value: '',
+		unit: '℃',
+		color: '#9c9bf5'
+	},
+]
+
 const optionList = [
 	{
 		icon: 'iconiconfontdingwei3',
@@ -173,6 +228,7 @@ export default {
 			ifMap: true,
 			defaultAvatar,
 			status: 'loading',
+			infoList,
 			deviceStatus: ['未激活', '已激活', '过期', '黑名单', '在线', '离线'],
 			showLeft: false,
 			scrollHeight: 400,
@@ -180,10 +236,7 @@ export default {
 			deviceList: [],
 			healthyList,
 			optionList,
-			radiaList,
-			token: '',
-			webViewStr: '',
-			h5Url: 'http://web.tiderway.com/H5Location/H5Monitor'
+			radiaList
 		};
 	},
 	components: {
@@ -193,7 +246,6 @@ export default {
 		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem'])
 	},
 	onLoad() {
-		this.getWebViewToken()
 		uni.getSystemInfo({
 			success: (res) => {
 				let windowHeight = res.windowHeight
@@ -202,9 +254,6 @@ export default {
 				this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
 			}
 		})
-	},
-	onReady() {
-		this.setWebViewHeight()
 	},
 	onShow() {
 		if (this.deviceEmpey) {
@@ -222,15 +271,12 @@ export default {
 				}
 			})
 		} else {
-			// console.log(this.deviceImei)
 			if (this.deviceImei) {
 				this.loadData()
 			}
 			let bool = uni.getStorageSync('isSwitchDevice')
 			if (bool) {
-				this.getWebViewToken()
 				uni.removeStorageSync('isSwitchDevice')
-				this.setWebViewHeight()
 			}
 		}
 	},
@@ -240,24 +286,16 @@ export default {
 			page += 1
 			this.getDeviceList()
 		},
-		setWebViewHeight() {
-			// #ifdef APP-PLUS
-			var currentWebview = this.$scope.$getAppWebview() 
-			//此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效，非v3编译模式使用this.$mp.page.$getAppWebview()
-			setTimeout(() => {
-				wv = currentWebview.children()[0]
-				wv.setStyle({top: 45 + this.statusBarHeight, height: uni.upx2px(400)})
-			}, 400); //如果是页面初始化调用时，需要延时一下
-			// #endif
-		},
-		getWebViewToken() {
-			this.token = ''
-			getDeviceToken({}).then(res => {
-				this.token = res.Data
-				let url = this.h5Url + `?token=${this.token}&tool=0`
-				this.webViewStr = url
-			})
-		},
+		// setWebViewHeight() {
+		// 	// #ifdef APP-PLUS
+		// 	var currentWebview = this.$scope.$getAppWebview() 
+		// 	//此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效，非v3编译模式使用this.$mp.page.$getAppWebview()
+		// 	setTimeout(() => {
+		// 		wv = currentWebview.children()[0]
+		// 		wv.setStyle({top: 45 + this.statusBarHeight, height: uni.upx2px(400)})
+		// 	}, 400); //如果是页面初始化调用时，需要延时一下
+		// 	// #endif
+		// },
 		jumpDevice(url) {
 			uni.navigateTo({
 				url: url
@@ -272,6 +310,9 @@ export default {
 			})
 			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
+			})
+			this.infoList.forEach(item => {
+				item.value = result.Data[item.key]
 			})
 		},
 		moreClick(url) {
@@ -368,21 +409,11 @@ export default {
 		display: block;
 	}
 	
-	.map {
-		width: 100vw;
-		height: 400rpx;
-		position: relative;
-	}
-	
 	.text {
 		color: #999;
 		padding-top: 8rpx;
 		font-size: 14px;
 		text-align: center;
-	}
-	
-	.scroll-Y {
-		height: calc(100vh - 120rpx);
 	}
 	
 	.bar-text {
@@ -487,5 +518,91 @@ export default {
 		padding: 24rpx 0;
 		color: $font-color-dark;
 		text-align: center;
+	}
+	
+	.device-online {
+		padding: 24px 16px;
+		text-align: center;
+		background: #fff;
+	}
+	
+	.countdown {
+		display: inline-block;
+		width: 110px;
+		height: 110px;
+		text-align: center;
+		padding: 12px;
+		border: 1px solid $font-color-spec;
+		border-radius:50%;
+		position: relative;
+	}
+	
+	/*倒计时加上圆圈*/
+	.countdown .box{
+		width: 85px;
+		height: 85px;  
+		position: absolute;  
+		display: block;
+		/*旋转动画*/  
+		animation:circleRoate 3s infinite linear;
+	}  
+	.countdown .dotdot{  
+		position: absolute;  
+		left:-2px;  
+		width: 10px;  
+		height: 10px;  
+		border-radius: 50%;  
+		background:#2be0f0;  
+	}
+	.timeRefSeconds {
+		color: #2be0f0;
+		font-size: 17px;
+		font-weight: 100;
+		font-style: "microsoft-yahei";
+		line-height: 0px;
+		font-style: italic;
+	}
+	.countdown .seconds{  
+		font-size: 45px;
+		color: $font-color-spec;
+		font-weight: 100;
+		padding-top: 10px;
+		display: block;
+	}  
+	@keyframes circleRoate{  
+		from{transform: rotate(0deg);}  
+		to{transform: rotate(360deg);}  
+	}
+	
+	.info-list {
+		padding: 0 32rpx;
+		padding-bottom: 40rpx;
+		background: #fff;
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: row;
+		.info-item {
+			width: 50%;
+			height: 50px;
+			margin: 2px 0;
+			display: inline-flex;
+			align-items: center;
+			opacity: 0.8;
+			.left-icon {
+				color: #fff;
+				padding: 0 16rpx;
+				.iconfont {
+					font-size: 24px;
+				}
+			}
+		}
+		.left-radius {
+			border-top-left-radius: 6px;
+			border-bottom-left-radius: 6px;
+		}
+		.right-radius {
+			border-top-right-radius: 6px;
+			border-bottom-right-radius: 6px;
+		}
 	}
 </style>

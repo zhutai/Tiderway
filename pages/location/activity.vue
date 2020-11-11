@@ -5,7 +5,8 @@
 			<view class="input-view">
 				<picker mode="date" :value="dateTime" :start="startDate" :end="endDate" @change="bindDateChange">
 					<view class="uni-input">
-						<uni-icons class="input-uni-icon" type="compose" size="22" color="#666666" />
+						<!-- <uni-icons class="input-uni-icon" type="compose" size="22" color="#666666" /> -->
+						<text class="iconfont iconrili"></text>
 						<text>{{dateTime}}</text>
 					</view>
 				</picker>
