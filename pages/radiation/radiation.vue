@@ -19,16 +19,16 @@
 		</view>
 		
 		<view class="info-scroll" >
-			<view class="info-item" v-for="(item, index) in heartInfo" :key="index"
-			:class="{ 'no-margin' : !(index % 3) }">
-				<view class="info-num">
-					<text class="num">{{ item.num }}</text>
-					<text class="unit">{{ item.unit }}</text>
-				</view>
+			<view class="info-item" v-for="(item, index) in heartInfo" :key="index">
 				<view class="info-label">
 					<text class="round" :class="item.className"></text>
 					<text class="label">{{ item.name }}</text>
 				</view>
+				<view class="info-num">
+					<text class="num">{{ item.num }}</text>
+					<text class="unit">{{ item.unit }}</text>
+				</view>
+				
 			</view>
 		</view>
 
@@ -37,10 +37,6 @@
 			<view class="content">
 				<view class="title-style">
 					<text class="title-dot-light">实时剂量</text>
-					<view class="select-time" @click="actionSheetTap">
-						<text>{{ actionSheet[sheetIndex].value }}</text>
-						<uni-icons type="arrowdown" size="16" color="#909399" />
-					</view>
 				</view>
 				
 				<view class="chart" :style="{height: `${chartHeight}px`}">
@@ -123,21 +119,69 @@
 		dateTimeIndex: 0,
 		path: 'RadioHistory',
 		dateKey: 'RecivedAt',
-		units: [{ unit: 'μSv/h' }],
+		valueKey: 'Radio',
 		dataParams: [{
-			key: 'Radio',
-			value: 'data'
-		}]
+			name: '最小值',
+			unit: 'μSv/h',
+			key: 'min',
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '平均值',
+			unit: 'μSv/h',
+			key: 'normal',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '最大值',
+			unit: 'μSv/h',
+			key: 'max',
+			num: '--',
+			className: 'yellow'
+		}],
+		dataFormat(HistoryList) {
+			let Heart = this.valueKey
+			let data = HistoryList.map(item => item[Heart]);
+			let max = Math.max.apply(null, data);
+			let min = Math.min.apply(null, data);
+			let total = 0
+			data.forEach(item => {
+				total += item
+			})
+			let normal = (total / data.length) || 0
+			
+			let param = {
+				max: max ? max.toFixed(8) : 0,
+				min: min ? min.toFixed(8) : 0,
+				normal: normal ? normal.toFixed(8) : 0
+			}
+			return { param, echartData: { data }  }
+		}
 	}, {
 		name: '累计辐射',
 		dateTimeIndex: 0,
 		path: 'ReportRadioHistory',
 		dateKey: 'ReportTime',
-		units: [{ unit: 'mSv' }],
+		valueKey: 'Radio',
 		dataParams: [{
-			key: 'Radio',
-			value: 'data'
-		}]
+			name: '最小值',
+			unit: 'mSv',
+			key: 'min',
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '平均值',
+			unit: 'mSv',
+			key: 'normal',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '最大值',
+			unit: 'mSv',
+			key: 'max',
+			num: '--',
+			className: 'yellow'
+		}],
 	}]
 
 	const tabs = [{
@@ -177,39 +221,6 @@
 		active: false
 	}, ]
 
-	const getHeartInfo = (companyArray) => {
-		const heartInfo = [{
-			name: '平均值',
-			unit: '',
-			key: 'average',
-			num: '--',
-			className: 'blue'
-		}, {
-			name: '最大值',
-			unit: '',
-			key: 'max',
-			num: '--',
-			className: 'green'
-		}, {
-			name: '最小值',
-			unit: '',
-			key: 'min',
-			num: '--',
-			className: 'yellow'
-		}]
-		let index = 0
-		const heartList = []
-		companyArray.forEach(item => {
-			heartInfo.forEach(list => {
-				let cruuent = Object.assign({}, list)
-				cruuent.unit = item.unit
-				heartList[index] = cruuent
-				index += 1
-			})
-		})
-		return heartList
-	}
-
 	const actionSheet = [
 		{
 			key: 1,
@@ -236,7 +247,7 @@
 	export default {
 
 		data() {
-			let heartInfo = getHeartInfo([{ unit: 'μSv/h' }])
+			let heartInfo = tabbars[0].dataParams
 			var titleNames = tabbars.map(item => item.name)
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
@@ -273,9 +284,9 @@
 			this.chartHeight = uni.upx2px(500)
 			this.toggleTabs(this.current)
 		},
-		onShow() {
-			this.getHistoryData(false)
-		},
+		// onShow() {
+		// 	this.getHistoryData(false)
+		// },
 		methods: {
 			actionSheetTap() {
 				let itemLlst = this.actionSheet.map(item => item.value)
@@ -289,7 +300,7 @@
 					}
 				})
 			},
-			getHistoryData(isloading) {
+			getHistoryData(isloading = true) {
 				if (isloading) uni.showLoading({title: ' 加载中...', mask: true})
 				let tabbar = tabbars[this.current]
 				let path = tabbar.path
@@ -331,52 +342,23 @@
 			},
 			// 对数据进行格式化赋值
 			dataFormat(HistoryList, tabbar) {
-				let { dateKey, dataParams } = tabbar
+				let { dateKey, dataParams, dataFormat } = tabbar
 				let date = HistoryList.map(item => {
 					return item[dateKey].replace(' ', '\n')
 				})
-				let obj = {}
-				dataParams.forEach((param, index) => {
-					let data = HistoryList.map(item => item[param.key]);
-					if (param.custom) {
-						data = data.map(item => item * 7);
-					}
-					obj[param.value] = data
-					let arr = this.computeData(data)
-					let startIndex = 3 * index
-					let endIndex = 3 * (index + 1)
-					let heartInfo = this.heartInfo.slice(startIndex, endIndex)
-					heartInfo.forEach(item => {
-						item.num = arr[item.key]
+				let obj = null
+				if (HistoryList.length) {
+					obj = dataFormat.call(tabbar, HistoryList)
+					this.heartInfo.forEach(item => {
+						item.num = obj.param[item.key]
 					})
-				})
-				return { date, ...obj }
-			},
-			// 计算计数最大值最小值和平均值
-			computeData(data) {
-				let arr = null
-				if (data.length) {
-					let max = Math.max.apply(null, data);
-					let min = Math.min.apply(null, data);
-					let total = 0
-					data.forEach(item => {
-						total += item
-					})
-					
-					let average = (total / data.length) || 0
-					arr = {
-						max: Math.floor(max * 100) / 100,
-						min: Math.floor(min * 100) / 100,
-						average: Math.floor(average * 100) / 100
-					}
 				} else {
-					arr = {
-						max: '--',
-						min: '--',
-						average: '--'
-					}
+					obj = { echartData: {} }
+					this.heartInfo.forEach(item => {
+						item.num = '--'
+					})
 				}
-				return arr
+				return { date, ...obj.echartData }
 			},
 			getBooldParams({ data, date, seriesName }) {
 				let currentSize = 20;
@@ -483,8 +465,7 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
-					let HeartInfo = getHeartInfo(tabbars[this.current].units)
-					this.heartInfo = HeartInfo
+					this.heartInfo = tabbars[this.current].dataParams
 					this.toggleTabs(this.current)
 				}
 			},
@@ -542,7 +523,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	$color-white: #fff;
 
 	page {
@@ -592,24 +573,24 @@
 	}
 
 	.info-scroll {
-		padding: 12rpx 0;
+		padding: 12rpx 20rpx;
 
 		.info-item {
-			width: 30%;
-			height: 100%;
-			padding: 20rpx;
-			line-height: 60rpx;
-			display: inline-block;
+			width: 100%;
+			height: 40px;
+			padding: 0 20rpx;
+			line-height: 80rpx;
+			display: flex;
 			margin: 12rpx 16rpx 12rpx 0;
 			background: $color-white;
 
-			&.no-margin{
-				margin-left: 20rpx;
-			}
-
 			.info-num {
+				flex: 1;
+				padding-left: 12px;
+				display: flex;
+				justify-content: space-between;
 				.num {
-					font-size: 22px;
+					font-size: 18px;
 					color: $font-color-dark;
 				}
 
@@ -621,11 +602,7 @@
 			}
 
 			.info-label {
-				/* #ifndef APP-NVUE */
-				display: flex;
-				/* #endif */
-				margin-top: 12rpx;
-				height: 36rpx;
+				display: inline-flex;
 				align-items: center;
 				flex-direction: row;
 				justify-content: flex-start;

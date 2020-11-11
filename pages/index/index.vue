@@ -13,24 +13,32 @@
 		<!--  设备状态显示 -->
 		<view class="example-body">
 			<view class="device-info">
+				
 				<view class="device-online">
+					
+					<view class="info-list">
+						<view class="info-item left-radius" v-for="(item, index) in infoList.slice(0,3)">
+							<!-- <text class="iconfont" :class="item.icon"></text> -->
+							<text class="title">{{ item.name }}：</text>
+							<text class="value">{{ item.value + item.unit }}</text>
+						</view>
+					</view>
+					
 					<view class="countdown">
 						<view class="box"><text class="dotdot"></text></view>
 						<text class="seconds">172</text>
 						<view class="timeRefSeconds">μSv/h</view>
 					</view>
-				</view>
-				<view class="info-list">
-					<view class="info-item" :class="index % 2 ? 'right-radius' : 'left-radius'" v-for="(item, index) in infoList" :style="{backgroundColor: item.color}">
-						<view class="left-icon">
-							<text class="iconfont" :class="item.icon"></text>
-						</view>
-						<view class="right-text">
+					
+					<view class="info-list">
+						<view class="info-item right-radius" v-for="(item, index) in infoList.slice(3,5)">
+							<!-- <text class="iconfont" :class="item.icon"></text> -->
 							<text class="title">{{ item.name }}：</text>
 							<text class="value">{{ item.value + item.unit }}</text>
 						</view>
 					</view>
 				</view>
+				
 			</view>
 		</view>
 		
@@ -175,19 +183,19 @@ const infoList = [
 		icon: 'iconiconfontdingwei3',
 		name: '电压',
 		key: 'Battery',
-		value: '',
+		value: '',  
 		unit: 'V',
 		color: '#F59A23'
 	},{
 		icon: 'iconiconfontdingwei3',
-		name: '预警次数',
+		name: '预警',
 		key: 'Battery',
 		value: '',
 		unit: '次',
 		color: '#ec6e6e'
 	},{
 		icon: 'iconiconfontdingwei3',
-		name: '环境温度',
+		name: '温度',
 		key: 'Battery',
 		value: '',
 		unit: '℃',
@@ -521,15 +529,17 @@ export default {
 	}
 	
 	.device-online {
-		padding: 24px 16px;
-		text-align: center;
+		padding: 24px 0px;
+		// text-align: center;
 		background: #fff;
+		display: flex;
 	}
 	
 	.countdown {
 		display: inline-block;
-		width: 110px;
-		height: 110px;
+		width: 130px;
+		height: 130px;
+		margin: 0 30px;
 		text-align: center;
 		padding: 12px;
 		border: 1px solid $font-color-spec;
@@ -539,8 +549,8 @@ export default {
 	
 	/*倒计时加上圆圈*/
 	.countdown .box{
-		width: 85px;
-		height: 85px;  
+		width: 100px;
+		height: 100px;  
 		position: absolute;  
 		display: block;
 		/*旋转动画*/  
@@ -563,10 +573,10 @@ export default {
 		font-style: italic;
 	}
 	.countdown .seconds{  
-		font-size: 45px;
+		font-size: 56px;
 		color: $font-color-spec;
 		font-weight: 100;
-		padding-top: 10px;
+		padding-top: 6px;
 		display: block;
 	}  
 	@keyframes circleRoate{  
@@ -575,34 +585,55 @@ export default {
 	}
 	
 	.info-list {
-		padding: 0 32rpx;
-		padding-bottom: 40rpx;
-		background: #fff;
-		display: flex;
-		flex-wrap: wrap;
-		flex-direction: row;
-		.info-item {
-			width: 50%;
-			height: 50px;
-			margin: 2px 0;
-			display: inline-flex;
-			align-items: center;
+		flex: 1;
+		.info-item { 
+			height: 40px;
+			margin: 6px 0;
+			padding: 0 6px;
 			opacity: 0.8;
-			.left-icon {
-				color: #fff;
-				padding: 0 16rpx;
-				.iconfont {
-					font-size: 24px;
-				}
-			}
+			line-height: 40px;
+			// display: inline-flex;
+			// align-items: center;
 		}
+		// padding: 0 32rpx;
+		// padding-bottom: 40rpx;
+		// background: #fff;
+		// display: flex;
+		// flex-wrap: wrap;
+		// flex-direction: row;
+		// .info-item {
+		// 	width: 50%;
+		// 	height: 50px;
+		// 	margin: 2px 0;
+		// 	display: inline-flex;
+		// 	align-items: center;
+		// 	opacity: 0.8;
+		// 	.left-icon {
+		// 		color: #fff;
+		// 		padding: 0 16rpx;
+		// 		.iconfont {
+		// 			font-size: 24px;
+		// 		}
+		// 	}
+		// }
 		.left-radius {
-			border-top-left-radius: 6px;
-			border-bottom-left-radius: 6px;
-		}
-		.right-radius {
+			color: #fff;
+			background-color: $font-color-spec;
 			border-top-right-radius: 6px;
 			border-bottom-right-radius: 6px;
 		}
+		.right-radius {
+			color: #fff;
+			background-color: $font-color-spec;
+			border-top-left-radius: 6px;
+			border-bottom-left-radius: 6px;
+		}
+		// .right-radius {
+		// 	text-align: right;
+		// 	background-color: #fff;
+		// 	color: $font-color-spec;
+		// 	border-top-left-radius: 6px;
+		// 	border-bottom-left-radius: 6px;
+		// }
 	}
 </style>

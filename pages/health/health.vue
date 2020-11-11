@@ -147,40 +147,118 @@
 		name: '心率',
 		dateTimeIndex: 0,
 		dateKey: 'RecivedAt',
+		valueKey: 'Heart',
 		path: 'HeartHistory',
-		units: [{ unit: '次/分钟' }],
 		dataParams: [{
-			key: 'Heart',
-			value: 'data'
-		}]
+			name: '心率过低',
+			unit: '次/分钟',
+			key: 'min',
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '心率正常',
+			unit: '次/分钟',
+			key: 'normal',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '心率过高',
+			unit: '次/分钟',
+			key: 'max',
+			num: '--',
+			className: 'yellow'
+		}],
+		dataFormat(HistoryList) {
+			let Heart = this.valueKey
+			let data = HistoryList.map(item => item[Heart]);
+			let max = Math.max.apply(null, data);
+			let min = Math.min.apply(null, data);
+			let total = 0
+			data.forEach(item => {
+				total += item
+			})
+			let normal = (total / data.length) || 0
+			
+			let param = {
+				max: Math.floor(max),
+				min: Math.floor(min),
+				normal: Math.floor(normal)
+			}
+			return { param, echartData: { data }  }
+		}
 	}, {
 		name: '运动',
 		dateTimeIndex: 0,
 		dateKey: 'RecivedAt',
+		valueKey: 'Step-Distance-Kcal',
 		path: 'StepHistory',
-		units: [{ unit: '步' }, { unit: 'm' }],
 		dataParams: [{
+			name: '步数',
+			unit: '步',
 			key: 'Step',
-			value: 'data'
-		},{
-			key: 'Step',
-			value: 'data2',
-			custom: true
-		}]
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '距离',
+			unit: '公里',
+			key: 'Distance',
+			num: '--',
+			className: 'green'
+		}, {
+			name: '热量',
+			unit: '千卡',
+			key: 'Kcal',
+			num: '--',
+			className: 'yellow'
+		}],
+		dataFormat(HistoryList) {
+			let valueKey = this.valueKey.split('-')
+			let lastObj = HistoryList[HistoryList.length - 1]
+			
+			let param = {}
+			let echartData = {}
+			this.dataParams.forEach((item, index) => {
+				param[item.key] = lastObj[item.key]
+				echartData[item.key] = HistoryList.map(list => list[item.key] || index+1)
+			})
+			
+			return { param, echartData }
+		}
 	}, {
 		name: '血压',
 		dateTimeIndex: 0,
 		dateKey: 'RecivedAt',
 		path: 'BloodHistory',
-		units: [{ unit: 'mmHg' }, { unit: 'mmHg' }],
 		dataParams: [{
+			name: '低压',
+			unit: 'mmHg',
 			key: 'Shrink',
-			value: 'data'
-		},{
+			num: '--',
+			className: 'blue'
+		}, {
+			name: '高压',
+			unit: 'mmHg',
 			key: 'Diastole',
-			value: 'data2'
-		}]
-	}, ]
+			num: '--',
+			className: 'green'
+		}, {
+			name: '血氧',
+			unit: 'mmHg',
+			key: 'Sao2',
+			num: '--',
+			className: 'yellow'
+		}],
+		dataFormat(HistoryList) {
+			let lastObj = HistoryList[HistoryList.length - 1]
+			let param = {}
+			let echartData = {}
+			this.dataParams.forEach((item, index) => {
+				param[item.key] = lastObj[item.key] || index + 1
+				echartData[item.key] = HistoryList.map((list, index) => list[item.key] || index+1)
+			})
+			return { param, echartData }
+		}
+	}]
 
 	const tabs = [{
 		days: 0,
@@ -217,47 +295,12 @@
 		createTime: '',
 		endTime: '',
 		active: false
-	}, ]
-
-	const getHeartInfo = (companyArray, params) => {
-		console.log(companyArray)
-		let param = params || { name: '平均值', key: 'average' }
-		const heartInfo = [{
-			name: param.name,
-			unit: '',
-			key: param.key,
-			num: '--',
-			className: 'blue'
-		}, {
-			name: '最大值',
-			unit: '',
-			key: 'max',
-			num: '--',
-			className: 'green'
-		}, {
-			name: '最小值',
-			unit: '',
-			key: 'min',
-			num: '--',
-			className: 'yellow'
-		}]
-		let index = 0
-		const heartList = []
-		companyArray.forEach(item => {
-			heartInfo.forEach(list => {
-				let cruuent = Object.assign({}, list)
-				cruuent.unit = item.unit
-				heartList[index] = cruuent
-				index += 1
-			})
-		})
-		return heartList
-	}
+	}]
 
 	export default {
 
 		data() {
-			let heartInfo = getHeartInfo([{ unit: '次/分钟' }])
+			let heartInfo = tabbars[0].dataParams
 			var titleNames = tabbars.map(item => item.name)
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
@@ -293,7 +336,7 @@
 			this.toggleTabs(this.current)
 		},
 		onShow() {
-			this.getHistoryData(false)
+			// this.getHistoryData(false)
 		},
 		methods: {
 			getHistoryData(isloading = true) {
@@ -341,28 +384,24 @@
 			},
 			// 对数据进行格式化赋值
 			dataFormat(HistoryList, tabbar) {
-				let { dateKey, dataParams } = tabbar
+				let { dateKey, dataParams, dataFormat } = tabbar
 				let date = HistoryList.map(item => {
 					return item[dateKey].replace(' ', '\n')
 				})
-				let obj = {}
-				console.log(dataParams)
-				dataParams.forEach((param, index) => {
-					let data = HistoryList.map(item => item[param.key]);
-					if (param.custom) {
-						data = data.map(item => item / 7);
-					}
-					console.log(param)
-					obj[param.value] = data
-					let arr = this.computeData(data, param)
-					let startIndex = 3 * index
-					let endIndex = 3 * (index + 1)
-					let heartInfo = this.heartInfo.slice(startIndex, endIndex)
-					heartInfo.forEach(item => {
-						item.num = arr[item.key]
+				let obj = null
+				if (HistoryList.length) {
+					obj = dataFormat.call(tabbar, HistoryList)
+					this.heartInfo.forEach(item => {
+						item.num = obj.param[item.key]
 					})
-				})
-				return { date, ...obj }
+				} else {
+					obj = { echartData: {} }
+					this.heartInfo.forEach(item => {
+						item.num = '--'
+					})
+				}
+				console.log(obj)
+				return { date, ...obj.echartData }
 			},
 			telemetering() {
 				uni.showLoading({
@@ -374,37 +413,37 @@
 				}, 1000)
 			},
 			// 计算计数最大值最小值和平均值
-			computeData(data, param) {
-				let arr = null
-				if (data.length) {
-					let max = Math.max.apply(null, data);
-					let min = Math.min.apply(null, data);
-					let total = 0
-					data.forEach(item => {
-						total += item
-					})
-					let average = (total / data.length) || 0
-					arr = {
-						max: Math.floor(max),
-						min: Math.floor(min),
-						average: Math.floor(average)
-					}
-					if (param.key === 'Step') {
-						arr.current = Math.floor(data[0])
-					}
-				} else {
-					arr = {
-						max: '--',
-						min: '--',
-						average: '--'
-					}
-					if (param.key === 'Step') {
-						arr.current = '--'
-					}
-				}
-				return arr
-			},
-			getBooldParams({ data, date, data2 }) {
+			// computeData(data, param) {
+			// 	let arr = null
+			// 	if (data.length) {
+			// 		let max = Math.max.apply(null, data);
+			// 		let min = Math.min.apply(null, data);
+			// 		let total = 0
+			// 		data.forEach(item => {
+			// 			total += item
+			// 		})
+			// 		let average = (total / data.length) || 0
+			// 		arr = {
+			// 			max: Math.floor(max),
+			// 			min: Math.floor(min),
+			// 			average: Math.floor(average)
+			// 		}
+			// 		if (param.key === 'Step') {
+			// 			arr.current = Math.floor(data[0])
+			// 		}
+			// 	} else {
+			// 		arr = {
+			// 			max: '--',
+			// 			min: '--',
+			// 			average: '--'
+			// 		}
+			// 		if (param.key === 'Step') {
+			// 			arr.current = '--'
+			// 		}
+			// 	}
+			// 	return arr
+			// },
+			getBooldParams({ date, Shrink, Diastole, Sao2 }) {
 				let currentSize = 16;
 				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
 				return {
@@ -477,7 +516,7 @@
 								offset: 1,
 								color: 'rgb(255, 70, 131)'
 							}]],
-							data: data
+							data: Shrink
 						},{
 							name: '舒张压',
 							type: 'line',
@@ -495,13 +534,31 @@
 								offset: 1,
 								color: 'rgb(255, 70, 131)'
 							}]],
-							data: data2
-						},
+							data: Diastole
+						},{
+							name: '血氧',
+							type: 'line',
+							smooth: true,
+							symbol: 'none',
+							sampling: 'average',
+							itemStyle: {
+							color: 'rgb(180, 80, 11)'
+							},
+							// 自定义变量，以数组形式传递渐变参数
+							areaGradient: [0, 0, 0, 1,[{
+								offset: 0,
+								color: 'rgb(240, 173, 178)'
+							}, {
+								offset: 1,
+								color: 'rgb(155, 170, 11)'
+							}]],
+							data: Sao2
+						}
 					],
 				}
 			},
 			// 生成柱状图数据
-			getStepParams({date, data}) {
+			getStepParams({date, Step}) {
 				let currentSize = 16;
 				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
 				return {
@@ -550,7 +607,7 @@
 					series: [{
 							name: '步数',
 							type: 'bar',
-							data: data,
+							data: Step,
 							// 自定义变量，以数组形式传递渐变参数
 							linearGradient: [0, 0, 0, 1,
 								[{
@@ -716,11 +773,10 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex
-					console.log()
 					let selectCurrent = tabbars[this.current]
-					let param = selectCurrent.path === "StepHistory" ? { name: '当前值', key: 'current' } : null
-					let HeartInfo = getHeartInfo(selectCurrent.units, param)
-					this.heartInfo = HeartInfo
+					// let param = selectCurrent.path === "StepHistory" ? { name: '当前值', key: 'current' } : null
+					// let HeartInfo = getHeartInfo(selectCurrent.units, param)
+					this.heartInfo = selectCurrent.dataParams
 					this.toggleTabs(this.current)
 				}
 			},
