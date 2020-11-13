@@ -182,14 +182,14 @@ const infoList = [
 	},{
 		icon: 'iconiconfontdingwei3',
 		name: '电压',
-		key: 'Battery',
+		key: 'Voltage',
 		value: '',  
 		unit: 'V',
 		color: '#F59A23'
 	},{
 		icon: 'iconiconfontdingwei3',
 		name: '预警',
-		key: 'Battery',
+		key: 'AlarmCount',
 		value: '',
 		unit: '次',
 		color: '#ec6e6e'
@@ -294,16 +294,6 @@ export default {
 			page += 1
 			this.getDeviceList()
 		},
-		// setWebViewHeight() {
-		// 	// #ifdef APP-PLUS
-		// 	var currentWebview = this.$scope.$getAppWebview() 
-		// 	//此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效，非v3编译模式使用this.$mp.page.$getAppWebview()
-		// 	setTimeout(() => {
-		// 		wv = currentWebview.children()[0]
-		// 		wv.setStyle({top: 45 + this.statusBarHeight, height: uni.upx2px(400)})
-		// 	}, 400); //如果是页面初始化调用时，需要延时一下
-		// 	// #endif
-		// },
 		jumpDevice(url) {
 			uni.navigateTo({
 				url: url
@@ -319,8 +309,12 @@ export default {
 			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
 			})
-			this.infoList.forEach(item => {
-				item.value = result.Data[item.key]
+			this.infoList.forEach((item, index) => {
+				if (!index) {
+					item.value = result.Data[item.key] === 0 ? '离线' : '在线'
+				} else {
+					item.value = result.Data[item.key]
+				}
 			})
 		},
 		moreClick(url) {
@@ -587,53 +581,40 @@ export default {
 	.info-list {
 		flex: 1;
 		.info-item { 
-			height: 40px;
-			margin: 6px 0;
+			height: 36px;
+			margin: 8px 0;
 			padding: 0 6px;
 			opacity: 0.8;
-			line-height: 40px;
-			// display: inline-flex;
-			// align-items: center;
+			line-height: 36px;
 		}
-		// padding: 0 32rpx;
-		// padding-bottom: 40rpx;
-		// background: #fff;
-		// display: flex;
-		// flex-wrap: wrap;
-		// flex-direction: row;
-		// .info-item {
-		// 	width: 50%;
-		// 	height: 50px;
-		// 	margin: 2px 0;
-		// 	display: inline-flex;
-		// 	align-items: center;
-		// 	opacity: 0.8;
-		// 	.left-icon {
-		// 		color: #fff;
-		// 		padding: 0 16rpx;
-		// 		.iconfont {
-		// 			font-size: 24px;
-		// 		}
-		// 	}
+		// .left-radius {
+		// 	color: #fff;
+		// 	background-color: $font-color-spec;
+		// 	border-top-right-radius: 6px;
+		// 	border-bottom-right-radius: 6px;
 		// }
-		.left-radius {
-			color: #fff;
-			background-color: $font-color-spec;
-			border-top-right-radius: 6px;
-			border-bottom-right-radius: 6px;
-		}
-		.right-radius {
-			color: #fff;
-			background-color: $font-color-spec;
-			border-top-left-radius: 6px;
-			border-bottom-left-radius: 6px;
-		}
 		// .right-radius {
-		// 	text-align: right;
-		// 	background-color: #fff;
-		// 	color: $font-color-spec;
+		// 	color: #fff;
+		// 	background-color: $font-color-spec;
 		// 	border-top-left-radius: 6px;
 		// 	border-bottom-left-radius: 6px;
 		// }
+		.left-radius {
+			background-color: #fff;
+			color: $font-color-spec;
+			border: 1px solid;
+			border-left: none;
+			border-top-right-radius: 36px;
+			border-bottom-right-radius: 36px;
+		}
+		.right-radius {
+			text-align: right;
+			border: 1px solid;
+			border-right: none;
+			background-color: #fff;
+			color: $font-color-spec;
+			border-top-left-radius: 36px;
+			border-bottom-left-radius: 36px;
+		}
 	}
 </style>

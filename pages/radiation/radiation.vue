@@ -45,19 +45,8 @@
 				</view>
 			</view>
 			
-			<view class="content">
-				<view class="title-style">
-					<view class="title-dot-light">
-						<text>标准范围说明</text>
-					</view>
-				</view>
-				<view class="describe">
-					<text>实时辐射正常范围在90--120之间</text>
-				</view>
-			</view>
-			
-			<view class="bar-fixed">
-				<text>远程测量</text>
+			<view class="bar-fixed" @click="telemetering">
+				<text>监测</text>
 			</view>
 			
 		</view>
@@ -79,7 +68,7 @@
 				</view>
 			</view>
 			
-			<view class="content">
+			<!-- <view class="content">
 				<view class="title-style">
 					<view class="title-dot-light">
 						<text>标准范围说明</text>
@@ -88,12 +77,48 @@
 				<view class="describe">
 					<text>累计剂量正常范围在</text>
 				</view>
+			</view> -->
+			
+			<view class="bar-fixed" @click="telemetering">
+				<text>监测</text>
 			</view>
 			
-			<view class="bar-fixed">
-				<text>远程测量</text>
+		</view>
+
+		
+		<view class="content">
+			<view class="title-style">
+				<view class="title-dot-light">
+					<text>个人辐射剂量说明</text>
+				</view>
 			</view>
-			
+			<view class="describe">
+				<text class="text">辐射剂量常用单位：希沃特（Sv），毫希沃特（mSv）、微希沃特（μSv）。</text>
+				<text class="text">1 mSv=0.001Sv，1μSv=0.000001Sv。</text>
+				<text class="text bold">我国对健康人群设定的年平均电离辐射剂量限值为1mSv，医务工作者的剂量限值为20mSv。</text>
+				<text style="display:block;margin: 6px 0;">国家电离辐射防护与辐射源安全级别标准 ：</text>
+				<t-table>
+					<t-tr>
+						<t-th style="min-width: 140px;">类型</t-th>
+						<t-th>职业人群	</t-th>
+						<t-th>大众人群</t-th>
+					</t-tr>
+					<t-tr v-for="item in tableList" :key="item.id">
+						<t-td style="color: #007AFF;min-width: 140px;">{{ item.name }}</t-td>
+						<t-td>{{ item.vocation }}</t-td>
+						<t-td>{{ item.public }}</t-td>
+					</t-tr>
+				</t-table>
+				<text class="h3 bold">电离辐射小知识：</text>
+				<text class="text">在日常生活中，电离辐射主根据来源可以分为天然辐射和人造辐射两类</text>
+				<text class="text">一是天然本底辐射，如宇宙射线及存在于自然界中天然放射性核素发出的射线，如土壤、岩石、水和大气中的铀-238、铀-235、钍-232、钾-40、镭-226等；</text>
+				<text class="text">全球不同地区的天然本底辐射剂量值存在差别，我国天然本底辐射平均剂量约3.1mSv/年（约0.35μSv/h），芬兰和瑞典较高，约6~8mSv。</text>
+				<text class="text">二是人造辐射，包括医疗辐射（如胸片、CT、全身骨显像、PET-CT等）及核事故等。</text>
+				<text class="text"></text>
+				<text class="text">香烟内具有放射性的钋和铅，如果每天一包烟，每年受到的辐射剂量约为35mSv。</text>
+				<text class="text">香蕉当中约有 0.0117% 的放射性钾（钾40），每吃一根香蕉，就受到约 0.1uSv的辐射；</text>
+				<text class="text">在飞行到30000英尺高空时，辐射的强度约2μSv/h，也就是飞行10小时，接受的辐射约20μSv；</text>
+			</view>
 		</view>
 
 		<uni-calendar ref="calendar" class="uni-calendar--hook" :clear-date="true" :date="info.date" :insert="info.insert"
@@ -109,6 +134,11 @@
 	import Echarts from '@/components/echarts/echarts.vue'
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
+	import tTable from '@/components/t-table/t-table.vue';
+	import tTh from '@/components/t-table/t-th.vue';
+	import tTr from '@/components/t-table/t-tr.vue';
+	import tTd from '@/components/t-table/t-td.vue';
+	
 	import { dateRangeUtils } from '@/common/util.js'
 	import { getHistoryData } from '@/api/history.js'
 	var canvasObj = {};
@@ -243,7 +273,29 @@
 			value: '年',
 		}
 	]
-
+	
+	const tableList = [
+		{
+			name: '连续五年平均有效剂量',
+			vocation: '< 20mSv',
+			public: '<= 1mSv'
+		},
+		{
+			name: '任何一年不超过',
+			vocation: '<= 50mSv',
+			public: '<= 5mSv'
+		},
+		{
+			name: '一年内晶体受照射量',
+			vocation: '<= 150mSv',
+			public: '<= 15mSv'
+		},
+		{
+			name: '一年内四肢和皮肤',
+			vocation: '<= 500mSv',
+			public: '<= 50mSv'
+		}
+	]
 	export default {
 
 		data() {
@@ -263,6 +315,7 @@
 				titleNames,
 				dateTimeIndex: 0,
 				chartHeight: 0,
+				tableList,
 				info: {
 					lunar: true,
 					range: true,
@@ -278,7 +331,11 @@
 			empty,
 			uniNavBar,
 			Echarts,
-			EchartsEl
+			EchartsEl,
+			tTable,
+			tTh,
+			tTr,
+			tTd
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
@@ -483,6 +540,15 @@
 			close() {
 				console.log('弹窗关闭');
 			},
+			telemetering() {
+				uni.showLoading({
+					title: '正在监测中...',
+				})
+				setTimeout(() => {
+					uni.hideLoading()
+					this.$api.msg('辐射监测功能暂未开放')
+				}, 1000)
+			},
 			confirm(e) {
 				let { before, after } = e.range
 				if (before && after) {
@@ -645,6 +711,21 @@
 			font-size: 14px;
 			color: $font-color-base;
 			background-color: $color-white;
+			.text {
+				text-indent: 24px;
+				display: block;
+				font-size: 14px;
+				min-height: 22px;
+				line-height: 22px;
+				padding: 2px 0px;
+			}
+			.h3 {
+				display: block;
+				padding: 12px 0px;
+			}
+			.bold {
+				font-weight: bold;
+			}
 		}
 	}
 
@@ -675,9 +756,9 @@
 		width: 92rpx;
 		height: 92rpx;
 		border-radius: 50%;
-		font-size: 12px;
-		padding: 12rpx 20rpx;
-		line-height: 16px;
+		font-size: 14px;
+		padding: 12rpx;
+		line-height: 60rpx;
 		text-align: center;
 		color: #fff;
 	}

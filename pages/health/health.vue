@@ -51,9 +51,9 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>心率范围是指正常成年人在静息状态下60-100次/分钟，平均一般在75次/分钟。
-					正常人心率也可能超过100次/分钟（比如情绪激动、运动、刺激性饮品），有些情形也会低于60次/分钟（比如睡眠中），经常运动的人心率也会偏低。
-					心率会因为性别、年龄和体质不同会有差异，初生儿的心率很快，可达130次/分钟，成年人女性比男性快。</text>
+					<text class="text">心率范围是指正常成年人在静息状态下60-100次/分钟，平均一般在75次/分钟。</text>
+					<text class="text">正常人心率也可能超过100次/分钟（比如情绪激动、运动、刺激性饮品），有些情形也会低于60次/分钟（比如睡眠中），经常运动的人心率也会偏低。</text>
+					<text class="text">心率会因为性别、年龄和体质不同会有差异，初生儿的心率很快，可达130次/分钟，成年人女性比男性快。</text>
 				</view>
 			</view>
 
@@ -83,13 +83,13 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>国际卫生组织将行走定义为“世界上最好的运动”。
-《中国成人活动指南》、《中国居民膳食指南》建议一般健康人每天应达到6000步的活动量。
-每天走6000步≈3至4千米行走距离≈30分钟中等强度运动，步行是一种简单易行的有效运动方式。</text>
+					<text class="text">国际卫生组织将行走定义为“世界上最好的运动”。</text>
+					<text class="text">《中国成人活动指南》、《中国居民膳食指南》建议一般健康人每天应达到6000步的活动量。</text>
+					<text class="text">每天走6000步≈3至4千米行走距离≈30分钟中等强度运动，步行是一种简单易行的有效运动方式。</text>
 				</view>
 			</view>
 			
-			<view class="bar-fixed">
+			<view class="bar-fixed" @click="telemetering">
 				<text>远程测量</text>
 			</view>
 			
@@ -115,11 +115,23 @@
 					</view>
 				</view>
 				<view class="describe">
-					<text>高血压定义：为多次重复测量后诊室收缩压≥140 mmHg和／或诊室舒张压≥90 mmHg，根据血压升高水平，将高血压分为 1 级、2 级和 3 级。</text>
+					<text class="text">高血压定义：为多次重复测量后诊室收缩压≥140 mmHg和／或诊室舒张压≥90 mmHg，根据血压升高水平，将高血压分为 1 级、2 级和 3 级。</text>
+					<t-table>
+						<t-tr>
+							<t-th style="min-width: 140px;">类别</t-th>
+							<t-th>收缩压(mmhg)	</t-th>
+							<t-th>舒张压(mmhg)</t-th>
+						</t-tr>
+						<t-tr v-for="item in tableList" :key="item.id">
+							<t-td style="color: #007AFF;min-width: 140px;">{{ item.name }}</t-td>
+							<t-td>{{ item.vocation }}</t-td>
+							<t-td>{{ item.public }}</t-td>
+						</t-tr>
+					</t-table>
 				</view>
 			</view>
 			
-			<view class="bar-fixed">
+			<view class="bar-fixed" @click="telemetering">
 				<text>远程测量</text>
 			</view>
 			
@@ -138,6 +150,10 @@
 	import Echarts from '@/components/echarts/echarts.vue'
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
+	import tTable from '@/components/t-table/t-table.vue';
+	import tTh from '@/components/t-table/t-th.vue';
+	import tTr from '@/components/t-table/t-tr.vue';
+	import tTd from '@/components/t-table/t-td.vue';
 	import { dateRangeUtils } from '@/common/util.js'
 	import { getHistoryData } from '@/api/history.js'
 	var canvasObj = {};
@@ -297,6 +313,29 @@
 		active: false
 	}]
 
+	const tableList = [
+		{
+			name: '正常血压',
+			vocation: '< 120',
+			public: '<= 1mSv'
+		},
+		{
+			name: '任何一年不超过',
+			vocation: '<= 50mSv',
+			public: '<= 5mSv'
+		},
+		{
+			name: '一年内晶体受照射量',
+			vocation: '<= 150mSv',
+			public: '<= 15mSv'
+		},
+		{
+			name: '一年内四肢和皮肤',
+			vocation: '<= 500mSv',
+			public: '<= 50mSv'
+		}
+	]
+
 	export default {
 
 		data() {
@@ -305,6 +344,7 @@
 			var today = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
 				tabs,
+				tableList,
 				chartLoading: false,
 				bloodOption: null,
 				motionOption: null,
@@ -329,7 +369,11 @@
 			empty,
 			uniNavBar,
 			Echarts,
-			EchartsEl
+			EchartsEl,
+			tTable,
+			tTh,
+			tTr,
+			tTd
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
@@ -409,40 +453,9 @@
 				})
 				setTimeout(() => {
 					uni.hideLoading()
-					this.$api.msg('运程测量功能暂未开放')
+					this.$api.msg('远程测量功能暂未开放')
 				}, 1000)
 			},
-			// 计算计数最大值最小值和平均值
-			// computeData(data, param) {
-			// 	let arr = null
-			// 	if (data.length) {
-			// 		let max = Math.max.apply(null, data);
-			// 		let min = Math.min.apply(null, data);
-			// 		let total = 0
-			// 		data.forEach(item => {
-			// 			total += item
-			// 		})
-			// 		let average = (total / data.length) || 0
-			// 		arr = {
-			// 			max: Math.floor(max),
-			// 			min: Math.floor(min),
-			// 			average: Math.floor(average)
-			// 		}
-			// 		if (param.key === 'Step') {
-			// 			arr.current = Math.floor(data[0])
-			// 		}
-			// 	} else {
-			// 		arr = {
-			// 			max: '--',
-			// 			min: '--',
-			// 			average: '--'
-			// 		}
-			// 		if (param.key === 'Step') {
-			// 			arr.current = '--'
-			// 		}
-			// 	}
-			// 	return arr
-			// },
 			getBooldParams({ date, Shrink, Diastole, Sao2 }) {
 				let currentSize = 16;
 				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
@@ -962,6 +975,13 @@
 			font-size: 14px;
 			color: $font-color-base;
 			background-color: $color-white;
+			.text {
+				text-indent: 24px;
+				display: block;
+				font-size: 14px;
+				line-height: 22px;
+				padding: 2px 0px;
+			}
 		}
 	}
 
