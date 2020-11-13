@@ -116,14 +116,14 @@
 				</view>
 				<view class="describe">
 					<text class="text">高血压定义：为多次重复测量后诊室收缩压≥140 mmHg和／或诊室舒张压≥90 mmHg，根据血压升高水平，将高血压分为 1 级、2 级和 3 级。</text>
-					<t-table>
+					<t-table class="table-class">
 						<t-tr>
 							<t-th style="min-width: 140px;">类别</t-th>
 							<t-th>收缩压(mmhg)	</t-th>
 							<t-th>舒张压(mmhg)</t-th>
 						</t-tr>
 						<t-tr v-for="item in tableList" :key="item.id">
-							<t-td style="color: #007AFF;min-width: 140px;">{{ item.name }}</t-td>
+							<t-td style="min-width: 140px;">{{ item.name }}</t-td>
 							<t-td>{{ item.vocation }}</t-td>
 							<t-td>{{ item.public }}</t-td>
 						</t-tr>
@@ -257,13 +257,15 @@
 			key: 'Diastole',
 			num: '--',
 			className: 'green'
-		}, {
-			name: '血氧',
-			unit: 'mmHg',
-			key: 'Sao2',
-			num: '--',
-			className: 'yellow'
-		}],
+		}, 
+		// {
+		// 	name: '血氧',
+		// 	unit: 'mmHg',
+		// 	key: 'Sao2',
+		// 	num: '--',
+		// 	className: 'yellow'
+		// },
+		],
 		dataFormat(HistoryList) {
 			let lastObj = HistoryList[HistoryList.length - 1]
 			let param = {}
@@ -317,23 +319,38 @@
 		{
 			name: '正常血压',
 			vocation: '< 120',
-			public: '<= 1mSv'
+			public: '< 80'
 		},
 		{
-			name: '任何一年不超过',
-			vocation: '<= 50mSv',
-			public: '<= 5mSv'
+			name: '正常高值',
+			vocation: '120~139',
+			public: '80~90'
 		},
 		{
-			name: '一年内晶体受照射量',
-			vocation: '<= 150mSv',
-			public: '<= 15mSv'
+			name: '高血压',
+			vocation: '>=140',
+			public: '>=90'
 		},
 		{
-			name: '一年内四肢和皮肤',
-			vocation: '<= 500mSv',
-			public: '<= 50mSv'
-		}
+			name: '1级高血压(轻度)',
+			vocation: '140~159',
+			public: '90~99'
+		},
+		{
+			name: '2级高血压(中度)',
+			vocation: '160~179',
+			public: '100~109'
+		},
+		{
+			name: '3级高血压(重度)',
+			vocation: '>=180',
+			public: '>=110'
+		},
+		{
+			name: '单间收缩期高血压',
+			vocation: '>=140',
+			public: '<90'
+		},
 	]
 
 	export default {
@@ -900,9 +917,10 @@
 
 	.info-scroll {
 		padding: 12rpx 0;
-
+		display: flex;
 		.info-item {
-			width: 30%;
+			flex: 1;
+			// width: 30%;
 			height: 100%;
 			padding: 20rpx;
 			line-height: 60rpx;
@@ -981,6 +999,12 @@
 				font-size: 14px;
 				line-height: 22px;
 				padding: 2px 0px;
+			}
+			.table-class {
+				margin-top: 24rpx;
+				.t-tr:nth-child(2n) {
+					background-color: rgba(67, 153, 252, 0.6);
+				}
 			}
 		}
 	}

@@ -138,7 +138,7 @@
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '手机号不正确'
+						title: '手机号格式不正确'
 					});
 					return false;
 				}
@@ -146,7 +146,7 @@
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '密码不正确'
+						title: '密码不能少于6位'
 					});
 					return false;
 				}

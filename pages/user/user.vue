@@ -4,7 +4,7 @@
 		<view class="cover-container">
 			<uni-list>
 				<!-- <uni-list-item title="列表左侧带略缩图" note="列表描述信息" showArrow thumb="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" thumb-size="lg" rightText="" /> -->
-				<uni-list-item style="line-height: 1.8;" :title="userInfo.LoginName" :note="userInfo.UserName" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
+				<uni-list-item style="line-height: 1.8;" :title="userInfo.UserName" :note="userInfo.PhoneNum" showArrow to="../userinfo/userinfo" thumb-size="lg" direction="row">
 					<template slot="header">
 						<image class="slot-image" :src="userInfo.Avatar || defaultAvatar" @error="imageError" style="width:50px;height: 50px;border-radius: 50%;margin-right: 10px;" ></image>
 					</template>
@@ -54,7 +54,7 @@
 			iconColor: '#9789f7',
 			title: '我的数据',
 			tips: '',
-			url: '/pages/public/forget'
+			url: ''
 		},{
 			icon: 'iconyijian',
 			iconColor: '#ee883b',
@@ -101,7 +101,11 @@
 				console.log(err)
 			},
 			navTo(url){
-				uni.navigateTo({ url })  
+				if (url) {
+					uni.navigateTo({ url })
+				} else {
+					this.$api.msg('功能正在开发中，敬请期待...')
+				}
 			}
     }  
     }  

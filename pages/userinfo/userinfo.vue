@@ -9,9 +9,9 @@
 			<text class="cell-tip">{{ userInfo.PhoneNum }}</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
-		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50" @click="handleChange">
 			<text class="cell-tit">昵称</text>
-			<text class="cell-tip">{{ userInfo.LoginName }}</text>
+			<text class="cell-tip">{{ userInfo.UserName }}</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
 		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50" @click="jumpPws">
@@ -25,12 +25,15 @@
 		<view class="list-cell log-out-btn" @click="toLogout">
 			<text class="cell-tit">退出登录</text>
 		</view>
+		<uni-popup id="dialogInput" ref="dialogInput" type="dialog">
+			<uni-popup-dialog mode="input" title="修改昵称" :value="inputValue" placeholder="请输入内容" @confirm="dialogInputConfirm"></uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
 	import permision from "@/utils/permission.js"
-	import { setAvatar } from "@/api/user.js"
+	import { setAvatar, setUserInfo } from "@/api/user.js"
 	import { mapState, mapMutations } from 'vuex';
 	const defaultAvatar = require('@/static/image/userAvatar.png')
 	var sourceType = [
@@ -48,7 +51,8 @@
 			return {
 				imageList: [],
 				avartImageUrl: '',
-				defaultAvatar
+				defaultAvatar,
+				inputValue: ''
 			};
 		},
 		computed:{
@@ -58,7 +62,7 @@
 			this.avartImageUrl = this.userInfo.Avatar
 		},
 		methods:{
-			...mapMutations(['login']),
+			...mapMutations(['login', 'logout']),
 			navTo(url){
 				uni.navigateTo({ url })
 			},
@@ -66,6 +70,23 @@
 			switchChange(e){
 				let statusTip = e.detail.value ? '打开': '关闭';
 				this.$api.msg(`${statusTip}消息推送`);
+			},
+			handleChange(value) {
+				this.selectCellValue = value
+				this.inputValue = this.userInfo.UserName
+				this.$refs.dialogInput.open()
+			},
+			async dialogInputConfirm(done, val) {
+				if (val) {
+					this.inputValue = val
+					let obj = Object.assign({}, this.userInfo, { UserName: this.inputValue } )
+					done()
+					await setUserInfo(obj)
+					this.login(obj)
+				} else {
+					done()
+				}
+				
 			},
 			// 添加图片
 			chooseImage() {

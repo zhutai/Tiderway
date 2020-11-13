@@ -54,6 +54,14 @@ export const setAvatar = (data) => {
 }
 
 /**
+ * 设置系统信息
+ * @param {Object} params - 设置系统信息
+ */
+export const setUserInfo = (data) => {
+  return http.post(`${VERSION}/User/setUserInfo`, data)
+}
+
+/**
  * 系统消息列表
  * @param {Object} params - 系统消息列表  
  */
