@@ -349,8 +349,8 @@
 				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
 				let params = {
-					Limit: 0,
-					Page: 10000,
+					Limit: 10000,
+					Page: 0,
 					StartTime: currentTab.createTime,
 					EndTime: currentTab.endTime,
 					type: this.actionSheet[this.sheetIndex].key
@@ -628,7 +628,7 @@
 
 	.info-scroll {
 		padding: 12rpx 20rpx;
-
+		background: #f5f5f5;
 		.info-item {
 			width: 100%;
 			height: 40px;

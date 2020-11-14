@@ -319,7 +319,8 @@ export default {
 			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
 			})
-			this.bigRadio = String(result.Data.Radio || '')
+			let Radio = Math.floor(result.Data.Radio * 100 ) / 100
+			this.bigRadio = String( Radio || '')
 			this.infoList.forEach((item, index) => {
 				if (!index) {
 					item.value = result.Data[item.key] === 0 ? '离线' : '在线'

@@ -393,8 +393,8 @@
 				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
 				let params = {
-					Limit: 0,
-					Page: 10000,
+					Limit: 10000,
+					Page: 0,
 					StartTime: currentTab.createTime,
 					EndTime: currentTab.endTime
 				}
