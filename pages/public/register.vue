@@ -174,6 +174,8 @@
 					uni.navigateTo({
 						url: '/pages/public/login'
 					})
+				}, err => {
+					this.isRotate = false
 				})
 			}
 		}

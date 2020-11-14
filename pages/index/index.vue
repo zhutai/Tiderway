@@ -40,7 +40,7 @@
 						<view class="info-item right-radius" v-for="(item, index) in infoList.slice(2,4)">
 							<!-- <text class="iconfont" :class="item.icon"></text> -->
 							<text class="title">{{ item.name }}：</text>
-							<text class="value">{{ item.value + item.unit }}</text>
+							<text class="value">{{ (item.value || '--') + item.unit }}</text>
 						</view>
 					</view>
 				</view>
@@ -320,16 +320,13 @@ export default {
 				this.loadData()
 				this.timer = setInterval(() => {
 					this.loadData()
-				}, 3000)
+				}, 10000)
 			}
 			let bool = uni.getStorageSync('isSwitchDevice')
 			if (bool) {
 				uni.removeStorageSync('isSwitchDevice')
 			}
 		}
-	},
-	onHide() {
-		clearInterval(this.timer)
 	},
 	methods: {
 		...mapMutations(['selectDevice']),
@@ -365,6 +362,7 @@ export default {
 			this.isOnLine = result.Data.Status
 			this.infoList.forEach((item, index) => {
 				item.value = String(result.Data[item.key])
+				console.log(item.value)
 			})
 		},
 		moreClick(url) {
@@ -400,16 +398,10 @@ export default {
 			}
 		}
 	},
-	// #ifdef APP-PLUS
 	// app端拦截返回事件 ，仅app端生效
 	onHide() {
-		if (this.showLeft) {
-			this.ifMap = true
-			this.$refs.showLeft.close()
-			return true
-		}
+		clearInterval(this.timer)
 	},
-	// #endif
 	// #ifndef MP
 	// 标题栏input搜索框点击
 	onNavigationBarSearchInputClicked: async function(e) {
@@ -572,15 +564,15 @@ export default {
 	}
 	
 	.device-status {
-		height: 36px;
-		width: 60%;
+		height: 32px;
+		width: 70%;
 		text-align: center;
 		padding: 0 6px;
 		opacity: 0.8;
 		margin: 0 auto;
 		margin-top: 12px;
-		line-height: 36px;
-		border-radius: 36px;
+		line-height: 32px;
+		border-radius: 32px;
 		color: $font-color-spec;
 		border: 1px solid $font-color-spec;
 	}
@@ -589,7 +581,7 @@ export default {
 		display: inline-block;
 		width: 140px;
 		height: 140px;
-		margin: 0 40px;
+		margin: 0 20px;
 		text-align: center;
 		padding: 12px;
 		border: 1px solid $font-color-spec;
@@ -616,7 +608,7 @@ export default {
 	}
 	.timeRefSeconds {
 		color: $font-color-spec;
-		font-size: 17px;
+		font-size: 16px;
 		font-weight: 300;
 		line-height: 0px;
 	}
@@ -635,11 +627,11 @@ export default {
 	.info-list {
 		flex: 1;
 		.info-item { 
-			height: 36px;
-			margin: 18px 0;
+			height: 32px;
+			margin: 24px 0;
 			padding: 0 6px;
 			opacity: 0.8;
-			line-height: 36px;
+			line-height: 32px;
 		}
 		// .left-radius {
 		// 	color: #fff;

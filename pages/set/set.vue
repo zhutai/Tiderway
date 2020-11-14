@@ -54,11 +54,8 @@
 			confirmButton() {
 				this.logout();
 				setTimeout(()=>{
-					uni.navigateTo({
+					uni.reLaunch({
 						url: '/pages/public/login',
-						fail(err) {
-							console.log(err)
-						}
 					})
 				}, 200)
 			},

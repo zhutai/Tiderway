@@ -56,7 +56,7 @@
 				} else {
 					let arr = ["pages/public/register", "pages/public/login"]
 					if (!arr.includes(option.path)) {
-						uni.navigateTo({ url: '/pages/public/login' })
+						uni.reLaunch({ url: '/pages/public/login' })
 					}
 				}
 			}

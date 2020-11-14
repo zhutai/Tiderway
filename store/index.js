@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
-		deviceEmpey: false,
+		deviceEmpey: true,
 		deviceImei: '',
 		deviceItem: {},
 		hasLogin: false,

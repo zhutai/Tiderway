@@ -116,11 +116,11 @@
 				try{
 					// 先登录再同时获取用户设备列表，默认选择第一个
 					let result = await login(params);
-					this.login(result.Data)
+					await this.login(result.Data)
 					let res = await getDeviceList({Page: 0, Limit: 10 })
 					let deviceList = res.Data.DeviceList || []
 					let deviceItem = deviceList.length ? deviceList[0] : {}
-					this.selectDevice({ deviceItem: deviceItem, imeiLength: deviceList.length })
+					await this.selectDevice({ deviceItem: deviceItem, imeiLength: deviceList.length })
 					this.isRotate = false
 					uni.reLaunch({
 						url: '/pages/index/index'
