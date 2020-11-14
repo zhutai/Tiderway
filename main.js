@@ -3,7 +3,9 @@ import store from './store'
 import App from './App'
 import { msg, json, prePage } from './mock' // mock模拟数据可删除
 import http from '@/api/service.js' // 全局挂载引入，配置相关在该index.js文件里修改
+import xyDialog from './components/xy-dialog/xy-dialog.vue'
 
+Vue.component('xyDialog', xyDialog)
 Vue.config.productionTip = false
 Vue.prototype.$fire = new Vue();
 Vue.prototype.$store = store;

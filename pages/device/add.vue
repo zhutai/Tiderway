@@ -11,6 +11,15 @@
 			</view>
 			
 			<wButton class="wbutton" text="添加设备" :rotate="isRotate" @click="addDevice"></wButton>
+			
+			<xy-dialog
+				title="无法添加"
+				:show="dialogVisible"
+				:isShowCancel="false"
+				content="抱歉，当前用户无法添加设备"
+				@cancelButton="dialogVisible = false"
+				@confirmButton="confirmButton">
+			</xy-dialog>
 		</view>
 	</view>
 </template>
@@ -25,6 +34,7 @@
 			return {
 				deviceCode: '', //用户设备编号
 				isRotate: false, //是否加载旋转
+				dialogVisible: false
 			};
 		},
 		components: {
@@ -38,25 +48,16 @@
 			console.log(this.userInfo)
 			let UserType = this.userInfo.UserType
 			if (UserType == 1 || UserType == 2) {
-				uni.showModal({
-					content: "抱歉，当前用户无法添加设备",
-					showCancel: false,
-					confirmText: "确定",
-					success: function(res) {
-						if (res.confirm) {
-							uni.navigateBack({
-								delta: 1
-							})
-						}
-					}
-				})
+				this.dialogVisible = true
 			}
-		},
-		mounted() {
-			console.log(this.userInfo)
 		},
 		methods: {
 			...mapMutations(['login', 'selectDevice']),
+			confirmButton() {
+				uni.navigateBack({
+					delta: 1
+				})
+			},
 			async addDevice() {
 				if (this.isRotate) {
 					//判断是否加载中，避免重复点击请求

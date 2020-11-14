@@ -23,19 +23,27 @@
 				</view>
 			</view>
 		</uni-popup>
+		<xy-dialog 
+			title="指令下发"
+			:show="dialogVisible"
+			content="是否立即下发"
+			@cancelButton="dialogVisible = false"
+			@confirmButton="confirm">
+		</xy-dialog>
 	</view>
 </template>
 
 <script>
 	import { getCmdList, setCmdSend, getCmdCodeVlaue } from '@/api/cmd.js'
 	import { mapMutations } from 'vuex';
-	
+	// import xyDialog from '@/components/xy-dialog/xy-dialog.vue'
 	export default {
 		data() {
 			return {
 				cmdItem: null,
 				cmdList: [],
 				currentList: [],
+				dialogVisible: false,
 				activeIndex: 0,
 				alarmTypeIndex: 0,
 			};
@@ -65,17 +73,7 @@
 						//TODO handle the exception
 					}
 				} else {
-					uni.showModal({
-						content: "是否立即下发",
-						showCancel: true,
-						confirmText: "确定",
-						cancelText: "取消",
-						success: (res) => {
-							if (res.confirm) {
-								this.confirm()
-							}
-						}
-					})
+					this.dialogVisible = true
 				}
 			},
 			parseData(str) {
@@ -95,9 +93,12 @@
 			confirm() {
 				let params = this.cmdParams(this.cmdItem, this.currentList)
 				setCmdSend(params).then(res => {
+					this.$api.msg('指令下发成功')
+					this.dialogVisible = false
 					console.log(res)
 				},err => {
-					
+					this.$api.msg('指令下发异常')
+					this.dialogVisible = false
 				})
 			},
 			cmdParams(cmdItem, currentList) {

@@ -116,18 +116,18 @@
 				</view>
 				<view class="describe">
 					<text class="text">高血压定义：为多次重复测量后诊室收缩压≥140 mmHg和／或诊室舒张压≥90 mmHg，根据血压升高水平，将高血压分为 1 级、2 级和 3 级。</text>
-					<t-table class="table-class">
-						<t-tr>
-							<t-th style="min-width: 140px;">类别</t-th>
-							<t-th>收缩压(mmhg)	</t-th>
-							<t-th>舒张压(mmhg)</t-th>
-						</t-tr>
-						<t-tr v-for="item in tableList" :key="item.id">
-							<t-td style="min-width: 140px;">{{ item.name }}</t-td>
-							<t-td>{{ item.vocation }}</t-td>
-							<t-td>{{ item.public }}</t-td>
-						</t-tr>
-					</t-table>
+					<table class="table-class">
+						<tr>
+							<th style="min-width: 140px;">类别</th>
+							<th>收缩压(mmhg)	</th>
+							<th>舒张压(mmhg)</th>
+						</tr>
+						<tr v-for="item in tableList" :key="item.id">
+							<td style="min-width: 140px;">{{ item.name }}</td>
+							<td>{{ item.vocation }}</td>
+							<td>{{ item.public }}</td>
+						</tr>
+					</table>
 				</view>
 			</view>
 			
@@ -146,18 +146,10 @@
 
 <script>
 	import empty from '@/components/empty.vue'
-	import uCharts from '@/components/u-charts/u-charts.js'
-	import Echarts from '@/components/echarts/echarts.vue'
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
-	import tTable from '@/components/t-table/t-table.vue';
-	import tTh from '@/components/t-table/t-th.vue';
-	import tTr from '@/components/t-table/t-tr.vue';
-	import tTd from '@/components/t-table/t-td.vue';
 	import { dateRangeUtils } from '@/common/util.js'
 	import { getHistoryData } from '@/api/history.js'
-	var canvasObj = {};
-	var _self;
 
 	const tabbars = [{
 		name: '心率',
@@ -385,12 +377,7 @@
 		components: {
 			empty,
 			uniNavBar,
-			Echarts,
-			EchartsEl,
-			tTable,
-			tTh,
-			tTr,
-			tTd
+			EchartsEl
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
@@ -681,7 +668,9 @@
 						item.active = false
 					}
 				})
-				this.getHistoryData()
+				if (!this.deviceEmpey) {
+					this.getHistoryData()
+				}
 			},
 			getHeartRateParams({ date, data }) {
 				let currentSize = 16;
@@ -1000,9 +989,22 @@
 				line-height: 22px;
 				padding: 2px 0px;
 			}
+			table,
+			table tr th,
+			table tr td {
+				border: 1px solid #4399fc;
+			}
+			
 			.table-class {
+				
 				margin-top: 24rpx;
-				.t-tr:nth-child(2n) {
+				width: 100%;
+				min-height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border-collapse: collapse;
+				padding: 6px;
+				tr:nth-child(2n) {
 					background-color: rgba(67, 153, 252, 0.6);
 				}
 			}

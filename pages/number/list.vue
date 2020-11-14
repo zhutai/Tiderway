@@ -20,6 +20,14 @@
 			</view>
 		</scroll-view>
 		
+		<xy-dialog
+			title="确认删除"
+			:show="dialogVisible"
+			content="是否确认删除该号码"
+			@cancelButton="dialogVisible = false"
+			@confirmButton="confirmButton">
+		</xy-dialog>
+		
 	</view>
 </template>
 
@@ -31,6 +39,7 @@
 	export default {
 		data() {
 			return {
+				dialogVisible: false,
 				numberList: []
 			};
 		},
@@ -52,7 +61,10 @@
 				this.loading = false
 				const result = await getCmdList({ cmdCode: '1009' })
 				let cmdList = result.Data.CmdList
-				let numberList = this.parseData(cmdList[0].CmdTemplate)
+				let numberList = ''
+				if (cmdList.length) {
+					numberList = this.parseData(cmdList[0].CmdTemplate)
+				}
 				const phoneValues = await getCmdCodeVlaue({cmdCode: '1009'})
 				let array = []
 				if (phoneValues.Data) {
@@ -134,25 +146,22 @@
 					if (sosStr) {
 						await setCmdSend({ CmdCode: '1004', CmdContent: sosStr, Source: 4 })
 					}
+					this.dialogVisible = false
 					uni.showToast("删除成功")
 					uni.setStorageSync('numberList', this.numberList)
 				}catch(e){
 					console.log(e)
+					this.dialogVisible = false
 					//TODO handle the exception
 				}
 			},
+			confirmButton(){
+				this.numberList.splice(this.clickIndex, 1)
+				this.savaConfig()
+			},
 			handleDelete(index) {
-				uni.showModal({
-					content: "是否确认删除该号码",
-					confirmText: "确定",
-					cancelText: "取消",
-					success: (res) => {
-						if (res.confirm) {
-							this.numberList.splice(index, 1)
-							this.savaConfig()
-						}
-					}
-				})
+				this.dialogVisible = true
+				this.clickIndex = index
 			}
 		}
 	}

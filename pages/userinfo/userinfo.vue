@@ -22,12 +22,19 @@
 			<text class="cell-tit">绑定微信</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
-		<view class="list-cell log-out-btn" @click="toLogout">
+		<view class="list-cell log-out-btn" @click="dialogVisible = true">
 			<text class="cell-tit">退出登录</text>
 		</view>
 		<uni-popup id="dialogInput" ref="dialogInput" type="dialog">
 			<uni-popup-dialog mode="input" title="修改昵称" :value="inputValue" placeholder="请输入内容" @confirm="dialogInputConfirm"></uni-popup-dialog>
 		</uni-popup>
+		<xy-dialog
+			title="退出登录"
+			:show="dialogVisible"
+			content="确定要退出登录么？"
+			@cancelButton="dialogVisible = false"
+			@confirmButton="confirmButton">
+		</xy-dialog>
 	</view>
 </template>
 
@@ -52,7 +59,8 @@
 				imageList: [],
 				avartImageUrl: '',
 				defaultAvatar,
-				inputValue: ''
+				inputValue: '',
+				dialogVisible: false
 			};
 		},
 		computed:{
@@ -164,25 +172,17 @@
 					url: '/pages/public/forget'
 				})
 			},
-			//退出登录
-			toLogout(){
-				uni.showModal({
-					content: '确定要退出登录么',
-					success: (e)=>{
-						if(e.confirm){
-							this.logout();
-							setTimeout(()=>{
-								uni.navigateTo({
-									url: '/pages/public/login',
-									fail(err) {
-										console.log(err)
-									}
-								})
-							}, 200)
+			confirmButton() {
+				this.logout();
+				setTimeout(()=>{
+					uni.navigateTo({
+						url: '/pages/public/login',
+						fail(err) {
+							console.log(err)
 						}
-					}
-				});
-			},
+					})
+				}, 200)
+			}
 		}
 	}
 </script>

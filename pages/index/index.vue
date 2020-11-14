@@ -20,13 +20,13 @@
 						<view class="info-item left-radius" v-for="(item, index) in infoList.slice(0,3)">
 							<!-- <text class="iconfont" :class="item.icon"></text> -->
 							<text class="title">{{ item.name }}：</text>
-							<text class="value">{{ item.value + item.unit }}</text>
+							<text class="value">{{ (item.value || '--') + item.unit }}</text>
 						</view>
 					</view>
 					
 					<view class="countdown">
 						<view class="box"><text class="dotdot"></text></view>
-						<text class="seconds">172</text>
+						<text class="seconds">{{ bigRadio || '--' }}</text>
 						<view class="timeRefSeconds">μSv/h</view>
 					</view>
 					
@@ -102,6 +102,13 @@
 			</view>
 		</view>
 
+		<xy-dialog
+			:title="dialogTitle"
+			:show="dialogVisible"
+			:content="dialogContent"
+			:isShowCancel="false"
+			@confirmButton="confirmButton">
+		</xy-dialog>
 	</view>
 </template>
 
@@ -244,7 +251,12 @@ export default {
 			deviceList: [],
 			healthyList,
 			optionList,
-			radiaList
+			radiaList,
+			cancelText: '',
+			dialogTitle: '',
+			dialogVisible: false,
+			dialogContent: '',
+			bigRadio: '--'
 		};
 	},
 	components: {
@@ -265,19 +277,9 @@ export default {
 	},
 	onShow() {
 		if (this.deviceEmpey) {
-			uni.showModal({
-				title: "未添加设备",
-				content: "用户未添加设备，无法查看相应的设备信息，请添加设备后进行查看。",
-				showCancel: false,
-				confirmText: "确定",
-				success: function(res) {
-					if (res.confirm) {
-						uni.navigateTo({
-							url: '/pages/device/add'
-						})
-					}
-				}
-			})
+			this.dialogTitle = '未添加设备'
+			this.dialogContent = '用户未添加设备，无法查看相应的设备信息，请添加设备后进行查看。'
+			this.dialogVisible = true
 		} else {
 			if (this.deviceImei) {
 				this.loadData()
@@ -290,6 +292,14 @@ export default {
 	},
 	methods: {
 		...mapMutations(['selectDevice']),
+		confirmButton() {
+			this.dialogVisible = false
+			if (this.dialogTitle === '未添加设备') {
+				uni.navigateTo({
+					url: '/pages/device/add'
+				})
+			}
+		},
 		scrolltolower(e) {
 			page += 1
 			this.getDeviceList()
@@ -309,6 +319,7 @@ export default {
 			this.radiaList.forEach(item => {
 				item.num = result.Data[item.key]
 			})
+			this.bigRadio = String(result.Data.Radio || '')
 			this.infoList.forEach((item, index) => {
 				if (!index) {
 					item.value = result.Data[item.key] === 0 ? '离线' : '在线'
@@ -343,18 +354,9 @@ export default {
 						phoneNumber: phone
 					})
 				} else {
-					uni.showModal({
-						content: "用户未添加手机号码，暂时无法拨打，请添加手机号码后再进行拨打",
-						showCancel: false,
-						confirmText: "确定",
-						success: function(res) {
-							if (res.confirm) {
-								// uni.navigateTo({
-								// 	url: '/pages/device/setting'
-								// })
-							}
-						}
-					})
+					this.dialogTitle = ''
+					this.dialogContent = '用户未添加手机号码，暂时无法拨打，请添加手机号码后再进行拨打'
+					this.dialogVisible = true
 				}
 			}
 		}

@@ -97,18 +97,18 @@
 				<text class="text">1 mSv=0.001Sv，1μSv=0.000001Sv。</text>
 				<text class="text bold">我国对健康人群设定的年平均电离辐射剂量限值为1mSv，医务工作者的剂量限值为20mSv。</text>
 				<text style="display:block;margin: 6px 0;">国家电离辐射防护与辐射源安全级别标准 ：</text>
-				<t-table>
-					<t-tr>
-						<t-th style="min-width: 140px;">类型</t-th>
-						<t-th>职业人群	</t-th>
-						<t-th>大众人群</t-th>
-					</t-tr>
-					<t-tr v-for="item in tableList" :key="item.id">
-						<t-td style="color: #007AFF;min-width: 140px;">{{ item.name }}</t-td>
-						<t-td>{{ item.vocation }}</t-td>
-						<t-td>{{ item.public }}</t-td>
-					</t-tr>
-				</t-table>
+				<table class="table-class">
+					<tr>
+						<th style="min-width: 140px;">类型</th>
+						<th>职业人群	</th>
+						<th>大众人群</th>
+					</tr>
+					<tr v-for="item in tableList" :key="item.id">
+						<td style="min-width: 140px;">{{ item.name }}</td>
+						<td>{{ item.vocation }}</td>
+						<td>{{ item.public }}</td>
+					</tr>
+				</table>
 				<text class="h3 bold">电离辐射小知识：</text>
 				<text class="text">在日常生活中，电离辐射主根据来源可以分为天然辐射和人造辐射两类</text>
 				<text class="text">一是天然本底辐射，如宇宙射线及存在于自然界中天然放射性核素发出的射线，如土壤、岩石、水和大气中的铀-238、铀-235、钍-232、钾-40、镭-226等；</text>
@@ -130,20 +130,11 @@
 
 <script>
 	import empty from '@/components/empty.vue'
-	import uCharts from '@/components/u-charts/u-charts.js'
-	import Echarts from '@/components/echarts/echarts.vue'
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import EchartsEl from '@/components/echarts/echarts-el.vue'
-	import tTable from '@/components/t-table/t-table.vue';
-	import tTh from '@/components/t-table/t-th.vue';
-	import tTr from '@/components/t-table/t-tr.vue';
-	import tTd from '@/components/t-table/t-td.vue';
-	
 	import { dateRangeUtils } from '@/common/util.js'
 	import { getHistoryData } from '@/api/history.js'
-	var canvasObj = {};
-	var _self;
-
+	
 	const tabbars = [{
 		name: '实时剂量',
 		dateTimeIndex: 0,
@@ -330,12 +321,7 @@
 		components: {
 			empty,
 			uniNavBar,
-			Echarts,
-			EchartsEl,
-			tTable,
-			tTh,
-			tTr,
-			tTd
+			EchartsEl
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
@@ -517,7 +503,9 @@
 						item.active = false
 					}
 				})
-				this.getHistoryData()
+				if (!this.deviceEmpey) {
+					this.getHistoryData()
+				}
 			},
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
@@ -745,6 +733,26 @@
 		}
 		.select-time {
 			color: $font-color-light;
+		}
+	}
+	
+	table,
+	table tr th,
+	table tr td {
+		border: 1px solid #4399fc;
+	}
+	
+	.table-class {
+		
+		margin-top: 24rpx;
+		width: 100%;
+		min-height: 30px;
+		line-height: 30px;
+		text-align: center;
+		border-collapse: collapse;
+		padding: 6px;
+		tr:nth-child(2n) {
+			background-color: rgba(67, 153, 252, 0.6);
 		}
 	}
 
