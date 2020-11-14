@@ -3,7 +3,7 @@
 		<view class="content">
 			<!-- 头部logo -->
 			<view class="about">
-				<image class="image" src="/static/image/about.png"></image>
+				<image class="image" src="/static/image/about.jpeg"></image>
 			</view>
 			
 			<view class="example-body">

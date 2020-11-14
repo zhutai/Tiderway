@@ -17,21 +17,27 @@
 				<view class="device-online">
 					
 					<view class="info-list">
-						<view class="info-item left-radius" v-for="(item, index) in infoList.slice(0,3)">
+						<view class="info-item left-radius" v-for="(item, index) in infoList.slice(0,2)">
 							<!-- <text class="iconfont" :class="item.icon"></text> -->
 							<text class="title">{{ item.name }}：</text>
 							<text class="value">{{ (item.value || '--') + item.unit }}</text>
 						</view>
 					</view>
 					
-					<view class="countdown">
-						<view class="box"><text class="dotdot"></text></view>
-						<text class="seconds">{{ bigRadio || '--' }}</text>
-						<view class="timeRefSeconds">μSv/h</view>
+					<view>
+						<view class="countdown">
+							<view class="box"><text class="dotdot" :style="countColor"></text></view>
+							<text class="seconds" :style="countFontSize">{{ bigRadio || '--' }}</text>
+							<view class="timeRefSeconds">μSv/h</view>
+						</view>
+						<view class="device-status">
+							<text class="title">设备状态：</text>
+							<text class="value">{{ isOnLine ? '在线' : '离线' }}</text>
+						</view>
 					</view>
 					
 					<view class="info-list">
-						<view class="info-item right-radius" v-for="(item, index) in infoList.slice(3,5)">
+						<view class="info-item right-radius" v-for="(item, index) in infoList.slice(2,4)">
 							<!-- <text class="iconfont" :class="item.icon"></text> -->
 							<text class="title">{{ item.name }}：</text>
 							<text class="value">{{ item.value + item.unit }}</text>
@@ -94,8 +100,8 @@
 				<uni-grid :column="3" :show-border="false" :square="false" @change="changeOption">
 					<uni-grid-item v-for="(item ,index) in optionList" :index="index"  :key="index">
 						<view class="cate-item">
-								<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
-								<text class="block">{{ item.name }}</text>
+							<text class="block text iconfont" :style="{ color: '#4399fc', fontSize: '30px' }" :class="item.icon"></text>
+							<text class="block">{{ item.name }}</text>
 						</view>
 					</uni-grid-item>
 				</uni-grid>
@@ -173,13 +179,6 @@ const radiaList = [
 
 const infoList = [
 	{
-		icon: 'icontubiaozhizuomoban-1-05',
-		name: '状态',
-		key: 'Status',
-		value: '',
-		unit: '',
-		color: '#4399fc'
-	},{
 		icon: 'iconiconfontdingwei3',
 		name: '电量',
 		key: 'Battery',
@@ -241,6 +240,7 @@ export default {
 	data() {
 		return {
 			ifMap: true,
+			isOnLine: 0,
 			defaultAvatar,
 			status: 'loading',
 			infoList,
@@ -263,7 +263,42 @@ export default {
 		uniNavBar
 	},
 	computed: {
-		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem'])
+		...mapState(['deviceImei', 'deviceEmpey', 'userInfo', 'deviceItem']),
+		countFontSize() {
+			let bigRadio = this.bigRadio
+			if (bigRadio) {
+				let big = bigRadio.split('.')
+				let len = String(big[0]).length + String(big[1]).length
+				let colors = ['#06f204', '#f29f04', '#f06f51']
+				let colorObj = {}
+				if (bigRadio < 0.5) {
+					colorObj.color = colors[0]
+				} else if (bigRadio < 1) {
+					colorObj.color = colors[1]
+				} else {
+					colorObj.color = colors[2]
+				}
+				if (len === 4) {
+					return { 'font-size' : '46px', 'padding-top': '10px', 'padding-bottom':' 10px', ...colorObj }
+				} else if (len === 5) {
+					return { 'font-size' : '42px', 'padding-top': '16px', 'padding-bottom':' 12px', ...colorObj }
+				}
+				return colorObj
+			}
+		},
+		countColor() {
+			let colorObj = {}
+			let bigRadio = this.bigRadio
+			let colors = ['#06f204', '#f29f04', '#f06f51']
+			if (bigRadio < 0.5) {
+				colorObj.backgroundColor = colors[0]
+			} else if (bigRadio < 1) {
+				colorObj.backgroundColor = colors[1]
+			} else {
+				colorObj.backgroundColor = colors[2]
+			}
+			return colorObj
+		}
 	},
 	onLoad() {
 		uni.getSystemInfo({
@@ -283,12 +318,18 @@ export default {
 		} else {
 			if (this.deviceImei) {
 				this.loadData()
+				this.timer = setInterval(() => {
+					this.loadData()
+				}, 3000)
 			}
 			let bool = uni.getStorageSync('isSwitchDevice')
 			if (bool) {
 				uni.removeStorageSync('isSwitchDevice')
 			}
 		}
+	},
+	onHide() {
+		clearInterval(this.timer)
 	},
 	methods: {
 		...mapMutations(['selectDevice']),
@@ -321,12 +362,9 @@ export default {
 			})
 			let Radio = Math.floor(result.Data.Radio * 100 ) / 100
 			this.bigRadio = String( Radio || '')
+			this.isOnLine = result.Data.Status
 			this.infoList.forEach((item, index) => {
-				if (!index) {
-					item.value = result.Data[item.key] === 0 ? '离线' : '在线'
-				} else {
-					item.value = result.Data[item.key]
-				}
+				item.value = String(result.Data[item.key])
 			})
 		},
 		moreClick(url) {
@@ -462,7 +500,8 @@ export default {
 			height: 140rpx;
 		}
 		.option-list {
-			height: 368rpx;
+			// height: 368rpx;
+			padding-bottom: 6px;
 			background-color: #fff;
 		}
 	}
@@ -532,11 +571,25 @@ export default {
 		display: flex;
 	}
 	
+	.device-status {
+		height: 36px;
+		width: 60%;
+		text-align: center;
+		padding: 0 6px;
+		opacity: 0.8;
+		margin: 0 auto;
+		margin-top: 12px;
+		line-height: 36px;
+		border-radius: 36px;
+		color: $font-color-spec;
+		border: 1px solid $font-color-spec;
+	}
+	
 	.countdown {
 		display: inline-block;
-		width: 130px;
-		height: 130px;
-		margin: 0 30px;
+		width: 140px;
+		height: 140px;
+		margin: 0 40px;
 		text-align: center;
 		padding: 12px;
 		border: 1px solid $font-color-spec;
@@ -546,8 +599,8 @@ export default {
 	
 	/*倒计时加上圆圈*/
 	.countdown .box{
-		width: 100px;
-		height: 100px;  
+		width: 110px;
+		height: 110px;  
 		position: absolute;  
 		display: block;
 		/*旋转动画*/  
@@ -559,15 +612,13 @@ export default {
 		width: 10px;  
 		height: 10px;  
 		border-radius: 50%;  
-		background:#2be0f0;  
+		background:	$font-color-spec;  
 	}
 	.timeRefSeconds {
-		color: #2be0f0;
+		color: $font-color-spec;
 		font-size: 17px;
-		font-weight: 100;
-		font-style: "microsoft-yahei";
+		font-weight: 300;
 		line-height: 0px;
-		font-style: italic;
 	}
 	.countdown .seconds{  
 		font-size: 56px;
@@ -585,7 +636,7 @@ export default {
 		flex: 1;
 		.info-item { 
 			height: 36px;
-			margin: 8px 0;
+			margin: 18px 0;
 			padding: 0 6px;
 			opacity: 0.8;
 			line-height: 36px;
