@@ -13,8 +13,7 @@
 							</picker>
 						</view>
 					</view>
-				</view>
- -->
+				</view>		-->
 				<view class="uni-list list-pd">
 					<view class="uni-list-cell" style="height: 50px;">
 						<view class="uni-list-cell-left">
@@ -94,8 +93,10 @@
 		},
 		methods: {
 			formSubmit: async function(e){
-				let result=await this.$http.post("v1.0/common/feedback",e.detail.value)
-				alert(result.Message)
+				let result = await this.$http.post("v1.0/common/feedback", e.detail.value)
+				uni.showToast({
+					title: "提交成功"
+				})
 			},
 			sourceTypeChange: function(e) {
 				this.sourceTypeIndex = parseInt(e.detail.value)
@@ -236,6 +237,9 @@
 	
 	.uni-list-cell-db .uni-input{
 		height: auto;
+	}
+	.uni-input {
+		padding: 0;
 	}
 	
 	uni-textarea {

@@ -282,6 +282,8 @@ export default {
 					return { 'font-size' : '46px', 'padding-top': '10px', 'padding-bottom':' 10px', ...colorObj }
 				} else if (len === 5) {
 					return { 'font-size' : '42px', 'padding-top': '16px', 'padding-bottom':' 12px', ...colorObj }
+				} else if (len === 6) {
+					return { 'font-size' : '32px', 'padding-top': '20px', 'padding-bottom':' 18px', ...colorObj }
 				}
 				return colorObj
 			}
@@ -362,7 +364,6 @@ export default {
 			this.isOnLine = result.Data.Status
 			this.infoList.forEach((item, index) => {
 				item.value = String(result.Data[item.key])
-				console.log(item.value)
 			})
 		},
 		moreClick(url) {
@@ -400,6 +401,7 @@ export default {
 	},
 	// app端拦截返回事件 ，仅app端生效
 	onHide() {
+		console.log('隐藏了')
 		clearInterval(this.timer)
 	},
 	// #ifndef MP
