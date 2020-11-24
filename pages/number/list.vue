@@ -16,7 +16,7 @@
 			</view>
 			<view class="flex add-number" v-if="numberList.length < 10 && loading" @click="JumpEdit(null)">
 				<uni-icons class="add-icon" type="plus" size="36" color="#606266" />
-				<text class="tips">{{ numberList.length ? `您已添加个${numberList.length}亲情号` : '您暂未添加亲情号码' }}{{ `,还可以添加${10 - numberList.length}个亲情号码` }}</text>
+				<text class="tips">{{ numberList.length ? `您已添加个${numberList.length}联系人` : '您暂未添加联系人' }}</text>
 			</view>
 		</scroll-view>
 		
@@ -220,7 +220,7 @@
 			color: $font-color-base;
 			background: #fff;
 			flex-direction: column;
-			margin-bottom: 12rpx;
+			margin: 12rpx 0;
 			.add-icon {
 				padding: 12rpx;
 			}

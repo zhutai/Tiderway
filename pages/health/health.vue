@@ -186,10 +186,13 @@
 				total += item
 			})
 			let normal = (total / data.length) || 0
-			
+			let maxFloor = Math.floor(max)
+			maxFloor = maxFloor > 100 ? maxFloor : '--'
+			let minFloor = Math.floor(min)
+			minFloor = minFloor < 60 ? minFloor : '--'
 			let param = {
-				max: Math.floor(max),
-				min: Math.floor(min),
+				max: maxFloor,
+				min: minFloor,
 				normal: Math.floor(normal)
 			}
 			return { param, echartData: { data }  }
@@ -238,13 +241,13 @@
 		dateKey: 'RecivedAt',
 		path: 'BloodHistory',
 		dataParams: [{
-			name: '低压',
+			name: '收缩压',
 			unit: 'mmHg',
 			key: 'Shrink',
 			num: '--',
 			className: 'blue'
 		}, {
-			name: '高压',
+			name: '舒张压',
 			unit: 'mmHg',
 			key: 'Diastole',
 			num: '--',
@@ -381,10 +384,13 @@
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
+			this.isLoad = false
 			this.toggleTabs(this.current)
 		},
 		onShow() {
-			// this.getHistoryData(false)
+			if (this.isLoad) {
+				this.getHistoryData(false)			
+			}
 		},
 		methods: {
 			getHistoryData(isloading = true) {
@@ -392,11 +398,15 @@
 				let tabbar = tabbars[this.current]
 				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
+				// 查询截止为今天，时间要添加一天
+				let endTime = new Date(currentTab.endTime).getTime()
+				endTime = new Date(endTime + (24 * 60 * 60 * 1000))
+				endTime = dateRangeUtils.formateDate(endTime)
 				let params = {
 					Limit: 10000,
 					Page: 0,
 					StartTime: currentTab.createTime,
-					EndTime: currentTab.endTime
+					EndTime: endTime
 				}
 				this.chartLoading = false
 				getHistoryData(path, params).then(res => {
@@ -428,6 +438,7 @@
 						}
 					}
 					uni.hideLoading()
+					this.isLoad = true
 				})
 			},
 			// 对数据进行格式化赋值
@@ -448,7 +459,6 @@
 						item.num = '--'
 					})
 				}
-				console.log(obj)
 				return { date, ...obj.echartData }
 			},
 			telemetering() {

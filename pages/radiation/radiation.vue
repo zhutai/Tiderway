@@ -325,11 +325,14 @@
 		},
 		onLoad() {
 			this.chartHeight = uni.upx2px(500)
+			this.isLoad = false
 			this.toggleTabs(this.current)
 		},
-		// onShow() {
-		// 	this.getHistoryData(false)
-		// },
+		onShow() {
+			if (this.isLoad) {
+				this.getHistoryData(false)
+			}
+		},
 		methods: {
 			actionSheetTap() {
 				let itemLlst = this.actionSheet.map(item => item.value)
@@ -348,11 +351,15 @@
 				let tabbar = tabbars[this.current]
 				let path = tabbar.path
 				let currentTab = this.tabs.find(item => item.active) || {}
+				// 查询截止为今天，时间要添加一天
+				let endTime = new Date(currentTab.endTime).getTime()
+				endTime = new Date(endTime + (24 * 60 * 60 * 1000))
+				endTime = dateRangeUtils.formateDate(endTime)
 				let params = {
 					Limit: 10000,
 					Page: 0,
 					StartTime: currentTab.createTime,
-					EndTime: currentTab.endTime,
+					EndTime: endTime,
 					type: this.actionSheet[this.sheetIndex].key
 				}
 				this.chartLoading = false
@@ -381,6 +388,7 @@
 						}
 					}
 					uni.hideLoading()
+					this.isLoad = true
 				})
 			},
 			// 对数据进行格式化赋值

@@ -202,7 +202,7 @@ const infoList = [
 	},{
 		icon: 'iconiconfontdingwei3',
 		name: '温度',
-		key: 'Battery',
+		key: 'Temperature',
 		value: '',
 		unit: '℃',
 		color: '#9c9bf5'
@@ -219,20 +219,20 @@ const optionList = [
 		name: '活动轨迹',
 		url: '/pages/location/activity',
 	},{
-		icon: 'iconboda',
-		name: '拨打设备'
+		icon: 'iconshebeishezhi',
+		name: '设备配置',
+		url: "/pages/device/setting"
 	},{
 		icon: 'iconqinqinghaomachaxun',
-		name: 'SOS号码',
+		name: '联系人',
 		url: '/pages/number/list',
+	},{
+		icon: 'iconboda',
+		name: '拨打设备'
 	},{
 		icon: 'iconjianyixiaxian',
 		name: '预警设置',
 		url: '/pages/alarm/set',
-	},{
-		icon: 'iconshebeishezhi',
-		name: '设备配置',
-		url: "/pages/device/setting"
 	}
 ]
 var wv;

@@ -25,7 +25,7 @@
 			<uni-load-more :status="status" />
 		</scroll-view>
 		<view class="button-list">
-			<button class="mini-btn" type="primary"  @click="addDevece">绑定设备</button>
+			<button class="mini-btn" type="primary"  @click="addDevece">绑定其它设备</button>
 		</view>
 	</view>
 </template>

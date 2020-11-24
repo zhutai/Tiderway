@@ -79,6 +79,9 @@ export default {
 					}
 				}
 				this.selectDevice({ deviceItem: item, imeiLength: 1 })
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 200)
 			}
 		},
 		back() {

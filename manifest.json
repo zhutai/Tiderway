@@ -62,7 +62,7 @@
                 }
             },
             "splashscreen" : {
-                "androidStyle" : "common"
+                "androidStyle" : "default"
             },
             "icons" : {
                 "android" : {

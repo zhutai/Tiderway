@@ -31,7 +31,7 @@
 		<xy-dialog
 			title="退出登录"
 			:show="dialogVisible"
-			content="确定要退出登录么？"
+			content="确定要退出辐射健康监测系统吗？"
 			@cancelButton="dialogVisible = false"
 			@confirmButton="confirmButton">
 		</xy-dialog>

@@ -90,12 +90,12 @@
 		},{
 			"path": "pages/number/list",
 			"style": {
-				"navigationBarTitleText": "亲情号码"
+				"navigationBarTitleText": "联系人"
 			}
 		},{
 			"path": "pages/number/edit",
 			"style": {
-				"navigationBarTitleText": "编辑亲情号码"
+				"navigationBarTitleText": "编辑联系人"
 			}
 		},{
 			"path": "pages/device/add",
