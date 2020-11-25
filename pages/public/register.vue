@@ -49,7 +49,11 @@
 					:class="showAgree?'iconradio_box':'iconround'"></text>
 				<text style="margin: 0;" class="text" @tap="isShowAgree">同意</text>
 				<!-- 协议地址 -->
-				<navigator url="" open-type="navigate">《用户注册协议》</navigator>
+				<view class="treaty">
+					<navigator url="/pages/treaty/index?type=yhzc" open-type="navigate">《用户注册同意条款》</navigator>
+					<navigator url="/pages/treaty/index?type=fysn" open-type="navigate">《法律声明及隐私权政策》</navigator>
+					<navigator url="/pages/treaty/index?type=fsjk" open-type="navigate">《辐射健康监测设备许可协议》</navigator>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -187,5 +191,8 @@
 	
 	.wbutton {
 		margin-top: 60rpx;
+	}
+	.footer {
+		margin-top: 100rpx;
 	}
 </style>

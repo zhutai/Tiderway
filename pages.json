@@ -169,6 +169,11 @@
 			"style": {
 				"navigationBarTitleText": "关于"
 			}
+		},{
+			"path" : "pages/treaty/index",
+			"style" : {
+				"navigationBarTitleText":"注册须知"
+			}
 		}
   ],
 	"globalStyle": {
