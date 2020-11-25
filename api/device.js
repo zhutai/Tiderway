@@ -26,8 +26,8 @@ export const getHealthInfo = (data) => {
  * 获取用户设备信息
  * @param {Object} data - 获取用户设备信息  
  */
-export const  getDeviceInfo = (data) => {
-  return http.post(`${VERSION}/Device​/deviceInfo`, data)
+export const getDeviceInfo = (data) => {
+  return http.post(`${VERSION}/Device/deviceInfo`, data)
 }
 
 /**

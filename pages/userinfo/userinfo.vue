@@ -40,7 +40,7 @@
 
 <script>
 	import permision from "@/utils/permission.js"
-	import { setAvatar, setUserInfo } from "@/api/user.js"
+	import { setAvatar, setUserName } from "@/api/user.js"
 	import { mapState, mapMutations } from 'vuex';
 	const defaultAvatar = require('@/static/image/userAvatar.png')
 	var sourceType = [
@@ -87,9 +87,9 @@
 			async dialogInputConfirm(done, val) {
 				if (val) {
 					this.inputValue = val
-					let obj = Object.assign({}, this.userInfo, { UserName: this.inputValue } )
 					done()
-					await setUserInfo(obj)
+					await setUserName({ UserName: this.inputValue  })
+					let obj = Object.assign({}, this.userInfo, { UserName: this.inputValue } )
 					this.login(obj)
 				} else {
 					done()
