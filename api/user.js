@@ -62,6 +62,22 @@ export const setUserName = (data) => {
 }
 
 /**
+ * 获取用户信息
+ * @param {Object} params - 获取用户信息
+ */
+export const getUserInfo = (data) => {
+  return http.post(`${VERSION}/User/getUserInfo`, data)
+}
+
+/**
+ * 设置用户信息
+ * @param {Object} params - 设置用户信息
+ */
+export const setMyData = (data) => {
+  return http.post(`${VERSION}/User/setMyData`, data)
+}
+
+/**
  * 系统消息列表
  * @param {Object} params - 系统消息列表  
  */

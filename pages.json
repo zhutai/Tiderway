@@ -154,10 +154,15 @@
 			"style": {
 				"navigationBarTitleText": "设置"
 			}
-		}, {
+		},{
 			"path": "pages/userinfo/userinfo",
 			"style": {
 				"navigationBarTitleText": "个人资料"
+			}
+		},{
+			"path": "pages/userinfo/myData",
+			"style": {
+				"navigationBarTitleText": "我的数据"
 			}
 		}, {
 			"path": "pages/user/feedback",

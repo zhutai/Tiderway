@@ -54,7 +54,7 @@
 			iconColor: '#9789f7',
 			title: '我的数据',
 			tips: '',
-			url: ''
+			url: '/pages/userinfo/myData'
 		},{
 			icon: 'iconyijian',
 			iconColor: '#ee883b',
