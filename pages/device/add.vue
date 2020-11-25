@@ -7,7 +7,7 @@
 			</view>
 			
 			<view class="main">
-				<wInput v-model="deviceCode" type="text" maxlength="16" placeholder="请输入设备编号"></wInput>
+				<wInput v-model="deviceCode" type="text" maxlength="16" customIcon="iconsaomiao" placeholder="请输入设备编号" @onclick="InputClick"></wInput>
 			</view>
 			
 			<wButton class="wbutton" text="添加设备" :rotate="isRotate" @click="addDevice"></wButton>
@@ -64,6 +64,15 @@
 				uni.navigateBack({
 					delta: 1
 				})
+			},
+			InputClick() {
+				uni.scanCode({
+					success: (res) => {
+						console.log('条码类型：' + res.scanType);
+						console.log('条码内容：' + res.result);
+						this.deviceCode = res.result
+					}
+				});
 			},
 			async confirm() {
 				let deviceItem = await this.queryDeviceInfo(this.deviceCode)

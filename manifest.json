@@ -10,7 +10,7 @@
         "usingComponents" : true,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
-            "waiting" : true,
+            "waiting" : false,
             "autoclose" : true,
             "delay" : 0
         },
@@ -62,7 +62,12 @@
                 }
             },
             "splashscreen" : {
-                "androidStyle" : "default"
+                "androidStyle" : "default",
+                "android" : {
+                    "hdpi" : "static/image/splash.9.png",
+                    "xhdpi" : "static/image/splash.9.png",
+                    "xxhdpi" : "static/image/splash.9.png"
+                }
             },
             "icons" : {
                 "android" : {

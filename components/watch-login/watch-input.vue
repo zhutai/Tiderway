@@ -25,8 +25,15 @@
 		<image 
 			v-if="_isShowPass && type==='password' && !_isShowCode"
 			class="img iconfont" 
-			:class="showPassword?'iconkejian':'iconbukejian1'" 
+			:class="showPassword ? 'iconkejian' : 'iconbukejian1'" 
 			@tap="showPass"
+		></image>
+		<!--  扫描 -->
+		<image
+			v-if="!isShowPass && customIcon"
+			class="img iconfont" 
+			:class="customIcon" 
+			@tap="onclick"
 		></image>
 		<!-- 倒计时 -->
 		<view 
@@ -75,6 +82,10 @@
 				//倒计时时间设置
 				type: [Number,String],
 				default: 60,
+			},
+			customIcon: {
+				type: [String],
+				default: ''
 			}
 		},
 		model: {
@@ -93,6 +104,9 @@
 			showPass(){
 				//是否显示密码
 				this.showPassword = !this.showPassword
+			},
+			onclick() {
+				this.$emit('onclick')
 			},
 			setCode(){
 				//设置获取验证码的事件
