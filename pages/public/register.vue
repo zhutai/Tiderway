@@ -12,20 +12,20 @@
 					v-model="phoneData"
 					type="text"
 					maxlength="11"
-					placeholder="手机号"
+					placeholder="请输入手机号"
 				></wInput>
 				<wInput
 					v-model="passData"
 					type="password"
 					maxlength="11"
-					placeholder="登录密码"
+					placeholder="请输入登录密码"
 					isShowPass
 				></wInput>
 				<wInput
 					v-model="verCode"
 					type="number"
 					:maxlength="codeLength"
-					placeholder="验证码"
+					placeholder="请输入验证码"
 					isShowCode
 					ref="runCode"
 					@setCode="getVerCode()"

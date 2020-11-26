@@ -1,40 +1,33 @@
 <template>
 	<view class="container">
-		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">头像</text>
-			<text class="cell-tip">{{ userInfo.PhoneNum }}</text>
+		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50" @click="actionSheetTap">
+			<text class="cell-tit">性别</text>
+			<text class="cell-tip">{{ userData.Sex ? '男' : '女' }}</text>
+			<uni-icons type="arrowright" size="18" color="#909399" />
+			<!-- 0女  1男 -->
 		</view>
 		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">手机号</text>
-			<text class="cell-tip">{{ userInfo.PhoneNum }}</text>
+			<picker class="cell-tit" mode="date" :value="birthDate" :start="startDate" :end="endDate" @change="bindDateChange">
+				<view style="display: flex;">
+					<text class="cell-tit">出生年月</text>
+					<text class="cell-tip">{{ userData.BirthDate }}</text>
+				</view>
+			</picker>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
-		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50" @click="handleChange">
-			<text class="cell-tit">昵称</text>
-			<text class="cell-tip">{{ userInfo.UserName }}</text>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50" @click="handleChange('Height')">
+			<text class="cell-tit">身高</text>
+			<text class="cell-tip">{{ userData.Height }}cm</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
 		</view>
-		<view class="list-cell b-b m-t" hover-class="cell-hover" :hover-stay-time="50" @click="jumpPws">
-			<text class="cell-tit">修改密码</text>
+		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50" @click="handleChange('Weight')">
+			<text class="cell-tit">体重</text>
+			<text class="cell-tip">{{ userData.Weight }}Kg</text>
 			<uni-icons type="arrowright" size="18" color="#909399" />
-		</view>
-		<view class="list-cell" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">绑定微信</text>
-			<uni-icons type="arrowright" size="18" color="#909399" />
-		</view>
-		<view class="list-cell log-out-btn" @click="dialogVisible = true">
-			<text class="cell-tit">退出登录</text>
 		</view>
 		<uni-popup id="dialogInput" ref="dialogInput" type="dialog">
-			<uni-popup-dialog mode="input" title="修改昵称" :value="inputValue" placeholder="请输入内容" @confirm="dialogInputConfirm"></uni-popup-dialog>
+			<uni-popup-dialog mode="input" :title="titleName" :value="inputValue" placeholder="请输入内容" @confirm="dialogInputConfirm"></uni-popup-dialog>
 		</uni-popup>
-		<xy-dialog
-			title="退出登录"
-			:show="dialogVisible"
-			content="确定要退出辐射健康监测系统吗？"
-			@cancelButton="dialogVisible = false"
-			@confirmButton="confirmButton">
-		</xy-dialog>
 	</view>
 </template>
 
@@ -42,25 +35,19 @@
 	import permision from "@/utils/permission.js"
 	import { getUserInfo, setMyData } from "@/api/user.js"
 	import { mapState, mapMutations } from 'vuex';
-	const defaultAvatar = require('@/static/image/userAvatar.png')
-	var sourceType = [
-		['camera'],
-		['album'],
-		['camera', 'album']
-	]
-	var sizeType = [
-		['compressed'],
-		['original'],
-		['compressed', 'original']
-	]
+	import { dateRangeUtils } from '@/common/util.js'
 	export default {
 		data() {
+			let date = dateRangeUtils.getDateRange(new Date(), 0, true)
 			return {
 				imageList: [],
 				avartImageUrl: '',
-				defaultAvatar,
 				inputValue: '',
-				dialogVisible: false
+				userData: {},
+				birthDate: '',
+				titleName: '',
+				endDate: date.endTime,
+				startDate: '1900-01-01',
 			};
 		},
 		computed:{
@@ -69,6 +56,7 @@
 		onLoad() {
 			getUserInfo({}).then(res => {
 				console.log(res)
+				this.userData = res.Data
 			})
 		},
 		methods:{
@@ -83,16 +71,47 @@
 			},
 			handleChange(value) {
 				this.selectCellValue = value
-				this.inputValue = this.userInfo.UserName
+				this.inputValue = this.userData[value]
+				if (value === 'Height') {
+					this.titleName = '编辑身高'
+				} else {
+					this.titleName = '编辑体重'
+				}
 				this.$refs.dialogInput.open()
+			},
+			updateMyData() {
+				let obj = Object.assign({} , this.userData)
+				setMyData(obj).then(res => {
+					uni.showToast({
+						title: '修改成功'
+					})
+				})
+			},
+			bindDateChange(e) {
+				let time = e.detail.value
+				this.birthDate = time
+				this.userData.BirthDate = time
+				this.updateMyData()
+			},
+ 			actionSheetTap() {
+				uni.showActionSheet({
+					title:'性别',
+					itemList: ['男', '女'],
+					success: (e) => {
+						let index = e.tapIndex
+						console.log(e.tapIndex);
+						this.userData.Sex = Number(!index)
+						this.updateMyData()
+					}
+				})
 			},
 			async dialogInputConfirm(done, val) {
 				if (val) {
 					this.inputValue = val
 					done()
-					await setUserName({ UserName: this.inputValue  })
-					let obj = Object.assign({}, this.userInfo, { UserName: this.inputValue } )
-					this.login(obj)
+					let value = this.selectCellValue
+					this.userData[value] = val
+					this.updateMyData()
 				} else {
 					done()
 				}
