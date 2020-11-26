@@ -100,7 +100,8 @@
 	}
 
 	.list-scroll-content {
-		height: calc(100% - 58px);
+		padding-top: 8px;
+		height: calc(100% - 64px);
 	}
 
 	.content-box {

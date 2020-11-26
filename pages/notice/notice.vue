@@ -12,7 +12,7 @@
 			</view>
 		</view>
 		
-		<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
+		<scroll-view class="list-scroll-content" :style="{ height: scrollHeight + 'px' }" scroll-y @scrolltolower="loadData">
 			<view v-if="!tabCurrentIndex">
 				<view class="notice-item" v-for="item in noticeList">
 					<text class="time">{{item.CreatedAt}}</text>
@@ -45,7 +45,7 @@
 						</label>
 					</view>
 				</checkbox-group>
-				<uni-load-more :status="status" />
+				<uni-load-more :class="isCheck ? 'more-margin' : '' " :status="status" />
 			</view>
 		</scroll-view>
 		
@@ -116,23 +116,17 @@
 				alarmList: [],
 				noticeList: [],
 				tabCurrentIndex: 0,
+				scrollHeight: 300,
 				loading: false,
 				status: 'loading',
 			}
 		},
 		async onLoad() {
-			let alarmType = {
-				0: [],
-				1: ["182"],
-				2: ["176", "177", "178", "179", "180", "181"],
-				3: ["1", "2", "3", "4", "6", "7", "109", "110", "174", "175"],
-				4: ["5"],
-			}
-			let selectIndex = uni.getStorageSync('alarmTypeVisible') || 0
-			this.AlarmTypes = alarmType[selectIndex].join(',')
 			uni.showLoading({
 				title: '加载中...'
 			})
+			this.getScrollHeight()
+			this.getAlarmTypes()
 			await this.getNoticeList()
 			uni.hideLoading()
 			await this.getAlarmList()
@@ -141,6 +135,27 @@
 			...mapState(['deviceImei', 'userInfo'])
 		},
 		methods: {
+			getScrollHeight() {
+				uni.getSystemInfo({
+					success: (res) => {
+						let windowHeight = res.windowHeight
+						let titleHeight =  90
+						this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
+						console.log(this.scrollHeight, windowHeight, titleHeight, res.statusBarHeight)
+					}
+				})
+			},
+			getAlarmTypes() {
+				let alarmType = {
+					0: [],
+					1: ["182"],
+					2: ["176", "177", "178", "179", "180", "181"],
+					3: ["1", "2", "3", "4", "6", "7", "109", "110", "174", "175"],
+					4: ["5"],
+				}
+				let selectIndex = uni.getStorageSync('alarmTypeVisible') || 0
+				this.AlarmTypes = alarmType[selectIndex].join(',')
+			},
 			loadData() {
 				if (this.loading || this.status == 'noMore') return;
 				this.loading = true
@@ -268,10 +283,9 @@
 		height: 100%;
 	}
 
-	.list-scroll-content {
+	/* .list-scroll-content {
 		height: calc(100% - 92px);
-		/* padding-top: 8px; */
-	}
+	} */
 
 	.notice-item {
 		display: flex;
@@ -402,10 +416,16 @@
 	.color3 {
 		color: $font-color-light;
 	}
-	.uni-load-more {
+	
+	.more-margin {
+		/* height: 200rpx;*/
+		padding-top: 60rpx;
+		padding-bottom: 150rpx;
+	}
+	/* .uni-load-more {
 		padding-bottom: 20px;
 		height: 80px;
-	}
+	} */
 	
 	.fixed-part {
 		position: fixed;
