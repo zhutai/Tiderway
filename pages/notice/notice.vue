@@ -2,7 +2,7 @@
 	<view class="page-notice">
 		
 		<view class="nav-bar">
-			<uni-nav-bar :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="isCheck = true"  />
+			<uni-nav-bar :border="false" :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="isCheck = true"  />
 		</view>
 		
 		<view class="navbar">
@@ -205,11 +205,11 @@
 				params.note = val
 				// console.log(params)
 				let result = await alarmHandle(params)
-				this.alarmList.forEach(item => {
-					if (item.Id === current.Id) {
-						item.Status = 2
-					}
-				})
+				// this.alarmList.forEach(item => {
+				// 	if (item.Id === current.Id) {
+				// 		item.Status = 2
+				// 	}
+				// })
 				done()
 				this.$api.msg('处理成功')
 			},
@@ -237,7 +237,7 @@
 				if (!this.isCheck) {
 					this.selectAlarmId = item.Id
 				}
-					this.$refs.dialogInput.open()
+				this.$refs.dialogInput.open()
 			},
 			checkboxChange(e) {
 				let values = e.detail.value

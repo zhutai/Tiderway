@@ -2,7 +2,7 @@
 	<view class="container">
 		
 		<!--  自定义顶部栏 -->
-		<uni-nav-bar fixed :border="false" :statusBar="true">
+		<uni-nav-bar fixed :border="true" :statusBar="true">
 			<view class="user-center">
 				<image class="user-avatar" :src="userInfo.Avatar || defaultAvatar"></image>
 			</view>
@@ -32,7 +32,9 @@
 						</view>
 						<view class="device-status">
 							<text class="title">设备状态：</text>
-							<text class="value">{{ isOnLine ? '在线' : '离线' }}</text>
+							<text class="value gray" v-if="!deviceImei">无设备</text>
+							<text class="value" v-else-if="isOnLine">在线</text>
+							<text class="value gray" v-else>离线</text>
 						</view>
 					</view>
 					
@@ -577,6 +579,9 @@ export default {
 		border-radius: 32px;
 		color: $font-color-spec;
 		border: 1px solid $font-color-spec;
+		.gray {
+			color: #aaa;
+		}
 	}
 	
 	.countdown {

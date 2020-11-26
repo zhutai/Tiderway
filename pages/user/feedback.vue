@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="uni-common-mt">
-			<form @submit="formSubmit">
+			<form>
 				<!-- 	<view class="uni-list">
 					<view class="uni-list-cell" style="height: 50px;">
 						<view class="uni-list-cell-left">
@@ -20,7 +20,7 @@
 							邮箱
 						</view>
 						<view class="uni-list-cell-right">
-							<input class="uni-input" placeholder="请输入邮箱" name="email" />
+							<input class="uni-input" placeholder="请输入邮箱" name="email" v-model="email" />
 						</view>
 					</view>
 				</view>
@@ -28,7 +28,7 @@
 				<view class="uni-list list-pd">
 					<view style="padding: 20rpx;margin-left: 10rpx;"> <text>反馈内容</text></view>
 					<view class="uni-textarea">
-						<textarea placeholder="请输入遇到的问题或建议" name="content" :value="feedbackValue" style="height: 300px;" />
+						<textarea placeholder="请输入遇到的问题或建议" name="content" v-model="feedbackValue" style="height: 300px;" />
 						</view>
 					<!-- <view class="uni-list-cell cell-pd">
 						<view class="uni-uploader">
@@ -49,7 +49,7 @@
 				</view>
 				
 				<view class="uni-button">
-					<button form-type="submit" type="primary">提交</button>
+					<button type="primary" :disabled="!email || !feedbackValue" @click="formSubmit">提交</button>
 				</view>
 				
 			</form>
@@ -58,6 +58,7 @@
 </template>
 <script>
 	import permision from "@/utils/permission.js"
+	import { feedback } from '@/api/cmd.js'
 	var sourceType =['camera', 'album']
 	var sizeType = ['original']
 	
@@ -73,6 +74,7 @@
 			return {
 				pickerIndex: 0,
 				pickerArray,
+				email: '',
 				feedbackValue: '',
 				imageList: [],
 				sourceTypeIndex: 2,
@@ -92,11 +94,26 @@
 				this.countIndex = 8;
 		},
 		methods: {
-			formSubmit: async function(e){
-				let result = await this.$http.post("v1.0/common/feedback", e.detail.value)
+			async formSubmit(){
+				let params = {
+					email: this.email,
+					content: this.feedbackValue
+				}
+				let reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+				if(!reg.test(this.email)) {
+					uni.showToast({
+						icon: 'none',
+						position: 'bottom',
+						title: '邮箱格式不正确'
+					});
+					return false
+				}
+				let result = await feedback(params)
 				uni.showToast({
 					title: "提交成功"
 				})
+				this.email = ''
+				this.feedbackValue = ''
 			},
 			sourceTypeChange: function(e) {
 				this.sourceTypeIndex = parseInt(e.detail.value)
