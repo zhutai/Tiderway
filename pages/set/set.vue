@@ -8,14 +8,16 @@
 			<text class="cell-tit">消息推送</text>
 			<switch checked color="#4399fc" @change="switchChange" />
 		</view>
+		<view class="list-cell m-t" @click="actionSheetTap" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">预警显示</text>
+			<text class="cell-tip">{{ itemList[selectIndex] }}</text>
+			<uni-icons type="arrowright" size="20" color="#909399" />
+		</view>
 		<view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">清除缓存</text>
 			<uni-icons type="arrowright" size="20" color="#909399" />
 		</view>
-	<!-- 	<view class="list-cell b-b" @click="navTo('关于Dcloud')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">关于TiderWay</text>
-			<uni-icons type="arrowright" size="20" color="#909399" />
-		</view> -->
+		
 		<view class="list-cell">
 			<text class="cell-tit">检查更新</text>
 			<text class="cell-tip">当前版本 1.0.0</text>
@@ -36,14 +38,18 @@
 </template>
 
 <script>
-	import {  
-	    mapMutations  
-	} from 'vuex';
+	import { mapMutations } from 'vuex';
 	export default {
 		data() {
 			return {
-				dialogVisible: false
+				dialogVisible: false,
+				selectIndex: 0,
+				itemList: ['全部', '辐射预警', '健康预警', '设备预警', 'SOS预警'],
 			};
+		},
+		created() {
+			let selectIndex = uni.getStorageSync('alarmTypeVisible')
+			this.selectIndex = selectIndex || 0
 		},
 		methods:{
 			...mapMutations(['logout']),
@@ -58,6 +64,17 @@
 						url: '/pages/public/login',
 					})
 				}, 200)
+			},
+			actionSheetTap() {
+				uni.showActionSheet({
+					title: '预警显示',
+					itemList: this.itemList,
+					success: (e) => {
+						let index = e.tapIndex
+						this.selectIndex = index
+						uni.setStorageSync('alarmTypeVisible', this.selectIndex)
+					}
+				})
 			},
 			//switch
 			switchChange(e){
