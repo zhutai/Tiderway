@@ -45,3 +45,19 @@ export const alarmClear = (data) => {
 export const getAlarmList = (data) => {
   return http.post(`${VERSION}/Alarm/list`, data)
 }
+
+/**
+ * 批量清除预警消息
+ * @param {Object} data - 批量清除预警消息
+ */
+export const batchClear = (data) => {
+  return http.post(`${VERSION}/Alarm/batchClear`, data)
+}
+
+/**
+ * 批量处理预警消息
+ * @param {Object} data - 批量处理预警消息
+ */
+export const batchHandle = (data) => {
+  return http.post(`${VERSION}/Alarm/batchHandle`, data)
+}
