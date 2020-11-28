@@ -172,9 +172,9 @@
 			let normal = (total / data.length) || 0
 			
 			let param = {
-				max: max ? max.toFixed(8) : 0,
-				min: min ? min.toFixed(8) : 0,
-				normal: normal ? normal.toFixed(8) : 0
+				max: max ? max.toFixed(2) : 0,
+				min: min ? min.toFixed(2) : 0,
+				normal: normal ? normal.toFixed(2) : 0
 			}
 			return { param, echartData: { data }  }
 		}

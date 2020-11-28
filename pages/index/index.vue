@@ -359,7 +359,9 @@ export default {
 				item.num = result.Data[item.key]
 			})
 			this.radiaList.forEach(item => {
-				item.num = result.Data[item.key]
+				let num = result.Data[item.key]
+				num = Math.floor(num * 100)
+				item.num = num / 100
 			})
 			let Radio = Math.floor(result.Data.Radio * 100 ) / 100
 			this.bigRadio = String( Radio || '')

@@ -1,21 +1,52 @@
 <template>
 	<view class="container">
-		<view class="list-cell m-t" @click="actionSheetTap">
-			<text class="cell-tit">预警方式</text>
-			<view class="cell-value">{{ alarmTypeOptions[alarmTypeIndex].value }}</view>
-			<uni-icons type="arrowright" size="18" color="#909399" />
+		
+		<view class="cell-box">
+			<view class="list-cell b-b">
+				<text class="cell-tit">辐射预警</text>
+				<switch class="cell-value" :checked="!!alarmTypeIndex" color="#4399fc" @change="switchChange" />
+			</view>
+			<view class="list-cell b-b" @click="actionSheetTap">
+				<text class="cell-tit">预警方式</text>
+				<view class="cell-value">{{ alarmTypeOptions[alarmTypeIndex].value }}</view>
+				<uni-icons type="arrowright" size="18" color="#909399" />
+			</view>
+			
+			<view class="list-cell" v-for="(item, index) in cellList.slice(0,2)" :key="index"
+				:class="{ 'b-b': item.isBorder }" @click="handleClick(item, index)">
+				<text class="cell-tit">{{ item.label }}</text>
+				<view class="cell-value">
+					<picker v-if="item.min && item.max" @change="bindPickerChange" :value="item.index" :range="item.options">
+						<view class="uni-input">{{ (item.num || '-') + ' ' + item.unit }}</view>
+					</picker>
+					<text v-else>{{ (item.num || '-') + ' ' + item.unit }}</text>
+				</view>
+				<uni-icons type="arrowright" size="18" color="#909399" />
+			</view>
 		</view>
 		
-		<view class="list-cell" v-for="(item, index) in cellList" :key="index"
-			:class="{ 'm-t': item.space, 'b-b': item.isBorder }" @click="handleClick(item, index)">
-			<text class="cell-tit">{{ item.label }}</text>
-			<view class="cell-value">
-				<picker v-if="item.min && item.max" @change="bindPickerChange" :value="item.index" :range="item.options">
-					<view class="uni-input">{{ (item.num || '-') + ' ' + item.unit }}</view>
-				</picker>
-				<text v-else>{{ (item.num || '-') + ' ' + item.unit }}</text>
+		<view class="cell-box">
+			<view class="list-cell b-b">
+				<text class="cell-tit">健康预警</text>
+				<switch class="cell-value" :checked="!!healthAlarmNotityType" color="#4399fc" @change="switchChangeHealth" />
 			</view>
-			<uni-icons type="arrowright" size="18" color="#909399" />
+			<view class="list-cell b-b" @click="actionSheetTapHealth">
+				<text class="cell-tit">预警方式</text>
+				<view class="cell-value">{{ alarmTypeOptions[healthAlarmNotityType].value }}</view>
+				<uni-icons type="arrowright" size="18" color="#909399" />
+			</view>
+			
+			<view class="list-cell" v-for="(item, index) in cellList.slice(2, cellList.length)" :key="index"
+				:class="{ 'b-b': item.isBorder }" @click="handleClick(item, index)">
+				<text class="cell-tit">{{ item.label }}</text>
+				<view class="cell-value">
+					<picker v-if="item.min && item.max" @change="bindPickerChange" :value="item.index" :range="item.options">
+						<view class="uni-input">{{ (item.num || '-') + ' ' + item.unit }}</view>
+					</picker>
+					<text v-else>{{ (item.num || '-') + ' ' + item.unit }}</text>
+				</view>
+				<uni-icons type="arrowright" size="18" color="#909399" />
+			</view>
 		</view>
 		
 		<uni-popup id="dialogInput" ref="dialogInput" type="dialog">
@@ -28,6 +59,26 @@
 	import { mapMutations } from 'vuex';
 	import { getConfig, saveConfig } from '@/api/alarm.js'
 	const cellList = [
+		{
+			label: '报警阀值-累计剂量',
+			space: true,
+			isBorder: true,
+			num: 80,
+			index: 26,
+			unit: 'µSv/h',
+			key: 'RadioMin',
+			options: []
+		},
+		{
+			label: '报警阀值-实时剂量',
+			space: false,
+			isBorder: false,
+			num: 80,
+			index: 27,
+			unit: 'µSv/h',
+			key: 'RadioMax',
+			options: []
+		},
 		{
 			label: '心率低值',
 			space: true,
@@ -43,7 +94,7 @@
 		{
 			label: '心率高值',
 			space: false,
-			isBorder: false,
+			isBorder: true,
 			min: 60,
 			max: 90,
 			num: 80,
@@ -91,7 +142,7 @@
 		{
 			label: '缩收压高值',
 			space: false,
-			isBorder: false,
+			isBorder: true,
 			min: 60,
 			max: 90,
 			num: 80,
@@ -99,27 +150,7 @@
 			unit: 'mmHg',
 			key: 'ShrinkMax',
 			options: []
-		},
-		{
-			label: '辐射低值',
-			space: true,
-			isBorder: true,
-			num: 80,
-			index: 26,
-			unit: 'µSv/h',
-			key: 'RadioMin',
-			options: []
-		},
-		{
-			label: '辐射高值',
-			space: false,
-			isBorder: false,
-			num: 80,
-			index: 27,
-			unit: 'µSv/h',
-			key: 'RadioMax',
-			options: []
-		},
+		}
 	]
 	
 	const alarmTypeOptions = [
@@ -127,8 +158,8 @@
 			key: 0,
 			value: '无'
 		},{
-		key: 1,
-		value: '声音'
+			key: 1,
+			value: '声音'
 		}, {
 			key: 2,
 			value: '推送'
@@ -147,6 +178,7 @@
 				cellList,
 				activeIndex: 0,
 				alarmTypeIndex: 0,
+				healthAlarmNotityType: 0,
 				alarmTypeOptions,
 				dialogInput: ''
 			};
@@ -160,18 +192,31 @@
 				const config = await getConfig({UserId: 1})
 				this.configData = config.Data
 				this.alarmTypeIndex = this.configData.AlarmNotityType
+				this.healthAlarmNotityType = this.configData.HealthAlarmNotityType
 				this.cellList.forEach(item => {
 					item.num = this.configData[item.key]
 				})
 			},
 			async saveConfig(obj) {
-				obj.AlarmNotityType = this.alarmTypeIndex
+				// console.log(this.alarmTypeIndex)
+				obj.AlarmNotityType = this.alarmTypeIndex || 0
+				obj.HealthAlarmNotityType = this.healthAlarmNotityType
 				let params = Object.assign(this.configData, obj)
 				saveConfig(params).then(res => {
 					console.log(res)
 				}, err => {
 					console.log(err)
 				})
+			},
+			switchChange(e) {
+				let val = e.detail.value
+				this.alarmTypeIndex = Number(val)
+				this.saveConfig({})
+			},
+			switchChangeHealth(e) {
+				let val = e.detail.value
+				this.healthAlarmNotityType = Number(val)
+				this.saveConfig({})
 			},
 			confirmDialog(num) {
 				if (num) this.dialogInput = num
@@ -218,6 +263,18 @@
 					}
 				})
 			},
+			actionSheetTapHealth(item) {
+				let itemLlst = this.alarmTypeOptions.map(item => item.value)
+				uni.showActionSheet({
+					title:'选择预警方式',
+					itemList: itemLlst,
+					success: (e) => {
+						let tapIndex = e.tapIndex
+						this.healthAlarmNotityType = tapIndex
+						this.saveConfig({})
+					}
+				})
+			},
 			bindPickerChange(e) {
 				let index = e.detail.value
 				let activeIndex = this.activeIndex
@@ -239,13 +296,17 @@
 	page{
 		background: $page-color-base;
 	}
+	.cell-box {
+		margin: 16px;
+		border-radius: 16px;
+		background-color: #fff;
+	}
 	.list-cell{
 		display:flex;
 		align-items:baseline;
 		padding: 20upx $page-row-spacing;
 		line-height:60upx;
 		position:relative;
-		background: #fff;
 		justify-content: center;
 		&.cell-hover{
 			background:#fafafa;
@@ -263,7 +324,7 @@
 			margin-left:10upx;
 		}
 		.cell-tit{
-			width: 200rpx;
+			// width: 200rpx;
 			font-size: $font-base + 2upx;
 			color: $font-color-dark;
 			margin-right:10upx;
