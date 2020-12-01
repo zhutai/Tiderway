@@ -2,17 +2,17 @@
 	<view class="page-notice">
 		
 		<view class="nav-bar">
-			<uni-nav-bar :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="isCheck = true"  />
+			<uni-nav-bar :border="false" :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="clickRight"  />
 		</view>
 		
 		<view class="navbar">
-			<view v-for="(item, index) in navList" :key="index" class="nav-item" right-text="批量"  :class="{current: tabCurrentIndex === index}"
+			<view v-for="(item, index) in navList" :key="index" class="nav-item" :class="{current: tabCurrentIndex === index}"
 			 @click="tabClick(index)">
 				{{item.text}}
 			</view>
 		</view>
 		
-		<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
+		<scroll-view class="list-scroll-content" :style="{ height: scrollHeight + 'px' }" scroll-y @scrolltolower="loadData">
 			<view v-if="!tabCurrentIndex">
 				<view class="notice-item" v-for="item in noticeList">
 					<text class="time">{{item.CreatedAt}}</text>
@@ -32,7 +32,7 @@
 					<view class="content-box" v-for="(item, index) in alarmList" :key="item.IMEI + index" @click="alarmHandle(item)">
 						<label>
 							<view class="content-title">
-								<checkbox class="checkbox" v-show="isCheck" :value="item.alarmId" :checked="item.checked" />
+								<checkbox class="checkbox" v-if="isCheck" :value="item.alarmId" :checked="item.checked" />
 								<text class="content-text">{{ alarmType[item.AlarmType] }}</text>
 								<text class="content-text color1" v-if="item.AlarmValue">-{{ item.AlarmValue }}</text>
 								<text class="content-status" :class="`color${item.Status}`">{{ item.Status === 1 ? '待处理' : item.Status === 2 ? '已处理' : '已清除' }}</text>
@@ -45,7 +45,7 @@
 						</label>
 					</view>
 				</checkbox-group>
-				<uni-load-more :status="status" />
+				<uni-load-more :class="isCheck ? 'more-margin' : '' " :status="status" />
 			</view>
 		</scroll-view>
 		
@@ -56,7 +56,7 @@
 				</checkbox-group>
 			</label>
 			<view>
-				<button class="mini-btn" :disabled="!selectAlarm.length" type="primary" size="mini" @click="alarmHandle">处理</button>
+				<button class="mini-btn" :disabled="!selectAlarm.length" type="primary" size="mini" @click="alarmHandle(null)">处理</button>
 				<button class="mini-btn" :disabled="!selectAlarm.length" type="warn" size="mini" @click="alarmClear">删除</button>
 				<button class="mini-btn" type="default" size="mini" @click="cancel">取消</button>
 			</view>
@@ -72,7 +72,7 @@
 <script>
 	import { mapState } from 'vuex';
 	import { getNoticeList } from '@/api/user.js'
-	import { getAlarmList, alarmClear, alarmHandle } from '@/api/alarm.js'
+	import { getAlarmList, alarmClear, alarmHandle, batchHandle, batchClear } from '@/api/alarm.js'
 	import alarmType from './alarmType.js'
 	
 	const navList = [{
@@ -116,23 +116,17 @@
 				alarmList: [],
 				noticeList: [],
 				tabCurrentIndex: 0,
+				scrollHeight: 300,
 				loading: false,
 				status: 'loading',
 			}
 		},
 		async onLoad() {
-			let alarmType = {
-				0: [],
-				1: ["182"],
-				2: ["176", "177", "178", "179", "180", "181"],
-				3: ["1", "2", "3", "4", "6", "7", "109", "110", "174", "175"],
-				4: ["5"],
-			}
-			let selectIndex = uni.getStorageSync('alarmTypeVisible') || 0
-			this.AlarmTypes = alarmType[selectIndex].join(',')
 			uni.showLoading({
 				title: '加载中...'
 			})
+			this.getScrollHeight()
+			this.getAlarmTypes()
 			await this.getNoticeList()
 			uni.hideLoading()
 			await this.getAlarmList()
@@ -141,6 +135,27 @@
 			...mapState(['deviceImei', 'userInfo'])
 		},
 		methods: {
+			getScrollHeight() {
+				uni.getSystemInfo({
+					success: (res) => {
+						let windowHeight = res.windowHeight
+						let titleHeight =  90
+						this.scrollHeight = windowHeight - titleHeight - res.statusBarHeight
+						console.log(this.scrollHeight, windowHeight, titleHeight, res.statusBarHeight)
+					}
+				})
+			},
+			getAlarmTypes() {
+				let alarmType = {
+					0: [],
+					1: ["182"],
+					2: ["176", "177", "178", "179", "180", "181"],
+					3: ["1", "2", "3", "4", "6", "7", "109", "110", "174", "175"],
+					4: ["5"],
+				}
+				let selectIndex = uni.getStorageSync('alarmTypeVisible') || 0
+				this.AlarmTypes = alarmType[selectIndex].join(',')
+			},
 			loadData() {
 				if (this.loading || this.status == 'noMore') return;
 				this.loading = true
@@ -188,41 +203,54 @@
 				}
 				let params = this.getParmas(alarmIds)
 				params.note = val
-				// console.log(params)
-				let result = await alarmHandle(params)
+				let result = await batchHandle(params)
 				this.alarmList.forEach(item => {
-					if (item.Id === current.Id) {
+					if (alarmIds.includes(item.alarmId)) {
 						item.Status = 2
 					}
 				})
 				done()
+				this.cancel()
 				this.$api.msg('处理成功')
 			},
 			getParmas(alarmIds) {
 				let ids = []
-				let imeis = []
 				this.alarmList.forEach(item => {
 					if (alarmIds.includes(item.alarmId)) {
 						ids.push(item.Id)
-						imeis.push(item.IMEI)
 					}
 				})
-				return { id: ids.join(','), imei: imeis.join(',') }
+				return { ids: ids, imei: this.deviceImei }
 			},
 			async alarmClear(index, item) {
-				if (this.selectAlarm.length) {
-					let params = this.getParmas(this.selectAlarm)
-					// console.log(params)
-					let result = await alarmClear(params)
-					this.alarmList.splice(index, 1)
+				let selectAlarms = this.selectAlarm
+				if (selectAlarms.length) {
+					let params = this.getParmas(selectAlarms)
+					let result = await batchClear(params)
+					let alarmList = []
+					this.alarmList.forEach(item => {
+						if (!selectAlarms.includes(item.alarmId)) {
+							alarmList.push(item)
+						}
+					})
+					this.alarmList = alarmList
+					this.cancel()
 					this.$api.msg('清除成功')
 				}
 			},
 			alarmHandle(item) {
 				if (!this.isCheck) {
+					if (item.Status !== 1) {
+						this.$api.msg('该告警已处理')
+						return false
+					}
 					this.selectAlarmId = item.Id
-				}
 					this.$refs.dialogInput.open()
+				} else {
+					if (item === null) {
+						this.$refs.dialogInput.open()
+					}
+				}
 			},
 			checkboxChange(e) {
 				let values = e.detail.value
@@ -243,6 +271,12 @@
 			},
 			back() {
 				uni.navigateBack({})
+			},
+			clickRight() {
+				this.isCheck = true
+				this.alarmList.forEach(item => {
+					item.checked = false
+				})
 			},
 			cancel() {
 				this.isCheck = false
@@ -268,10 +302,9 @@
 		height: 100%;
 	}
 
-	.list-scroll-content {
+	/* .list-scroll-content {
 		height: calc(100% - 92px);
-		/* padding-top: 8px; */
-	}
+	} */
 
 	.notice-item {
 		display: flex;
@@ -402,10 +435,16 @@
 	.color3 {
 		color: $font-color-light;
 	}
-	.uni-load-more {
+	
+	.more-margin {
+		/* height: 200rpx;*/
+		padding-top: 60rpx;
+		padding-bottom: 150rpx;
+	}
+	/* .uni-load-more {
 		padding-bottom: 20px;
 		height: 80px;
-	}
+	} */
 	
 	.fixed-part {
 		position: fixed;

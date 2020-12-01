@@ -78,6 +78,10 @@
 				let deviceItem = await this.queryDeviceInfo(this.deviceCode)
 				this.selectDevice({ deviceItem: deviceItem , imeiLength: 1 })
 				this.dialogVisible2 = false
+				this.deviceCode = ''
+				uni.showToast({
+					title: '连接成功'
+				});
 			},
 			async queryDeviceInfo(imei) {
 				const result = await getDeviceInfo({ imei })

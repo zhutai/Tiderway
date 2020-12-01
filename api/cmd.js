@@ -29,3 +29,11 @@ export const setCmdSend = (data) => {
 export const getCmdCodeVlaue = (data) => {
   return http.post(`${VERSION}/Cmd/value`, data)
 }
+
+/**
+ *  建议反馈接口
+ * @param {Object} data - 建议反馈接口  
+ */
+export const feedback = (data) => {
+  return http.post(`${VERSION}/common/feedback`, data)
+}
