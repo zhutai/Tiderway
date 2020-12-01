@@ -47,13 +47,14 @@
 					class="iconfont"
 					style="color: #4399fc;"
 					:class="showAgree?'iconradio_box':'iconround'"></text>
-				<text style="margin: 0;" class="text" @tap="isShowAgree">同意</text>
-				<!-- 协议地址 -->
-				<view class="treaty">
-					<navigator url="/pages/treaty/index?type=yhzc" open-type="navigate">《用户注册同意条款》</navigator>
-					<navigator url="/pages/treaty/index?type=fysn" open-type="navigate">《法律声明及隐私权政策》</navigator>
-					<navigator url="/pages/treaty/index?type=fsjk" open-type="navigate">《辐射健康监测设备许可协议》</navigator>
-				</view>
+					<view class="treaty">
+						<text class="text" @tap="isShowAgree">同意</text>
+						<!-- 协议地址 -->
+						<navigator class="inline" url="/pages/treaty/index?type=yhzc" open-type="navigate">《用户注册同意条款》</navigator>
+						<navigator class="inline" url="/pages/treaty/index?type=fysn" open-type="navigate">《法律声明及隐私权政策》</navigator>
+						<navigator class="inline" url="/pages/treaty/index?type=fsjk" open-type="navigate">《辐射健康监测设备许可协议》</navigator>
+					</view>
+				
 			</view>
 		</view>
 	</view>
@@ -134,7 +135,7 @@
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
-						title: '请先同意《用户注册协议》'
+						title: '请您阅读相关注册协议及条款内容，并同意后进行注册！'
 					});
 					return false;
 				}
@@ -193,6 +194,13 @@
 		margin-top: 60rpx;
 	}
 	.footer {
-		margin-top: 100rpx;
+		margin: 100rpx 72rpx 0 72rpx;
 	}
+	.inline {
+		display: inline;
+	}
+	.treaty{
+		text-align: left;
+		margin-left: 12px;
+	}   
 </style>

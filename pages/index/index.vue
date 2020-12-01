@@ -33,8 +33,8 @@
 						<view class="device-status">
 							<text class="title">设备状态：</text>
 							<text class="value gray" v-if="!deviceImei">无设备</text>
-							<text class="value" v-else-if="isOnLine">在线</text>
-							<text class="value gray" v-else>离线</text>
+							<text class="value" v-else-if="isOnLine == 5">{{ deviceStatus[isOnLine - 1] }}</text>
+							<text class="value gray" v-else>{{ deviceStatus[isOnLine - 1] }}</text>
 						</view>
 					</view>
 					
@@ -163,7 +163,7 @@ const healthyList = [
 
 const radiaList = [
 	{
-		name: '实时剂量',
+		name: '实时剂量率',
 		unit: 'µSv/h',
 		icon: 'iconshijian1',
 		key: 'Radio',
@@ -171,7 +171,7 @@ const radiaList = [
 		num: '--'
 	},{
 		name: '累计剂量',
-		unit: 'mSv',
+		unit: 'µSv',
 		icon: 'iconleiji',
 		color: '#F59A23',
 		key: 'TotalRadio',

@@ -82,6 +82,11 @@
 				uni.showToast({
 					title: '连接成功'
 				});
+				setTimeout(() => {
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+				}, 200)
 			},
 			async queryDeviceInfo(imei) {
 				const result = await getDeviceInfo({ imei })
@@ -113,6 +118,11 @@
 							position: 'bottom',
 							title: '添加设备成功'
 						});
+						setTimeout(() => {
+							uni.reLaunch({
+								url: '/pages/index/index'
+							})
+						}, 200)
 					} else {
 						// 有绑定设备的弹出提示是否切换到当前设备
 						this.dialogVisible2 = true

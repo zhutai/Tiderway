@@ -94,7 +94,7 @@
 			</view>
 			<view class="describe">
 				<text class="text">辐射剂量常用单位：希沃特（Sv），毫希沃特（mSv）、微希沃特（μSv）。</text>
-				<text class="text">1 mSv=0.001Sv，1μSv=0.000001Sv。</text>
+				<text class="text">1μSv=0.001mSv，1 mSv=0.001Sv，1μSv=0.000001Sv。</text>
 				<text class="text bold">我国对健康人群设定的年平均电离辐射剂量限值为1mSv，医务工作者的剂量限值为20mSv。</text>
 				<text style="display:block;margin: 6px 0;">国家电离辐射防护与辐射源安全级别标准 ：</text>
 				<table class="table-class">
@@ -116,7 +116,7 @@
 				<text class="text">二是人造辐射，包括医疗辐射（如胸片、CT、全身骨显像、PET-CT等）及核事故等。</text>
 				<text class="text"></text>
 				<text class="text">香烟内具有放射性的钋和铅，如果每天一包烟，每年受到的辐射剂量约为35mSv。</text>
-				<text class="text">香蕉当中约有 0.0117% 的放射性钾（钾40），每吃一根香蕉，就受到约 0.1uSv的辐射；</text>
+				<text class="text">香蕉当中约有 0.0117% 的放射性钾（钾40），每吃一根香蕉，就受到约 0.1μSv的辐射；</text>
 				<text class="text">在飞行到30000英尺高空时，辐射的强度约2μSv/h，也就是飞行10小时，接受的辐射约20μSv；</text>
 			</view>
 		</view>

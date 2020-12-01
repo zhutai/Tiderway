@@ -2,7 +2,7 @@
 	<view class="page-notice">
 		
 		<view class="nav-bar">
-			<uni-nav-bar :border="false" :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="clickRight"  />
+			<uni-nav-bar :border="false" :statusBar="true" left-icon="arrowleft" title="我的消息" :right-text="!tabCurrentIndex ? '批量' : ''"  @clickLeft="back" @clickRight="clickRight"  />
 		</view>
 		
 		<view class="navbar">
@@ -14,20 +14,6 @@
 		
 		<scroll-view class="list-scroll-content" :style="{ height: scrollHeight + 'px' }" scroll-y @scrolltolower="loadData">
 			<view v-if="!tabCurrentIndex">
-				<view class="notice-item" v-for="item in noticeList">
-					<text class="time">{{item.CreatedAt}}</text>
-					<view class="content">
-						<text class="title">{{ item.Title }}</text>
-						<text class="introduce">{{ item.Content }}</text>
-						<view class="bot b-t">
-							<text>查看详情</text>
-							<text class="more-icon yticon icon-you"></text>
-						</view>
-					</view>
-				</view>
-			</view>
-
-			<view v-else>
 				<checkbox-group @change="checkboxChange">
 					<view class="content-box" v-for="(item, index) in alarmList" :key="item.IMEI + index" @click="alarmHandle(item)">
 						<label>
@@ -47,6 +33,20 @@
 				</checkbox-group>
 				<uni-load-more :class="isCheck ? 'more-margin' : '' " :status="status" />
 			</view>
+			<view  v-else>
+				<view class="notice-item" v-for="item in noticeList">
+					<text class="time">{{item.CreatedAt}}</text>
+					<view class="content">
+						<text class="title">{{ item.Title }}</text>
+						<text class="introduce">{{ item.Content }}</text>
+						<view class="bot b-t">
+							<text>查看详情</text>
+							<text class="more-icon yticon icon-you"></text>
+						</view>
+					</view>
+				</view>
+			</view>
+
 		</scroll-view>
 		
 		<view class="fixed-part" v-if="isCheck">
@@ -75,15 +75,15 @@
 	import { getAlarmList, alarmClear, alarmHandle, batchHandle, batchClear } from '@/api/alarm.js'
 	import alarmType from './alarmType.js'
 	
-	const navList = [{
-			state: 0,
-			text: '系统消息',
-			loadingType: 'more',
-			orderList: []
-		},
+	const navList = [
 		{
 			state: 1,
 			text: '预警列表',
+			loadingType: 'more',
+			orderList: []
+		}, {
+			state: 0,
+			text: '系统消息',
 			loadingType: 'more',
 			orderList: []
 		}
