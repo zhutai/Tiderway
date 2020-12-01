@@ -203,6 +203,24 @@
 			num: '--',
 			className: 'yellow'
 		}],
+		dataFormat(HistoryList) {
+			let Heart = this.valueKey
+			let data = HistoryList.map(item => item[Heart]);
+			let max = Math.max.apply(null, data);
+			let min = Math.min.apply(null, data);
+			let total = 0
+			data.forEach(item => {
+				total += item
+			})
+			let normal = (total / data.length) || 0
+			
+			let param = {
+				max: max ? max.toFixed(8) : 0,
+				min: min ? min.toFixed(8) : 0,
+				normal: normal ? normal.toFixed(8) : 0
+			}
+			return { param, echartData: { data }  }
+		}
 	}]
 
 	const tabs = [{
@@ -399,6 +417,7 @@
 				})
 				let obj = null
 				if (HistoryList.length) {
+					console.log(dataFormat)
 					obj = dataFormat.call(tabbar, HistoryList)
 					this.heartInfo.forEach(item => {
 						item.num = obj.param[item.key]
