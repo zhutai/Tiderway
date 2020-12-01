@@ -21,7 +21,7 @@
 				</list-cell>
 			</view>
 			<view class="history-section icon">
-				<list-cell v-for="item in cellList.slice(3, 6)"
+				<list-cell v-for="item in cellList.slice(3, 7)"
 				:icon="`iconfont ${item.icon}`" 
 				:iconColor="item.iconColor"
 				:title="item.title" 
@@ -61,6 +61,12 @@
 			title: '意见反馈',
 			tips: '',
 			url: '/pages/user/feedback'
+		},{
+			icon: 'chatbubble',
+			iconColor: '#ee883b',
+			title: '联系我们',
+			tips: '',
+			url: '/pages/user/contact'
 		},{
 			icon: 'iconshebeishezhi',
 			iconColor: '#54b4ef',
