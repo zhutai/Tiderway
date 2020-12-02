@@ -185,7 +185,7 @@
 		},{
 			"path" : "pages/treaty/index",
 			"style" : {
-				"navigationBarTitleText":"注册须知"
+				"navigationBarTitleText": "注册须知"
 			}
 		}
   ],

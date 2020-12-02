@@ -28,7 +28,7 @@
 			<!-- 底部信息 -->
 			<view class="footer">
 				<navigator url="findPwd" open-type="navigate">找回密码</navigator>
-				<text>|</text>
+				<text class="line">|</text>
 				<navigator url="register" open-type="navigate">注册账号</navigator>
 			</view>
 		</view>
@@ -193,5 +193,9 @@
 
 	.github_color {
 		color: #24292E;
+	}
+		
+	.line {
+		margin: 0 12rpx;
 	}
 </style>

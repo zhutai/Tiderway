@@ -62,8 +62,8 @@
 			tips: '',
 			url: '/pages/user/feedback'
 		},{
-			icon: 'chatbubble',
-			iconColor: '#ee883b',
+			icon: 'iconweixin',
+			iconColor: '#32d67c',
 			title: '联系我们',
 			tips: '',
 			url: '/pages/user/contact'
