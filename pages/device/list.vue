@@ -3,24 +3,26 @@
 		<uni-search-bar radius="100" @confirm="search" placeholder="输入设备编号进行搜索" bgColor="#f8f8f8" @input="input" @cancel="cancel" />
 		<view class="device-box">
 			<scroll-view :style="{height: `${scrollHeight}px`}" scroll-y="true" @scrolltolower="scrolltolower">
-				<uni-list class="device-list">
-					<uni-list-item v-for="(item, index) in deviceList" :key="index" clickable @click="swtichDevice(item)">
-						<view slot="body" class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
-							<view class="block">
-								<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
-								<text v-if="item.LoginName && !item.sex"
-								style="color: #fa436a"
-								class="iconfont iconnv" />
-								<text style="color: #4399fc"
-								v-if="item.LoginName && item.sex" 
-								class="iconfont iconnan" />
-								<text v-if="!item.LoginName">未绑定</text>
+				<uni-swipe-action class="device-list">
+					<uni-swipe-action-item v-for="(item, index) in deviceList" :key="index" :threshold="0" :right-options="options" @click="bindClick($event, index)">
+						<view class="device-item" @click.stop="swtichDevice(item)">
+							<view class="device-left" :class="{ 'select-device' : item.IMEI === deviceImei }">
+								<view class="block">
+									<text class="login-name" v-if="item.LoginName">{{ item.LoginName }}</text>
+									<text v-if="item.LoginName && !item.sex"
+									style="color: #fa436a"
+									class="iconfont iconnv" />
+									<text style="color: #4399fc"
+									v-if="item.LoginName && item.sex" 
+									class="iconfont iconnan" />
+									<text v-if="!item.LoginName">未绑定</text>
+								</view>
+								<text class="block">{{ item.IMEI }}</text>
 							</view>
-							<text class="block">{{ item.IMEI }}</text>
+							<text class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
 						</view>
-						<text slot="footer" class="device-right" :class="{blue: item.Status === 5}">{{ deviceStatus[item.Status - 1]  }}</text>
-					</uni-list-item>
-				</uni-list>
+					</uni-swipe-action-item >
+				</uni-swipe-action>
 				<uni-load-more :status="status" />
 			</scroll-view>
 		</view>
@@ -30,7 +32,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { getHealthInfo, getDeviceList } from '@/api/device.js'
+import { getHealthInfo, getDeviceList, removeDevice } from '@/api/device.js'
 import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 const defaultAvatar = require('@/static/image/userAvatar.png')
 let page = 0
@@ -44,7 +46,13 @@ export default {
 			showLeft: false,
 			scrollHeight: 400,
 			deviceLoading: false,
-			deviceList: []
+			deviceList: [],
+			options: [{
+				text: '删除',
+				style: {
+					backgroundColor: '#dd524d'
+				}
+			}]
 		};
 	},
 	components: {
@@ -58,7 +66,6 @@ export default {
 		uni.getSystemInfo({
 			success: (res) => {
 				let windowHeight = res.windowHeight
-				console.log(res)
 				this.scrollHeight = windowHeight - 52
 			}
 		})
@@ -76,13 +83,23 @@ export default {
 					if (this.deviceImei !== item.IMEI) {
 						this.$api.msg('设备切换成功')
 						uni.setStorage({ key: 'isSwitchDevice', data: true })
-					}
+					}    
 				}
 				this.selectDevice({ deviceItem: item, imeiLength: 1 })
 				setTimeout(() => {
 					uni.navigateBack()
 				}, 200)
 			}
+		},
+		bindClick(e, index) {
+			let current = this.deviceList[index]
+			console.log({ imei: current.IMEI })
+			removeDevice({ imei: current.IMEI }).then(res => {
+				this.$api.msg('删除成功')
+				this.deviceList.splice(index, index + 1)
+			}, err => {
+				this.$api.msg(err.Message)
+			})
 		},
 		back() {
 			uni.navigateBack()
@@ -153,6 +170,14 @@ export default {
 			padding: 32rpx;
 			height: 120rpx;
 			font-size: 16px;
+		}
+		.device-item {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+			padding: 12px 16px;
+			background: #fff;
+			border-bottom: 1rpx solid #eee;
 		}
 		.device-left {
 			flex: 1;

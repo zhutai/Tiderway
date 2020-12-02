@@ -42,16 +42,24 @@ export const bindDevice = (data) => {
  * 解绑设备
  * @param {Object} data - 解绑设备  
  */
-export const unBindDevice = (path, data) => {
-	
+export const unBindDevice = (data) => {
   return http.post(`${VERSION}/Device/unBind`, data)
 }
+
+/**
+ * 删除设备
+ * @param {Object} data - 删除设备  
+ */
+export const removeDevice = (data) => {
+  return http.post(`${VERSION}/Device/remove`, data)
+}
+
 
 /**
  * 获取设备Token
  * @param {Object} data - 获取设备Token  
  */
-export const getDeviceToken = (path, data) => {
+export const getDeviceToken = (data) => {
   return http.post(`${VERSION}/Device/token`, data)
 }
 
@@ -59,6 +67,6 @@ export const getDeviceToken = (path, data) => {
  * 设备监控
  * @param {Object} data - 设备健康
  */
-export const monitor = (path,data) => {
+export const monitor = (data) => {
   return http.post(`${VERSION}/Device​/monitor`, data)
 }
