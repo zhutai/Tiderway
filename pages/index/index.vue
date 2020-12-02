@@ -590,7 +590,7 @@ export default {
 		display: inline-block;
 		width: 140px;
 		height: 140px;
-		margin: 0 20px;
+		margin: 0 24px;
 		text-align: center;
 		padding: 12px;
 		border: 1px solid $font-color-spec;
@@ -636,11 +636,11 @@ export default {
 	.info-list {
 		flex: 1;
 		.info-item { 
-			height: 32px;
+			height: 30px;
 			margin: 24px 0;
-			padding: 0 6px;
 			opacity: 0.8;
-			line-height: 32px;
+			font-size: 12px;
+			line-height: 30px;
 		}
 		// .left-radius {
 		// 	color: #fff;
@@ -658,6 +658,7 @@ export default {
 			background-color: #fff;
 			color: $font-color-spec;
 			border: 1px solid;
+			padding-left: 12rpx;
 			border-left: none;
 			border-top-right-radius: 36px;
 			border-bottom-right-radius: 36px;
@@ -666,6 +667,7 @@ export default {
 			text-align: right;
 			border: 1px solid;
 			border-right: none;
+			padding-right: 12rpx;
 			background-color: #fff;
 			color: $font-color-spec;
 			border-top-left-radius: 36px;
