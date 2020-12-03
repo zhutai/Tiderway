@@ -481,13 +481,13 @@ export default {
 				display: flex;
 				/* #endif */
 				flex-direction: row;
-				justify-content: center;
+				// justify-content: center;
 				align-items: center;
 				padding: 10px;
 				.box-right {
 					color: #666;
 					font-size: 14px;
-					padding-left: 24rpx;
+					padding-left: 20rpx;
 				}
 			}
 		}

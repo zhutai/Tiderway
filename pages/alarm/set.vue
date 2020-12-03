@@ -65,7 +65,7 @@
 			isBorder: true,
 			num: 80,
 			index: 26,
-			unit: 'µSv/h',
+			unit: 'µSv',
 			key: 'RadioMin',
 			options: []
 		},
