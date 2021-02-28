@@ -399,7 +399,7 @@
 						if (HistoryList.length) {
 							let obj = this.dataFormat(HistoryList, tabbar)
 							obj.seriesName = '累计剂量'
-							this.bloodOption = this.getBooldParams(obj)
+							this.bloodOption = this.getTotalBooldParams(obj)
 						} else {
 							this.dataFormat(HistoryList, tabbar)
 							this.bloodOption = null
@@ -429,11 +429,82 @@
 				}
 				return { date, ...obj.echartData }
 			},
+			getTotalBooldParams({ data, date, seriesName }) {
+				let currentSize = 20;
+				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize];
+				
+				return {
+					notMerge: true, // 自定义变量：true代表不合并数据，比如从折线图变为柱形图则需设置为true；false或不写代表合并
+					tooltip: {
+						trigger: 'axis',
+						positionStatus: true,
+						formatterStatus: true, // 自定义变量：是否格式化tooltip，设置为false时下面三项均不起作用
+					},
+					legend: {
+						show: false
+					},
+					grid: {
+						left: '5%',
+						right: '6%',
+						bottom: '5%',
+						top: 10,
+						containLabel: true
+					},
+					dataZoom: [
+						{
+							show: false,
+							startValue: startValue
+						},
+						{
+							type: 'inside'
+						}
+					],
+					xAxis: [{
+						type: 'category',
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						},
+						data: date
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLine: {
+							lineStyle: {
+								color: '#666'
+							}  
+						}
+					}],
+					series: [{
+							name: seriesName,
+							type: 'bar',
+							data: data,
+							// 自定义变量，以数组形式传递渐变参数
+							linearGradient: [0, 0, 0, 1,
+								[{
+										offset: 0,
+										color: '#f59a23'
+									},
+									{
+										offset: 0.7,
+										color: '#f6b560'
+									},
+									{
+										offset: 1,
+										color: '#f4d4a9'
+									}
+								]
+							]
+						}
+					]
+				}
+			},
 			getBooldParams({ data, date, seriesName }) {
 				let currentSize = 20;
 				let startValue = date.length < currentSize ? date[0] : date[date.length - currentSize]
 				return {
-					id: 'echartA',
+					id: 'echartB',
 					tooltip: {
 						trigger: 'axis',
 						positionStatus: true,
