@@ -186,19 +186,19 @@
 		valueKey: 'Radio',
 		dataParams: [{
 			name: '最小值',
-			unit: 'mSv',
+			unit: 'μSv',
 			key: 'min',
 			num: '--',
 			className: 'blue'
 		}, {
 			name: '平均值',
-			unit: 'mSv',
+			unit: 'μSv',
 			key: 'normal',
 			num: '--',
 			className: 'green'
 		}, {
 			name: '最大值',
-			unit: 'mSv',
+			unit: 'μSv',
 			key: 'max',
 			num: '--',
 			className: 'yellow'
@@ -215,9 +215,9 @@
 			let normal = (total / data.length) || 0
 			
 			let param = {
-				max: max ? max.toFixed(8) : 0,
-				min: min ? min.toFixed(8) : 0,
-				normal: normal ? normal.toFixed(8) : 0
+				max: max ? max.toFixed(2) : 0,
+				min: min ? min.toFixed(2) : 0,
+				normal: normal ? normal.toFixed(2) : 0
 			}
 			return { param, echartData: { data }  }
 		}
@@ -417,7 +417,6 @@
 				})
 				let obj = null
 				if (HistoryList.length) {
-					console.log(dataFormat)
 					obj = dataFormat.call(tabbar, HistoryList)
 					this.heartInfo.forEach(item => {
 						item.num = obj.param[item.key]

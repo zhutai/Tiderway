@@ -171,7 +171,7 @@ const radiaList = [
 		num: '--'
 	},{
 		name: '累计剂量',
-		unit: 'µSv',
+		unit: 'µSv/天',
 		icon: 'iconleiji',
 		color: '#F59A23',
 		key: 'TotalRadio',
@@ -481,10 +481,11 @@ export default {
 				display: flex;
 				/* #endif */
 				flex-direction: row;
-				// justify-content: center;
+				justify-content: center;
 				align-items: center;
 				padding: 10px;
 				.box-right {
+					flex: 1;
 					color: #666;
 					font-size: 14px;
 					padding-left: 20rpx;
